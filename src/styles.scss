@@ -1,1 +1,73 @@
 /* You can add global styles to this file, and also import other style files */
+@use 'tailwindcss';
+
+@theme {
+  /* --- COLORES DE MARCA (Detail Shop) --- */
+  --color-primary: #db2777; /* Rosa intenso (pink-600) */
+  --color-primary-hover: #be185d; /* Rosa oscuro (pink-700) */
+  --color-secondary: #475569; /* Slate-600 */
+
+  /* --- RADIOS DE BORDE (Estilo moderno) --- */
+  --radius-btn: 0.75rem; /* Botones redondeados suaves */
+  --radius-card: 1rem; /* Tarjetas más circulares */
+
+  /* --- SOMBRAS PERSONALIZADAS --- */
+  --shadow-beauty: 0 10px 15px -3px rgba(219, 39, 119, 0.1), 0 4px 6px -4px rgba(219, 39, 119, 0.1);
+  /* --- TOKENS DE COLOR --- */
+  --color-brand-50: #fdf2f8; /* Fondo muy claro */
+  --color-brand-100: #fce7f3; /* Decoraciones */
+  --color-brand-500: #ec4899; /* Principal (Pink) */
+  --color-brand-600: #db2777; /* Hover / Énfasis */
+
+  --color-neutral-500: #64748b; /* Slate suave */
+  --color-neutral-800: #1e293b; /* Texto fuerte */
+
+  /* --- TOKENS DE UI --- */
+  --radius-login: 1.5rem;
+  --shadow-brand: 0 10px 15px -3px rgba(219, 39, 119, 0.2);
+}
+
+/* --- CLASES GLOBALES DE COMPONENTES --- */
+@layer components {
+  // Botón Principal (Rosa)
+  .btn-primary {
+    @apply bg-(--color-primary) text-white font-bold py-3 px-6 rounded-(--radius-btn) 
+           transition-all duration-200 shadow-lg shadow-pink-600/20 
+           hover:bg-(--color-primary-hover) hover:scale-[1.02] active:scale-[0.98] 
+           disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  // Botón Secundario (Gris/Slate)
+  .btn-secondary {
+    @apply bg-white text-slate-700 border border-slate-200 font-semibold py-3 px-6 
+    rounded-(--radius-btn) 
+           transition-all duration-200 shadow-lg shadow-pink-600/20 
+           hover:bg-(--color-secondary-hover) hover:scale-[1.02] active:scale-[0.98] 
+           disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  // Inputs del Sistema
+  .input-field {
+    @apply w-full px-5 py-3 rounded-(--radius-btn) bg-slate-50 border border-slate-200 
+           placeholder-slate-400 text-slate-800 outline-none transition-all
+           focus:bg-white focus:border-(--color-primary) focus:ring-4 focus:ring-pink-500/10;
+  }
+  /* Contenedor de la parte decorativa (izquierda) */
+  .login-visual-panel {
+    @apply hidden md:flex md:w-1/2 bg-(--color-brand-50) items-center justify-center p-12 relative overflow-hidden;
+  }
+
+  /* El gradiente circular decorativo */
+  .login-decoration-circle {
+    @apply absolute top-0 left-0 w-full h-full bg-gradient-to-tr from-(--color-brand-100) to-transparent opacity-40 rounded-full transform -translate-x-1/2 -translate-y-1/2;
+  }
+
+  /* Estilos de Tipografía Globales para el Login */
+  .login-title {
+    @apply text-4xl font-extrabold text-(--color-neutral-800) mb-4 tracking-tight;
+  }
+
+  .login-subtitle {
+    @apply text-(--color-neutral-500) text-lg mb-8;
+  }
+}

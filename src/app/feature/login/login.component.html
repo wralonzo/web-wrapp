@@ -1,0 +1,86 @@
+<div class="h-dvh w-full flex flex-col md:flex-row overflow-hidden bg-white">
+  <div class="login-visual-panel">
+    <div class="login-decoration-circle"></div>
+    <div class="text-center z-10 relative">
+      <h2 class="login-title">
+        Bienvenido a <span class="text-(--color-brand-500)">Top Fashion</span>
+      </h2>
+      <p class="login-subtitle">Gestiona tu salón de belleza con estilo y eficiencia.</p>
+      <div class="max-w-md mx-auto">
+        <ng-lottie [options]="options" height="400px"></ng-lottie>
+      </div>
+    </div>
+  </div>
+
+  <div class="w-full md:w-1/2 h-full flex items-center justify-center bg-white">
+    <div class="w-full max-w-md p-8 overflow-y-auto max-h-full">
+      <header class="mb-10">
+        <h2 class="text-3xl font-bold text-(--color-neutral-800) tracking-tight">
+          Hola de nuevo 👋
+        </h2>
+        <p class="mt-2 text-(--color-neutral-500)">Por favor ingresa tus credenciales.</p>
+      </header>
+
+      <form class="space-y-6" (submit)="onLogin()">
+        <div class="space-y-5">
+          <div class="group">
+            @if (errorMessage()) {
+            <div class="error-banner">
+              <i class="fas fa-exclamation-circle"></i> {{ errorMessage() }}
+            </div>
+            }
+
+            <label class="block text-sm font-semibold text-(--color-neutral-800) mb-2"
+              >Correo Electrónico</label
+            >
+            <input
+              type="email"
+              name="email"
+              (ngModelChange)="errorMessage.set(null)"
+              [(ngModel)]="email"
+              required
+              class="input-field"
+              placeholder="tu@email.com"
+              [disabled]="isLoading()"
+              required
+            />
+          </div>
+
+          <app-input
+            label="Correo Electrónico"
+            type="email"
+            [(ngModel)]="email"
+            name="email"
+            [disabled]="isLoading()"
+          ></app-input>
+
+          <div class="group">
+            <label class="block text-sm font-semibold text-(--color-neutral-800) mb-2"
+              >Contraseña</label
+            >
+            <input
+              type="password"
+              name="password"
+              [(ngModel)]="password"
+              required
+              class="input-field"
+              placeholder="••••••••"
+              [disabled]="isLoading()"
+              required
+            />
+          </div>
+
+          <div class="flex justify-end">
+            <a
+              routerLink="/forgot-password"
+              class="text-sm font-medium text-(--color-brand-500) hover:text-(--color-brand-600) transition-colors"
+            >
+              ¿Olvidaste tu contraseña?
+            </a>
+          </div>
+        </div>
+        <app-button label="Ingresar" type="submit" [isLoading]="isLoading()"> </app-button>
+      </form>
+    </div>
+  </div>
+</div>

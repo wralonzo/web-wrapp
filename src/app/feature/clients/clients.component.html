@@ -1,0 +1,157 @@
+<div class="space-y-6">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-zinc-900">Directorio de Clientes</h1>
+      <p class="text-zinc-500 text-sm">Gestiona la información y el historial de tus clientes.</p>
+    </div>
+    <app-button
+      label="Registrar Cliente"
+      type="button"
+      (btnClick)="addClient()"
+      [icon]="'add-plus'"
+    >
+    </app-button>
+  </div>
+
+  <div class="bg-zinc-50 p-4 rounded-3xl border border-zinc-200 flex flex-col md:flex-row gap-4">
+    <div class="relative flex-1">
+      <span class="absolute inset-y-0 left-4 flex items-center text-zinc-400">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+          class="w-5 h-5"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+          />
+        </svg>
+      </span>
+      <input
+        [(ngModel)]="searchQuery"
+        type="text"
+        placeholder="Buscar por nombre o teléfono..."
+        class="w-full pl-12 pr-4 py-3 bg-white border border-zinc-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+      />
+    </div>
+
+    <app-custom-select [options]="options"></app-custom-select>
+  </div>
+
+  <div class="bg-white border border-zinc-200 rounded-3xl overflow-hidden shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr
+            class="bg-zinc-50/50 border-b border-zinc-200 text-zinc-500 text-xs uppercase tracking-wider"
+          >
+            <th class="px-6 py-4 font-semibold">Cliente</th>
+            <th class="px-6 py-4 font-semibold">Contacto</th>
+            <th class="px-6 py-4 font-semibold">Última Visita</th>
+            <th class="px-6 py-4 font-semibold">Gasto Total</th>
+            <th class="px-6 py-4 font-semibold">Estado</th>
+            <th class="px-6 py-4 font-semibold text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-zinc-100">
+          @for (client of filteredClients(); track client.id) {
+          <tr class="hover:bg-zinc-50/80 transition-colors group">
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center font-bold text-zinc-600 border border-zinc-200"
+                >
+                  {{ client.name.charAt(0) }}
+                </div>
+                <span class="font-semibold text-zinc-800">{{ client.name }}</span>
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <div class="flex flex-col">
+                <span class="text-sm text-zinc-600">{{ client.phone }}</span>
+                <span class="text-xs text-zinc-400">{{ client.email }}</span>
+              </div>
+            </td>
+            <td class="px-6 py-4 text-sm text-zinc-600">{{ client.phone }}</td>
+            <td class="px-6 py-4 font-medium text-zinc-900">{{ 100 | currency }}</td>
+            <td class="px-6 py-4">
+              <span
+                [ngClass]="{
+                  'bg-amber-100 text-amber-700': client.phone === 'VIP',
+                  'bg-blue-100 text-blue-700': client.phone === 'Regular',
+                  'bg-emerald-100 text-emerald-700': client.phone === 'Nuevo'
+                }"
+                class="px-3 py-1 rounded-full text-xs font-bold"
+              >
+                {{ client.status }}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <div
+                class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <button class="p-2 hover:bg-zinc-200 rounded-lg text-zinc-500" title="Editar">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-5 h-5"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                    />
+                  </svg>
+                </button>
+                <button class="p-2 hover:bg-red-50 rounded-lg text-red-400" title="Eliminar">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-5 h-5"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          } @empty {
+          <tr>
+            <td colspan="6" class="px-6 py-20 text-center text-zinc-400">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1"
+                stroke="currentColor"
+                class="w-16 h-16 mx-auto mb-4 opacity-20"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"
+                />
+              </svg>
+              <p>No se encontraron clientes que coincidan con tu búsqueda.</p>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

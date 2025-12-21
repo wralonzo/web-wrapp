@@ -3,9 +3,22 @@ import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 
+import { provideLottieOptions } from 'ngx-lottie';
+import player from 'lottie-web';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts'; // 👈 Importaciones nuevas
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes)
-  ]
+    provideRouter(routes),
+    provideLottieOptions({
+      player: () => player,
+    }),
+    provideHttpClient(
+      withInterceptors([authInterceptor]) // 👈 Registro del interceptor funcional
+    ),
+    provideCharts(withDefaultRegisterables()),
+  ],
 };

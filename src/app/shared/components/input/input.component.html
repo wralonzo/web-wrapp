@@ -1,0 +1,18 @@
+<div class="flex flex-col gap-2 w-full">
+  @if (label()) {
+  <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">
+    {{ label() }}
+  </label>
+  }
+
+  <input
+    name="{{ name() }}"
+    [type]="type()"
+    [placeholder]="placeholder()"
+    [value]="internalValue()"
+    [disabled]="isDisabled()"
+    (input)="handleInput($event)"
+    (blur)="handleBlur()"
+    class="input-field"
+  />
+</div>

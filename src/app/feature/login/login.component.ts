@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LottieComponent, AnimationOptions } from 'ngx-lottie';
@@ -22,7 +22,7 @@ import { InputComponent } from '../../shared/components/input/input.component';
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
 
@@ -39,7 +39,11 @@ export class LoginComponent {
     autoplay: true,
   };
 
-  onLogin() {
+  public ngOnInit(): void {
+    this.authService.deleteSession();
+  }
+
+  public onLogin() {
     this.errorMessage.set(null);
     this.isLoading.set(true);
 
@@ -57,6 +61,10 @@ export class LoginComponent {
           this.errorMessage.set(err.error.message || 'Credenciales inválidas. Intenta de nuevo.');
         } else if (err.status === 0) {
           this.errorMessage.set('No se pudo conectar con el servidor. Revisa tu conexión.');
+        } else if (err.status === 400) {
+          this.errorMessage.set(
+            err.error.data.message ?? 'No se pudo conectar con el servidor. Revisa tu conexión.'
+          );
         } else {
           // Intentamos obtener el mensaje que envía tu HttpResponseApi desde el backend
           const backendMessage = err.error?.message || 'Ocurrió un error inesperado.';

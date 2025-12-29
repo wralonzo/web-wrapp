@@ -14,7 +14,7 @@
 
   <div class="w-full md:w-1/2 h-full flex items-center justify-center bg-white">
     <div class="w-full max-w-md p-8 overflow-y-auto max-h-full">
-      <header class="mb-10">
+      <header class="mb-3">
         <h2 class="text-3xl font-bold text-(--color-neutral-800) tracking-tight">
           Hola de nuevo 👋
         </h2>
@@ -29,21 +29,6 @@
               <i class="fas fa-exclamation-circle"></i> {{ errorMessage() }}
             </div>
             }
-
-            <label class="block text-sm font-semibold text-(--color-neutral-800) mb-2"
-              >Correo Electrónico</label
-            >
-            <input
-              type="email"
-              name="email"
-              (ngModelChange)="errorMessage.set(null)"
-              [(ngModel)]="email"
-              required
-              class="input-field"
-              placeholder="tu@email.com"
-              [disabled]="isLoading()"
-              required
-            />
           </div>
 
           <app-input
@@ -54,21 +39,13 @@
             [disabled]="isLoading()"
           ></app-input>
 
-          <div class="group">
-            <label class="block text-sm font-semibold text-(--color-neutral-800) mb-2"
-              >Contraseña</label
-            >
-            <input
-              type="password"
-              name="password"
-              [(ngModel)]="password"
-              required
-              class="input-field"
-              placeholder="••••••••"
-              [disabled]="isLoading()"
-              required
-            />
-          </div>
+          <app-input
+            label="Contraseña"
+            type="password"
+            [(ngModel)]="password"
+            name="password"
+            [disabled]="isLoading()"
+          ></app-input>
 
           <div class="flex justify-end">
             <a

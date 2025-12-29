@@ -1,0 +1,54 @@
+<div class="p-8 flex flex-col items-center text-center bg-white">
+  <div
+    class="flex h-20 w-20 items-center justify-center rounded-full mb-6 shrink-0"
+    [ngClass]="{
+      'bg-red-50 text-red-600': variant() === 'danger',
+      'bg-blue-50 text-blue-600': variant() === 'primary',
+      'bg-zinc-100 text-zinc-600': variant() === 'info'
+    }"
+  >
+    @if (variant() === 'danger') {
+    <svg class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+      <path
+        d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+      />
+    </svg>
+    } @else {
+    <svg class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+      />
+    </svg>
+    }
+  </div>
+
+  <div class="w-full space-y-5 mb-10">
+    <h3 class="text-2xl font-bold text-zinc-900 tracking-tight">
+      {{ title() }}
+    </h3>
+    <p class="text-zinc-500 text-base leading-relaxed">
+      {{ message() }}
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+    <button
+      (click)="confirmService.close(false)"
+      class="order-2 sm:order-1 px-6 py-4 text-sm font-bold text-zinc-600 bg-zinc-50 hover:bg-zinc-100 rounded-2xl transition-all border border-zinc-200"
+    >
+      {{ btnCancelText() }}
+    </button>
+    <button
+      (click)="confirmService.close(true)"
+      class="order-1 sm:order-2 px-6 py-4 text-sm font-bold text-white rounded-2xl shadow-xl transition-all"
+      [ngClass]="{
+        'bg-red-600 hover:bg-red-700 shadow-red-500/30': variant() === 'danger',
+        'bg-blue-600 hover:bg-blue-700 shadow-blue-500/30': variant() === 'primary'
+      }"
+    >
+      {{ btnConfirmText() }}
+    </button>
+  </div>
+</div>

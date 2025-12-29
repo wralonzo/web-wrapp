@@ -53,6 +53,11 @@ export class AuthService {
     }
   }
 
+  public deleteSession(): void {
+    localStorage.removeItem(this.STORAGE_KEY);
+    this.userSignal.set(null);
+  }
+
   private getUserFromStorage(): User | null {
     const storedUser = localStorage.getItem(this.STORAGE_KEY);
     if (storedUser) {

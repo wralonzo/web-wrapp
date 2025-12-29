@@ -28,6 +28,29 @@ export class HttpService {
     );
   }
 
+  // Método GENÉRICO para PUT
+  doPut<T>(endpoint: string, body: any): Observable<T> {
+    return this.http.put<T>(`${this.baseUrl}${endpoint}`, body).pipe(
+      map((response) => response),
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  doPatch<T>(endpoint: string, body: any): Observable<T> {
+    return this.http.patch<T>(`${this.baseUrl}${endpoint}`, body).pipe(
+      map((response) => response),
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  // Método GENÉRICO para DELETE
+  doDelete<T>(endpoint: string): Observable<T> {
+    return this.http.delete<T>(`${this.baseUrl}${endpoint}`).pipe(
+      map((response) => response),
+      catchError((error) => this.handleError(error))
+    );
+  }
+
   // Manejo de errores centralizado
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Ocurrió un error desconocido';

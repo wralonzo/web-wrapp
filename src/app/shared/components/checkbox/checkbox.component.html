@@ -1,0 +1,43 @@
+<label
+  [attr.for]="id()"
+  class="group inline-flex items-center cursor-pointer relative"
+  [class.opacity-50]="isDisabled"
+  [class.pointer-events-none]="isDisabled"
+>
+  <input
+    type="checkbox"
+    [id]="id()"
+    [checked]="checked"
+    [disabled]="isDisabled"
+    (change)="toggle()"
+    (blur)="onTouched()"
+    class="peer sr-only"
+  />
+
+  <div
+    class="w-6 h-6 rounded-[10px] border-2 transition-all duration-200 ease-out flex items-center justify-center shadow-sm relative overflow-hidden bg-white border-slate-300 group-hover:border-(--color-primary) peer-checked:bg-(--color-primary) peer-checked:border-(--color-primary) peer-checked:shadow-md peer-checked:shadow-pink-500/20 peer-focus:ring-4 peer-focus:ring-pink-500/20"
+    [ngClass]="{ 'border-red-500 group-hover:border-red-500': isInvalid }"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="3.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="w-3.5 h-3.5 text-white opacity-0 transition-opacity duration-200 ease-in-out peer-checked:opacity-100 checkmark-path"
+    >
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  </div>
+
+  @if (label()) {
+  <span
+    class="ml-3 text-sm font-medium text-slate-700 select-none transition-colors group-hover:text-slate-900"
+    [ngClass]="{ 'text-red-500': isInvalid }"
+  >
+    {{ label() }}
+  </span>
+  }
+</label>

@@ -8,13 +8,26 @@ import { AddClient } from '../../shared/models/client/add-client.interface';
 })
 export class ClientService {
   private api = inject(HttpService);
+  private pathApi = 'client';
 
   // Solo pasas el endpoint y el tipo de dato
-  getClients() {
-    return this.api.doGet<ClientResponse>('client');
+  public getClients() {
+    return this.api.doGet<ClientResponse>(`${this.pathApi}`);
   }
 
-  createClient(client: AddClient) {
-    return this.api.doPost<AddClient>('client', client);
+  public createClient(client: AddClient) {
+    return this.api.doPost<AddClient>(`${this.pathApi}`, client);
+  }
+
+  public getById(id: number) {
+    return this.api.doGet<Client>(`${this.pathApi}/${id}`);
+  }
+
+  public updateClient(id: number, client: Client) {
+    return this.api.doPatch<Client>(`${this.pathApi}/${id}`, client);
+  }
+
+  public deleteClient(id: number) {
+    return this.api.doPatch<void>(`${this.pathApi}/${id}/delete`, null);
   }
 }

@@ -1,5 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, inject, input, output, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  ElementRef,
+  HostListener,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { SelectOption } from '../../models/select/option.interface';
 
 @Component({
@@ -13,6 +22,7 @@ export class CustomSelectComponent {
   // Inputs
   public options = input<SelectOption[]>([]);
   public label = input<string>();
+  public selected = input<string | undefined>();
 
   // Output para notificar al padre
   public onSelectionChange = output<SelectOption>();
@@ -20,6 +30,17 @@ export class CustomSelectComponent {
   private eRef = inject(ElementRef);
   public isOpen = signal(false);
   public selectedName = signal('');
+
+  public selectedLabel = computed(() => {
+    const currentOptions = this.options();
+    const currentValue = this.selected();
+
+    // Buscamos la opción que coincida con el valor seleccionado
+    const found = currentOptions.find((opt) => opt.value === currentValue);
+
+    // Si la encuentra devuelve el label, si no, un texto por defecto
+    return found ? found.label : 'Seleccionar...';
+  });
 
   toggle() {
     this.isOpen.update((v) => !v);

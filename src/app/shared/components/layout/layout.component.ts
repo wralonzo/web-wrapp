@@ -14,10 +14,10 @@ export class LayoutComponent {
   public authService = inject(AuthService);
 
   // Signals para el estado del menú
-  public isSidebarCollapsed = signal(false); // Para PC (ancho vs estrecho)
-  public isMobileMenuOpen = signal(false); // Para Móvil (escondido vs visible)
+  public isSidebarCollapsed = signal(true); // Para PC (ancho vs estrecho)
+  public isMobileMenuOpen = signal(true); // Para Móvil (escondido vs visible)
 
-  public isCollapsed = signal(false); // Estado del sidebar
+  public isCollapsed = signal(true); // Estado del sidebar
 
   public lottieOptions: AnimationOptions = {
     path: 'assets/lottie/salon-logo.json',
@@ -37,7 +37,7 @@ export class LayoutComponent {
   // Cerrar menú al hacer clic en un enlace (solo en móvil)
   closeMobileMenu() {
     if (window.innerWidth < 768) {
-      this.isMobileMenuOpen.set(false);
+      this.isMobileMenuOpen.set(true);
     }
   }
 }

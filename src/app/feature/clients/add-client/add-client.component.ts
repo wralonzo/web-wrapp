@@ -1,17 +1,26 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
-import { ButtonComponent } from '../../../shared/components/button/button.component';
-import { SelectOption } from '../../../shared/models/select/option.interface';
 import { FormsModule } from '@angular/forms';
-import { CustomSelectComponent } from '../../../shared/components/select/select.component';
-import { AddClient } from '../../../shared/models/client/add-client.interface';
-import { InputComponent } from '../../../shared/components/input/input.component';
-import { ClientService } from '../../../core/services/client.service';
 import { Router } from '@angular/router';
+import { ClientService } from '@core/services/client.service';
+import { ButtonComponent } from '@shared/components/button/button.component';
+import { CheckboxComponent } from '@shared/components/checkbox/checkbox.component';
+import { InputComponent } from '@shared/components/input/input.component';
+import { CustomSelectComponent } from '@shared/components/select/select.component';
+import { ClientTypes } from '@shared/enums/clients/Client-type.enum';
+import { AddClient } from '@shared/models/client/add-client.interface';
+import { SelectOption } from '@shared/models/select/option.interface';
 
 @Component({
   selector: 'app-add-client',
-  imports: [CommonModule, ButtonComponent, CustomSelectComponent, FormsModule, InputComponent],
+  imports: [
+    CommonModule,
+    ButtonComponent,
+    CustomSelectComponent,
+    FormsModule,
+    InputComponent,
+    CheckboxComponent,
+  ],
   templateUrl: './add-client.component.html',
   styleUrl: './add-client.component.scss',
   standalone: true,
@@ -26,12 +35,15 @@ export class AddClientComponent {
     email: '',
     address: '',
     phone: '',
+    flagUser: false,
+    clientType: ClientTypes.REGULAR,
   };
 
   public optionsTypeClient: SelectOption[] = [
-    { value: 1, label: 'Cliente Nuevo' },
-    { value: 2, label: 'Regular' },
-    { value: 3, label: 'VIP' },
+    { value: ClientTypes.REGULAR, label: 'Regular' },
+    { value: ClientTypes.VIP, label: 'VIP' },
+    { value: ClientTypes.WHOLESALER, label: 'MAYORISTA' },
+    { value: ClientTypes.PREMIUM, label: 'PREMIUM' },
   ];
 
   public register() {
@@ -53,6 +65,6 @@ export class AddClientComponent {
 
   selectTypeClient(option: SelectOption) {
     console.log('El valor seleccionado es:', option.value);
-    this.client.clientType = option.value; // Guardas el valor
+    this.client.clientType = option.value.toString() as ClientTypes; // Guardas el valor
   }
 }

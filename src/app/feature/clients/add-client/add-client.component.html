@@ -23,7 +23,7 @@
   }
 
   <form class="p-8 space-y-8" (submit)="register()">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <app-input name="nombreCliente" label="Nombre Completo" [(ngModel)]="client.name"></app-input>
 
       <app-input
@@ -55,6 +55,10 @@
         [options]="optionsTypeClient"
         (onSelectionChange)="selectTypeClient($event)"
       ></app-custom-select>
+
+      <app-checkbox [(ngModel)]="client.flagUser" name="flagUser" label="¿Deseas crear una cuenta de usuario para este cliente?">
+      </app-checkbox>
+
     </div>
 
     <hr class="border-zinc-100" />

@@ -6,6 +6,7 @@ import { DashboardComponent } from './shared/components/dashboard/dashboard.comp
 import { LayoutComponent } from './shared/components/layout/layout.component';
 import { ClientsComponent } from './feature/clients/clients.component';
 import { AddClientComponent } from './feature/clients/add-client/add-client.component';
+import { EditClientComponent } from './feature/clients/edit-client/edit-client.component';
 
 export const routes: Routes = [
   {
@@ -22,11 +23,14 @@ export const routes: Routes = [
       { path: 'dashboard', component: DashboardComponent },
       {
         path: 'clients',
-        component: ClientsComponent,
-      },
-      {
-        path: 'clients/add',
-        component: AddClientComponent,
+        children: [
+          { path: '', component: ClientsComponent },
+          {
+            path: 'add',
+            component: AddClientComponent,
+          },
+          { path: 'edit/:id', component: EditClientComponent },
+        ],
       },
       { path: 'products', component: HomeComponent },
       { path: 'reservations', component: HomeComponent },

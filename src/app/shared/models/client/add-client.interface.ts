@@ -1,9 +1,13 @@
+import { ClientTypes } from "@shared/enums/clients/Client-type.enum";
+
 export interface AddClient {
   name: string;
   email: string;
-  address: string;
   phone: string;
-  birthDate?: string;
-  clientType?: number;
+  address: string;
   notes?: number;
+  birthDate?: string;
+  clientType: ClientTypes;
+  warehouseId?: number;
+  flagUser?: boolean;
 }

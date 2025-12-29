@@ -18,6 +18,7 @@ export class InputComponent implements ControlValueAccessor, OnInit, OnDestroy {
   placeholder = input<string>('');
   debounceMs = input<number>(0);
   value: string = '';
+  required = input<boolean>(false);
 
   // Eventos estándar para quien prefiera no usar Forms
   onValueChange = output<string>();

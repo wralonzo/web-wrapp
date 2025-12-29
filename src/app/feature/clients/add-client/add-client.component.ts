@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ClientService } from '@core/services/client.service';
+import { ToastService } from '@core/services/toast.service';
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { CheckboxComponent } from '@shared/components/checkbox/checkbox.component';
 import { InputComponent } from '@shared/components/input/input.component';
@@ -28,8 +29,9 @@ import { SelectOption } from '@shared/models/select/option.interface';
 export class AddClientComponent {
   private clientService = inject(ClientService);
   private router = inject(Router);
+  private toastService = inject(ToastService);
+
   public loading = signal(false);
-  public errorMessage = signal(false);
   public client: AddClient = {
     name: '',
     email: '',
@@ -46,18 +48,26 @@ export class AddClientComponent {
     { value: ClientTypes.PREMIUM, label: 'PREMIUM' },
   ];
 
-  public register() {
+  public register(form: NgForm) {
+    if (form.invalid) {
+      this.toastService.show('Por favor, completa todos los campos requeridos.', 'error');
+      return;
+    }
+    if (!this.client.clientType) {
+      this.toastService.show('Por favor, selecciona un tipo de cliente.', 'error');
+      return;
+    }
+
     this.loading.set(true);
     this.clientService.createClient(this.client).subscribe({
       next: (res) => {
         console.log('¡Éxito!', res);
         this.loading.set(false);
+        this.toastService.show('Cliente creado exitosamente', 'success');
+
         this.router.navigate(['/app/clients']);
       },
       error: (err) => {
-        // Aquí 'err' es el objeto que armamos en el paso 1
-        console.error('Error capturado en el componente:', err.message);
-        this.errorMessage.set(err.message);
         this.loading.set(false);
       },
     });

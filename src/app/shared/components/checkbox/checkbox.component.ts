@@ -17,6 +17,7 @@ import { CommonModule } from '@angular/common';
 export class CheckboxComponent implements ControlValueAccessor {
   label = input<string>('');
   id = input<string>(`checkbox-${Math.random().toString(36).substring(2, 9)}`);
+  required = input<boolean>(false);
 
   checked: boolean = false;
   isDisabled: boolean = false;

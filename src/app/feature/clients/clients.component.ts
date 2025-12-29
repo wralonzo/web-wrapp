@@ -136,7 +136,7 @@ export class ClientsComponent implements OnInit {
       message: `¿Estás seguro de eliminar a ${client.name}? Esta acción borrará permanentemente sus facturas y registros.`,
       btnConfirmText: 'Sí, eliminar ahora',
       btnCancelText: 'No, cancelar',
-      variant: 'danger',
+      variant: 'info',
     });
     if (confirmed) {
       this.clientService.deleteClient(client.id).subscribe({

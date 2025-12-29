@@ -7,58 +7,61 @@
       Completa los datos para dar de alta al cliente en el sistema.
     </p>
   </div>
-  @if (errorMessage()) {
-  <div
-    class="bg-pink-50 border-l-4 border-(--color-primary) p-4 rounded-xl my-4 animate-in fade-in slide-in-from-top-2"
-  >
-    <div class="flex items-center gap-3">
-      <svg class="w-5 h-5 text-(--color-primary)" fill="currentColor" viewBox="0 0 20 20">
-        <path
-          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-        />
-      </svg>
-      <span class="text-pink-900 text-sm font-medium">{{ errorMessage() }}</span>
-    </div>
-  </div>
-  }
-
-  <form class="p-8 space-y-8" (submit)="register()">
+  <form class="p-8 space-y-8" #f="ngForm" (ngSubmit)="register(f)">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <app-input name="nombreCliente" label="Nombre Completo" [(ngModel)]="client.name"></app-input>
+      <app-input
+        name="nombreCliente"
+        label="Nombre Completo*"
+        [(ngModel)]="client.name"
+        [required]="true"
+      ></app-input>
 
       <app-input
         name="phone"
         [placeholder]="'0000-0000'"
-        label="teléfono`"
+        label="Teléfono*"
         [(ngModel)]="client.phone"
+        [required]="true"
       ></app-input>
 
       <app-input
-        name="email`"
-        label="Correo Electrónico"
+        name="email"
+        label="Correo Electrónico*"
         type="email"
         [(ngModel)]="client.email"
         [placeholder]="'example@gmail.com'"
+        [required]="true"
       ></app-input>
 
-      <app-input name="direccionCliente" label="Dirección" [(ngModel)]="client.address"></app-input>
+      <app-input
+        name="direccionCliente"
+        label="Dirección*"
+        [(ngModel)]="client.address"
+        [required]="true"
+      ></app-input>
 
       <app-input
-        label="Fecha de Nacimiento"
+        label="Fecha de Nacimiento*"
         type="date"
         [(ngModel)]="client.birthDate"
         name="fechaNacimiento"
+        [required]="true"
       ></app-input>
 
       <app-custom-select
         [label]="'Tipo de Cliente'"
         [options]="optionsTypeClient"
         (onSelectionChange)="selectTypeClient($event)"
+        [selected]="'REGULAR'"
       ></app-custom-select>
 
-      <app-checkbox [(ngModel)]="client.flagUser" name="flagUser" label="¿Deseas crear una cuenta de usuario para este cliente?">
+      <app-checkbox
+        [(ngModel)]="client.flagUser"
+        name="flagUser"
+        label="¿Deseas crear una cuenta de usuario para este cliente?"
+        [required]="false"
+      >
       </app-checkbox>
-
     </div>
 
     <hr class="border-zinc-100" />

@@ -2,7 +2,6 @@ import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Client } from '../../shared/models/client/client.interface';
-import { SelectOption } from '../../shared/models/select/option.interface';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { Router } from '@angular/router';
 import { ClientService } from '../../core/services/client.service';
@@ -12,6 +11,10 @@ import { TableListComponent } from '@shared/components/table-list/table-list.com
 import { LoggerService } from '@core/services/logger.service';
 import { ConfirmService } from '@core/services/confirm.service';
 import { ToastService } from '@core/services/toast.service';
+import { ClientTypes } from '@shared/enums/clients/Client-type.enum';
+import { toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop'; // Importante
+import { debounceTime, distinctUntilChanged, skip } from 'rxjs';
+import { SelectOption } from '../../shared/models/select/option.interface';
 
 @Component({
   selector: 'app-clients',
@@ -28,7 +31,7 @@ export class ClientsComponent implements OnInit {
   private toast = inject(ToastService);
 
   public clientColumns: ColumnConfig[] = [
-    { key: 'id', label: 'Nombre', type: 'text', sortable: true },
+    { key: 'code', label: 'Código', type: 'text', sortable: true },
     { key: 'name', label: 'Nombre', type: 'text', sortable: true },
     { key: 'phone', label: 'Teléfono', type: 'text', sortable: true },
     { key: 'email', label: 'Correo', type: 'text', sortable: true },
@@ -39,72 +42,96 @@ export class ClientsComponent implements OnInit {
 
   public filters: FilterConfig[] = [
     {
-      key: 'status',
-      label: 'Estado',
+      key: 'clientType',
+      label: 'Tipo de cliente',
+      selectedName: 'todos',
       options: [
-        { label: 'Todos', value: '' },
-        { label: 'VIP', value: 1 },
-        { label: 'REGULAR', value: 2 },
+        { value: 'ALL', label: 'Todos' },
+        { value: ClientTypes.REGULAR, label: 'Regular' },
+        { value: ClientTypes.VIP, label: 'VIP' },
+        { value: ClientTypes.WHOLESALER, label: 'MAYORISTA' },
+        { value: ClientTypes.PREMIUM, label: 'PREMIUM' },
       ],
     },
   ];
+  
   public totalItems = signal(0);
-  public currentPage = signal(1);
-  public pageSize = 10;
+  public currentPage = signal(0);
+  public totlPages = signal(0);
+  public pageSize = signal(10);
   public loading = signal(false);
-  private activeParams = signal<Record<string, any>>({});
+  private activeParams = signal<Record<string, any>>({
+    sort: 'name,asc',
+  });
 
   public clients = signal<Client[]>([]);
 
   public searchQuery = signal('');
+  public clientType = signal<ClientTypes | null>(null);
 
-  public options: SelectOption[] = [
-    { value: 1, label: 'Ana García' },
-    { value: 2, label: 'Roberto Carlos' },
-    { value: 3, label: 'Elena Martínez' },
-  ];
+  constructor() {
+    toObservable(this.searchQuery)
+      .pipe(
+        skip(1), // <--- IMPORTANTE: Ignora el valor inicial al cargar
+        debounceTime(2000), // 400ms es más natural que 2000ms
+        distinctUntilChanged(),
+        takeUntilDestroyed()
+      )
+      .subscribe(() => {
+        this.currentPage.set(0);
+        this.loadClients();
+      });
+
+    // 2. Manejo de tamaño de página (sin debounce o muy corto)
+    toObservable(this.pageSize)
+      .pipe(
+        skip(1), // <--- Ignora el valor inicial
+        takeUntilDestroyed()
+      )
+      .subscribe(() => {
+        this.currentPage.set(0);
+        this.loadClients();
+      });
+  }
 
   ngOnInit(): void {
     this.loadClients();
   }
 
   public filteredClients = computed(() => {
-    const query = this.searchQuery().toLowerCase().trim();
-    const allClients = this.clients();
-
-    // Si no hay búsqueda, devolvemos todo inmediatamente
-    if (!query) return allClients;
-
-    return allClients.filter((c) => {
-      // Verificación segura de nulidad antes de procesar
-      const name = (c.name || '').toLowerCase();
-      const phone = (c.phone || '').toLowerCase();
-      const email = (c.email || '').toLowerCase();
-
-      return name.includes(query) || phone.includes(query) || email.includes(query);
-    });
+    this.searchQuery().toLowerCase().trim();
+    return this.clients();
   });
 
   public addClient(): void {
     this.router.navigate(['/app/clients/add']);
-    console.log('Agregar nuevo cliente');
+    this.logger.log('Agregar nuevo cliente');
   }
 
-  public loadClients() {
-    this.clientService.getClients().subscribe({
+  public loadClients(): void {
+    this.loading.set(true);
+    const params = {
+      ...this.activeParams(),
+      term: this.searchQuery() ?? '', // Enviamos el término al backend
+      page: this.currentPage(),
+      size: this.pageSize(),
+    };
+    this.clientService.getClients(params).subscribe({
       next: (clients) => {
-        this.clients.set(clients.data as Client[]);
+        this.clients.set(clients.data.content);
+        this.totalItems.set(clients.data.totalElements);
+        this.totlPages.set(clients.data.totalPages);
+        this.loading.set(false);
         this.logger.log('Clientes cargados:', this.clients());
       },
       error: (err) => {
         this.clients.set([]);
-        console.error('Error al cargar los clientes:', err);
+        this.logger.error('Error al cargar los clientes:', err);
       },
     });
   }
 
   handleTableAction(event: TableActionEvent) {
-    // Usamos la interfaz aquí
     const { type, item } = event;
 
     switch (type) {
@@ -115,19 +142,23 @@ export class ClientsComponent implements OnInit {
         this.confirmDeleteClient(item);
         break;
       case 'view':
-        console.log('Viendo detalles de:', item.name);
+        this.goToViewClient(item.id);
         break;
       default:
-        console.warn('Acción no reconocida:', type);
+        this.logger.warnign('Acción no reconocida:', type);
     }
   }
 
   // --- Lógica específica por acción ---
 
   private goToEditClient(id: string) {
-    // Navegamos a la ruta de edición: /clients/edit/123
-    console.log('Navegando a editar cliente con ID:', id);
+    this.logger.log('Navegando a editar cliente con ID:', id);
     this.router.navigate(['/app/clients/edit', id]);
+  }
+
+  private goToViewClient(id: string) {
+    this.logger.log('Navegando a editar cliente con ID:', id);
+    this.router.navigate(['/app/clients/view', id]);
   }
 
   private async confirmDeleteClient(client: any) {
@@ -136,33 +167,38 @@ export class ClientsComponent implements OnInit {
       message: `¿Estás seguro de eliminar a ${client.name}? Esta acción borrará permanentemente sus facturas y registros.`,
       btnConfirmText: 'Sí, eliminar ahora',
       btnCancelText: 'No, cancelar',
-      variant: 'info',
+      variant: 'danger',
     });
     if (confirmed) {
       this.clientService.deleteClient(client.id).subscribe({
         next: () => {
           const clientDeteleted = this.clients().filter((c) => c.id !== client.id);
           this.clients.set(clientDeteleted);
-          this.toast.show('Cliente eliminado', 'success');
+          this.toast.show('Cliente eliminado', 'error');
         },
         error: () => this.toast.show('Error al eliminar', 'error'),
       });
     }
   }
 
-  handleFilter(filterValue: Record<string, any>) {
-    // Actualizamos los parámetros y volvemos a la página 1
-    this.activeParams.update((prev) => ({ ...prev, ...filterValue }));
-    this.currentPage.set(1);
+  handleFilter(filterUpdate: Record<string, any>) {
+    // 1. Extraemos la llave y el valor (ej: key='status', value='VIP')
+    const [key, value] = Object.entries(filterUpdate)[0] as [string, SelectOption];
+    this.logger.info('Filtro cambiado:', { key, value });
+    if (value.value === 'ALL') {
+      value.value = '';
+    }
+    this.activeParams.update((prev) => ({ ...prev, [key]: value.value }));
+    this.filters[0].selectedName = String(value.value);
+    this.currentPage.set(0);
     this.loadClients();
   }
 
   handleSort(event: { key: string; dir: 'asc' | 'desc' }) {
     this.activeParams.update((prev) => ({
-      ...prev,
-      sort: event.key,
-      order: event.dir,
+      sort: `${event.key},${event.dir}`,
     }));
+    this.logger.info('Ordenando por:', event);
     this.loadClients();
   }
 

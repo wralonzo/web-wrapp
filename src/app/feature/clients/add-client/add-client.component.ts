@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ClientService } from '@core/services/client.service';
 import { ToastService } from '@core/services/toast.service';
 import { ButtonComponent } from '@shared/components/button/button.component';
@@ -21,10 +21,10 @@ import { SelectOption } from '@shared/models/select/option.interface';
     FormsModule,
     InputComponent,
     CheckboxComponent,
+    RouterLink,
   ],
   templateUrl: './add-client.component.html',
   styleUrl: './add-client.component.scss',
-  standalone: true,
 })
 export class AddClientComponent {
   private clientService = inject(ClientService);
@@ -32,6 +32,8 @@ export class AddClientComponent {
   private toastService = inject(ToastService);
 
   public loading = signal(false);
+  public formSubmitted = signal(false);
+
   public client: AddClient = {
     name: '',
     email: '',
@@ -49,6 +51,8 @@ export class AddClientComponent {
   ];
 
   public register(form: NgForm) {
+    this.formSubmitted.set(true);
+
     if (form.invalid) {
       this.toastService.show('Por favor, completa todos los campos requeridos.', 'error');
       return;
@@ -60,21 +64,17 @@ export class AddClientComponent {
 
     this.loading.set(true);
     this.clientService.createClient(this.client).subscribe({
-      next: (res) => {
-        console.log('¡Éxito!', res);
+      next: () => {
         this.loading.set(false);
         this.toastService.show('Cliente creado exitosamente', 'success');
 
         this.router.navigate(['/app/clients']);
       },
-      error: (err) => {
-        this.loading.set(false);
-      },
     });
+    this.loading.set(false);
   }
 
   selectTypeClient(option: SelectOption) {
-    console.log('El valor seleccionado es:', option.value);
-    this.client.clientType = option.value.toString() as ClientTypes; // Guardas el valor
+    this.client.clientType = option.value.toString() as ClientTypes;
   }
 }

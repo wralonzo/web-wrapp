@@ -1,4 +1,14 @@
-import { Component, input, output, OnInit, OnDestroy, signal, Self, Optional } from '@angular/core';
+import {
+  Component,
+  input,
+  output,
+  OnInit,
+  OnDestroy,
+  signal,
+  Self,
+  Optional,
+  computed,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, FormsModule, ReactiveFormsModule, NgControl } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
@@ -12,21 +22,26 @@ import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 })
 export class InputComponent implements ControlValueAccessor, OnInit, OnDestroy {
   // Inputs de configuración
-  label = input<string>('');
-  name = input<string>('');
-  type = input<'text' | 'password' | 'email' | 'tel' | 'number' | 'date'>('text');
-  placeholder = input<string>('');
-  debounceMs = input<number>(0);
-  value: string = '';
-  required = input<boolean>(false);
+  public label = input<string>('');
+  public name = input<string>('');
+  public type = input<'text' | 'password' | 'email' | 'tel' | 'number' | 'date'>('text');
+  public placeholder = input<string>('');
+  public debounceMs = input<number>(0);
+  public value: string = '';
+  public required = input<boolean>(false);
+  public minLength = input<number | null>(null);
+  public maxLength = input<number | null>(null);
+  public showErrors = input<boolean>(false);
+  showPassword = signal(false);
 
   // Eventos estándar para quien prefiera no usar Forms
-  onValueChange = output<string>();
-  onBlur = output<void>();
+  public onValueChange = output<string>();
+  public onBlur = output<void>();
 
   // Estado interno
-  internalValue = signal<string>('');
-  isDisabled = signal<boolean>(false);
+  public internalValue = signal<string>('');
+  public isDisabled = signal<boolean>(false);
+  public isTouched = signal(false);
 
   // Manejo de Debounce y Ciclo de vida
   private inputSubject = new Subject<string>();
@@ -35,6 +50,8 @@ export class InputComponent implements ControlValueAccessor, OnInit, OnDestroy {
   // Callbacks de Angular Forms
   onChange: any = () => {};
   onTouch: any = () => {};
+
+  public canShowErrors = computed(() => this.isTouched() || this.showErrors());
   // Inyectamos el control de Angular
   constructor(@Self() @Optional() public controlDir: NgControl) {
     if (this.controlDir) {
@@ -73,6 +90,7 @@ export class InputComponent implements ControlValueAccessor, OnInit, OnDestroy {
 
   handleBlur() {
     this.onTouch();
+    this.isTouched.set(true);
     this.onBlur.emit();
   }
 
@@ -91,5 +109,29 @@ export class InputComponent implements ControlValueAccessor, OnInit, OnDestroy {
 
   setDisabledState(isDisabled: boolean): void {
     this.isDisabled.set(isDisabled);
+  }
+
+  public isInvalidEmail = computed(() => {
+    if (this.type() !== 'email' || !this.internalValue()) return false;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return !emailRegex.test(this.internalValue());
+  });
+
+  public isFutureDate = computed(() => {
+    if (this.type() !== 'date' || !this.internalValue()) return false;
+    const selectedDate = new Date(this.internalValue());
+    const today = new Date();
+    return selectedDate > today;
+  });
+
+  inputType = computed(() => {
+    if (this.type() === 'password') {
+      return this.showPassword() ? 'text' : 'password';
+    }
+    return this.type();
+  });
+
+  togglePassword() {
+    this.showPassword.update((v) => !v);
   }
 }

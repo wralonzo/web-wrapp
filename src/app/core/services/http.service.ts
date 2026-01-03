@@ -13,11 +13,18 @@ export class HttpService {
   private baseUrl = environment.apiUrl;
 
   // Método GENÉRICO para GET
-  doGet<T>(endpoint: string): Observable<T> {
-    return this.http.get<T>(`${this.baseUrl}${endpoint}`).pipe(
-      map((response) => response),
-      catchError(this.handleError)
-    );
+  doGet<T>(
+    endpoint: string,
+    params?: Record<string, string | number | boolean | ReadonlyArray<string | number | boolean >>
+  ): Observable<T> {
+    return this.http
+      .get<T>(`${this.baseUrl}${endpoint}`, {
+        params: params,
+      })
+      .pipe(
+        map((response) => response),
+        catchError(this.handleError)
+      );
   }
 
   // Método GENÉRICO para POST

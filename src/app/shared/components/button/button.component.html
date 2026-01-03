@@ -2,7 +2,9 @@
   [type]="type()"
   [disabled]="isDisabled() || isLoading()"
   (click)="handleClick($event)"
-  class="btn-primary w-full group relative flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed transition-all"
+  class="btn-{{
+    btnType()
+  }} w-full group relative flex justify-center items-center gap-2 transition-all cursor-pointer hover:scale-105 active:scale-95"
 >
   @if (isLoading()) {
   <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">

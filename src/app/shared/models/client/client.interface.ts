@@ -1,5 +1,6 @@
 import { ClientTypes } from '@shared/enums/clients/Client-type.enum';
-import { HttpResponseApi } from '../http/http-response';
+import { HttpResponseApi, HttpResponseApiFindOne } from '../http/http-response';
+import { User } from '../user/user.model';
 
 export interface Client {
   id: number;
@@ -13,6 +14,9 @@ export interface Client {
   status: 1 | 2 | 2;
   address?: string;
   notes?: string;
+  code: string;
+  user?: User;
 }
 
 export interface ClientResponse extends HttpResponseApi<Client> {}
+export interface ClientResponseFindOne extends HttpResponseApiFindOne<Client> {}

@@ -18,26 +18,26 @@ export class LoggerService {
       'color: #9b2226; font-weight: bold; background: #f8d7da; padding: 2px 5px; border-radius: 3px;',
   };
 
-  log(message: string, data?: any): void {
+  log(message: string, ...data: any[]): void {
     if (this.isDev) {
-      console.log(`%c[INFO] %c${message}`, this.styles.info, '', data ?? '');
+      console.log(`%c[INFO] %c${message}`, this.styles.info, '', ...data);
     }
   }
 
-  info(message: string, data?: any): void {
+  info(message: string, ...data: any[]): void {
     if (this.isDev) {
-      console.log(`%c[SUCCESS] %c${message}`, this.styles.success, '', data ?? '');
+      console.log(`%c[SUCCESS] %c${message}`, this.styles.success, '',  ...data);
     }
   }
 
-  warnign(message: string, data?: any): void {
+  warnign(message: string, ...data: any[]): void {
     if (this.isDev) {
-      console.warn(`%c[WARNING] %c${message}`, this.styles.warning, '', data ?? '');
+      console.warn(`%c[WARNING] %c${message}`, this.styles.warning, '',  ...data);
     }
   }
 
-  error(message: string, error?: any): void {
+  error(message: string, ...data: any[]): void {
     // Los errores se suelen mostrar incluso en producción para monitoreo remoto si fuera necesario
-    console.error(`%c[ERROR] %c${message}`, this.styles.error, '', error ?? '');
+    console.error(`%c[ERROR] %c${message}`, this.styles.error, '',  ...data);
   }
 }

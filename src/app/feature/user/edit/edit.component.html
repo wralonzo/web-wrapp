@@ -1,0 +1,107 @@
+<div class="max-w-4xl mx-auto">
+  <div class="mb-8 flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-zinc-900 tracking-tight">Editar Usuario</h1>
+      <p class="text-zinc-500 mt-1">Actualiza la información del usuario existente.</p>
+    </div>
+    <a
+      routerLink="/app/users"
+      class="text-zinc-500 hover:text-zinc-700 transition-colors flex items-center gap-1 font-medium text-sm"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 19l-7-7m0 0l7-7m-7 7h18"
+        />
+      </svg>
+      Volver a la lista
+    </a>
+  </div>
+
+  @if (loadingData()) {
+  <div class="flex justify-center py-20 bg-white rounded-3xl border border-zinc-200">
+    <div
+      class="w-10 h-10 border-4 border-zinc-100 border-t-blue-600 rounded-full animate-spin"
+    ></div>
+  </div>
+  } @else {
+  <form
+    (ngSubmit)="onSubmit()"
+    class="bg-white p-8 rounded-3xl border border-zinc-200 shadow-sm space-y-8"
+  >
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <app-input
+        name="nombreCliente"
+        label="Nombre Completo"
+        [(ngModel)]="user.fullName"
+        [required]="true"
+        [maxlength]="100"
+        [minLength]="3"
+        [showErrors]="formSubmitted()"
+      ></app-input>
+
+      <app-input
+        name="phone"
+        [placeholder]="'00000000'"
+        label="Teléfono"
+        [(ngModel)]="user.phone"
+        [required]="true"
+        [maxlength]="15"
+        [minLength]="8"
+        [showErrors]="formSubmitted()"
+      ></app-input>
+
+      <app-input
+        name="email"
+        label="Correo Electrónico"
+        type="email"
+        [(ngModel)]="user.username"
+        [placeholder]="'example@gmail.com'"
+        [required]="true"
+        [showErrors]="formSubmitted()"
+      ></app-input>
+
+      <app-input
+        name="direccionCliente"
+        label="Dirección"
+        [(ngModel)]="user.address"
+        [required]="true"
+        [showErrors]="formSubmitted()"
+      ></app-input>
+
+      @if(user.employee){
+      <app-custom-select
+        [label]="'Almacen'"
+        [selected]="user.employee.warehouseId"
+        [options]="optionsWarehouses()"
+        (onSelectionChange)="selectWarehouse($event)"
+      ></app-custom-select>
+
+      <app-custom-select
+        [label]="'Posición'"
+        [selected]="user.employee.positionId"
+        [options]="optionsPositionTypes"
+        (onSelectionChange)="selectPositionType($event)"
+      ></app-custom-select>
+      }
+
+      <app-multi-select-roles
+        [options]="roleOptions"
+        [(selectedRoles)]="userRoles"
+        label="Roles del Sistema"
+      >
+      </app-multi-select-roles>
+    </div>
+
+    <app-button
+      type="submit"
+      [label]="submitting() ? 'Guardando...' : 'Actualizar Cliente'"
+      [isLoading]="submitting()"
+      icon="add-plus"
+    >
+    </app-button>
+  </form>
+  }
+</div>

@@ -1,4 +1,4 @@
-import { HttpResponseApi } from "../http/http-response";
+import { HttpResponseApi, HttpResponseApiFindOne } from '../http/http-response';
 
 // auth.model.ts
 export interface User {
@@ -16,8 +16,23 @@ export interface User {
   createdAt: string;
   updateAt: string | null;
   deletedAt: string | null;
+  passwordInit?: string;
+  employee?: Employee;
+  roles?: string[];
+  enabled?: boolean;
+  clientId?: number;
 }
 
-export interface AuthResponse extends HttpResponseApi<User> {
+export interface Employee {
+  id: number;
+  warehouseId: number;
+  warehouseName: string;
+  positionId: number;
+  positionName: string;
+}
+
+export interface AuthResponse extends HttpResponseApiFindOne<User> {
   data: User;
 }
+
+export interface AuthResponseAll extends HttpResponseApi<User> {}

@@ -7,6 +7,11 @@ import { LayoutComponent } from './shared/components/layout/layout.component';
 import { ClientsComponent } from './feature/clients/clients.component';
 import { AddClientComponent } from './feature/clients/add-client/add-client.component';
 import { EditClientComponent } from './feature/clients/edit-client/edit-client.component';
+import { ClientDetailComponent } from './feature/clients/client-detail/client-detail.component';
+import { ListUserComponent } from './feature/user/list/list.component';
+import { AddUserComponent } from './feature/user/add/add.component';
+import { EditUserComponponent } from './feature/user/edit/edit.component';
+import { ViewUserComponent } from './feature/user/view/view.component';
 
 export const routes: Routes = [
   {
@@ -30,16 +35,28 @@ export const routes: Routes = [
             component: AddClientComponent,
           },
           { path: 'edit/:id', component: EditClientComponent },
+          { path: 'view/:id', component: ClientDetailComponent },
+        ],
+      },
+      {
+        path: 'users',
+        children: [
+          { path: '', component: ListUserComponent },
+          {
+            path: 'add',
+            component: AddUserComponent,
+          },
+          { path: 'edit/:id', component: EditUserComponponent },
+          { path: 'view/:id', component: ViewUserComponent },
+          { path: 'reset-pasword/:id', component: ListUserComponent },
         ],
       },
       { path: 'products', component: HomeComponent },
       { path: 'reservations', component: HomeComponent },
       { path: 'suppliers', component: HomeComponent },
-      { path: 'users', component: HomeComponent },
       { path: 'productos', component: HomeComponent },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },
-  // Redirección por defecto
   { path: '**', redirectTo: 'auth/login' },
 ];

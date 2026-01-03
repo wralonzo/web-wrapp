@@ -9,6 +9,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts'; // 👈 Importaciones nuevas
 import { errorInterceptor } from '@core/interceptors/error.interceptor';
+import { loaderInterceptor } from '@core/interceptors/loader.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,7 +19,7 @@ export const appConfig: ApplicationConfig = {
       player: () => player,
     }),
     provideHttpClient(
-      withInterceptors([authInterceptor, errorInterceptor]) // 👈 Registro del interceptor funcional
+      withInterceptors([authInterceptor, errorInterceptor, loaderInterceptor]) // 👈 Registro del interceptor funcional
     ),
     provideCharts(withDefaultRegisterables()),
   ],

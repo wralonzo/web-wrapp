@@ -16,7 +16,7 @@ export class DashboardService {
     // return this.http.get<DashboardResponse>(`${this.API_URL}/dashboard/summary`);
 
     // --- MODO SIMULACIÓN (Para que veas la vista funcionando ya) ---
-    const mockData: DashboardResponse = {
+    const mockData = {
       success: true,
       message: 'Datos obtenidos',
       status: 200,

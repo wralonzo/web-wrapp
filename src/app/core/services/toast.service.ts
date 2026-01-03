@@ -14,7 +14,7 @@ export class ToastService {
   private toastsSignal = signal<Toast[]>([]);
   public toasts = this.toastsSignal.asReadonly();
 
-  show(message: string, type: ToastType = 'success', duration: number = 10000) {
+  show(message: string, type: ToastType = 'success', duration: number = 5000) {
     const id = Date.now();
     const newToast: Toast = { id, message, type };
 

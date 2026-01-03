@@ -99,7 +99,7 @@
         <span [class.hidden]="isCollapsed()" class="font-medium">Clientes</span>
       </a>
       <a
-        routerLink="/app/products"
+        routerLink="/app/users"
         routerLinkActive="bg-blue-100 text-blue-700"
         class="flex items-center gap-4 p-3 rounded-xl text-zinc-600 hover:bg-zinc-200 transition-all"
       >
@@ -126,11 +126,10 @@
         <div
           class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold shrink-0"
         >
-          {{ authService.currentUser()?.name?.charAt(0) }}
+          {{ authService.currentUser()?.fullName?.charAt(0) }}
         </div>
         <div [class.hidden]="isCollapsed()" class="flex-1 min-w-0">
-          <p class="text-sm font-semibold truncate">{{ authService.currentUser()?.name }}</p>
-          <p class="text-xs text-zinc-500 truncate">Admin</p>
+          <p class="text-sm font-semibold truncate">{{ authService.currentUser()?.username }}</p>
         </div>
         <button
           (click)="authService.logout()"
@@ -215,7 +214,7 @@
       </div>
     </header>
 
-    <main class="flex-1 overflow-y-auto p-8 bg-white">
+    <main class="flex-1 overflow-y-auto p-4 bg-white">
       <div class="max-w-6xl mx-auto">
         <router-outlet></router-outlet>
       </div>

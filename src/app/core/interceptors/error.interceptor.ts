@@ -1,44 +1,45 @@
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { AuthService } from '@core/auth/auth.service';
 import { ToastService } from '@core/services/toast.service';
 import { catchError, throwError } from 'rxjs';
-
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const toastService = inject(ToastService);
+  const authService = inject(AuthService);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       let errorMessage = 'Ocurrió un error inesperado';
 
-      if (error.error instanceof ErrorEvent) {
-        // Error del lado del cliente (red, etc.)
+      // Importante: Si el status es 0, es un error de red o CORS
+      if (error.status === 0) {
+        errorMessage = 'No hay conexión con el servidor.';
+      } else if (error.error instanceof ErrorEvent) {
+        // Error del lado del cliente
         errorMessage = `Error: ${error.error.message}`;
       } else {
-        // Error del lado del servidor (HTTP Status)
+        // Error del lado del servidor
         switch (error.status) {
+          case 401:
+            // Verificamos si ya estamos en logout para evitar bucles
+            errorMessage = 'Sesión expirada. Redirigiendo...';
+            authService.logout();
+            break;
           case 400:
-            errorMessage = error.error?.data?.message || 'La información enviada es incorrecta.';
+            errorMessage = error.error?.data?.message || error.error?.message || 'Datos inválidos.';
+            break;
+          case 403:
+            errorMessage = 'No tienes permisos para realizar esta acción.';
             break;
           case 404:
-            errorMessage = error.error?.message || 'El recurso solicitado no existe.';
-            break;
-          case 409:
-            errorMessage = error.error?.message || 'Este registro ya existe (Conflicto).';
-            break;
-          case 500:
-            errorMessage =
-              error.error?.message || 'Error interno del servidor. Inténtalo más tarde.';
+            errorMessage = 'Recurso no encontrado.';
             break;
           default:
-            errorMessage = error.error?.message || 'Error desconocido';
-            break;
+            errorMessage = error.error?.message || `Error ${error.status}: ${error.statusText}`;
         }
       }
 
-      // Mostramos el Toast una sola vez aquí para TODA la app
       toastService.show(errorMessage, 'error');
-
-      // Devolvemos el error por si el componente aún necesita hacer algo
       return throwError(() => error);
     })
   );

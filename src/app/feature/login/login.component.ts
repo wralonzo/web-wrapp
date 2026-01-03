@@ -27,7 +27,7 @@ export class LoginComponent implements OnInit {
   private router = inject(Router);
 
   public email: string = '';
-  public password: string = '';
+  public password: string = 'n3z00N@beQ7(';
   public isLoading = signal(false);
 
   // 1. Creamos un signal para el mensaje de error

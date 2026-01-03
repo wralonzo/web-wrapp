@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
   Component,
   computed,
@@ -6,9 +5,11 @@ import {
   HostListener,
   inject,
   input,
+  model, // <--- Cambiamos input por model
   output,
   signal,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { SelectOption } from '../../models/select/option.interface';
 
 @Component({
@@ -19,26 +20,26 @@ import { SelectOption } from '../../models/select/option.interface';
   styleUrl: './select.component.scss',
 })
 export class CustomSelectComponent {
-  // Inputs
+  // Inputs y Modelos
   public options = input<SelectOption[]>([]);
   public label = input<string>();
-  public selected = input<string | undefined>();
 
-  // Output para notificar al padre
+  // Usamos model() para que el componente pueda actualizar el valor
+  // y el padre reciba el cambio automáticamente con [(selected)]
+  public selected = model<string | number | undefined>();
+
   public onSelectionChange = output<SelectOption>();
 
   private eRef = inject(ElementRef);
   public isOpen = signal(false);
-  public selectedName = signal('');
 
+  // Esta señal computada ahora reaccionará instantáneamente
+  // cuando hagamos this.selected.set(...)
   public selectedLabel = computed(() => {
     const currentOptions = this.options();
-    const currentValue = this.selected();
+    const currentValue = this.selected()?.toString();
 
-    // Buscamos la opción que coincida con el valor seleccionado
     const found = currentOptions.find((opt) => opt.value === currentValue);
-
-    // Si la encuentra devuelve el label, si no, un texto por defecto
     return found ? found.label : 'Seleccionar...';
   });
 
@@ -47,15 +48,21 @@ export class CustomSelectComponent {
   }
 
   select(option: SelectOption) {
-    this.selectedName.set(option.label);
+    // 1. Actualizamos el modelo local (esto dispara el computed selectedLabel)
+    this.selected.set(option.value);
+
+    // 2. Notificamos al padre
     this.onSelectionChange.emit(option);
+
+    // 3. Cerramos el menú
     this.isOpen.set(false);
   }
 
-  // Función auxiliar para obtener iniciales si no existen
   getInitials(name: string): string {
+    if (!name) return '?';
     return name
       .split(' ')
+      .filter((word) => word.length > 0)
       .map((word) => word[0])
       .join('')
       .toUpperCase()

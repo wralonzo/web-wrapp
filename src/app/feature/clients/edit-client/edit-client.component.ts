@@ -49,6 +49,7 @@ export class EditClientComponent implements OnInit {
     lastVisit: '',
     totalSpent: 0,
     status: 1,
+    code: '',
   };
 
   optionsTypeClient = [
@@ -96,7 +97,6 @@ export class EditClientComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error al actualizar', err);
-          this.toast.show('Ocurrió un error al guardar los cambios', 'error');
         },
       });
   }

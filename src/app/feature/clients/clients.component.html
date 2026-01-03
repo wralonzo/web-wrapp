@@ -19,12 +19,14 @@
     [filters]="filters"
     [totalItems]="totalItems()"
     [currentPage]="currentPage()"
+    [totalPages]="totlPages()"
     (onAction)="handleTableAction($event)"
     (onFilter)="handleFilter($event)"
     (onSort)="handleSort($event)"
     (onPageChange)="handlePage($event)"
     [searchTerm]="searchQuery()"
     (onSearch)="searchQuery.set($event)"
+    (onPageSizeChange)="pageSize.set($event)"
   >
   </app-table-list>
 </div>

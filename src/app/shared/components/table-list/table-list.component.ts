@@ -19,21 +19,24 @@ export class TableListComponent {
   onAction = output<TableActionEvent>();
 
   totalItems = input<number>(0);
+  totalPages = input<number>(0);
   pageSize = input<number>(10);
-  currentPage = input<number>(1);
+  currentPage = input<number>(0);
 
   sortKey = signal<string>('');
   sortDir = signal<'asc' | 'desc'>('asc');
 
   searchTerm = input<string>('');
   onSearch = output<string>();
+  onPageSizeChange = output<number>();
 
   // Outputs (Eventos)
   onPageChange = output<number>();
   onSort = output<{ key: string; dir: 'asc' | 'desc' }>();
   onFilter = output<Record<string, any>>();
-  
+
   private searchSubject = new Subject<string>();
+  private pageSizeSubject = new Subject<number>();
 
   constructor() {
     // Configuramos el debounce en el constructor
@@ -46,8 +49,13 @@ export class TableListComponent {
       .subscribe((value) => {
         this.onSearch.emit(value);
       });
-  }
 
+    this.pageSizeSubject
+      .pipe(debounceTime(500), distinctUntilChanged(), takeUntilDestroyed())
+      .subscribe((value) => {
+        this.onPageSizeChange.emit(value);
+      });
+  }
 
   emitAction(type: string, item: any) {
     this.onAction.emit({ type, item });
@@ -62,12 +70,18 @@ export class TableListComponent {
 
   handleFilterChange(key: string, value: any) {
     const filterUpdate = { [key]: value };
+    console.log('Filtro cambiado:', filterUpdate);
     this.onFilter.emit(filterUpdate);
   }
 
   handleSearch(event: Event) {
     const value = (event.target as HTMLInputElement).value;
     this.searchSubject.next(value); // Enviamos el valor al Subject en lugar de emitir directo
+  }
+
+  handlePageSizeChange(event: Event) {
+    const value = (event.target as HTMLInputElement).value;
+    this.pageSizeSubject.next(Number(value)); // Enviamos el valor al Subject en lugar de emitir directo
   }
 
   // Método para limpiar búsqueda (reset inmediato)

@@ -14,7 +14,8 @@ import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { TableListComponent } from '@shared/components/table-list/table-list.component';
 import { RoleService } from '@core/services/roles.service';
-
+import { PageConfiguration } from 'src/app/page-configurations';
+import { APP_ROUTES } from '@core/constants/routes.constants';
 @Component({
   selector: 'app-list',
   imports: [CommonModule, FormsModule, ButtonComponent, TableListComponent],
@@ -22,8 +23,7 @@ import { RoleService } from '@core/services/roles.service';
   styleUrl: './list.component.scss',
   standalone: true,
 })
-export class ListUserComponent implements OnInit {
-  private logger = inject(LoggerService);
+export class ListUserComponent extends PageConfiguration implements OnInit {
   private router = inject(Router);
   private confirmService = inject(ConfirmService);
   private toast = inject(ToastService);
@@ -57,13 +57,12 @@ export class ListUserComponent implements OnInit {
       key: 'roleName',
       label: 'Roles',
       selectedName: 'todos',
-      options: [
-        { value: 'ALL', label: 'Todos' },
-      ],
+      options: [{ value: 'ALL', label: 'Todos' }],
     },
   ]);
 
   constructor() {
+    super();
     toObservable(this.searchQuery)
       .pipe(
         skip(1), // <--- IMPORTANTE: Ignora el valor inicial al cargar
@@ -92,8 +91,9 @@ export class ListUserComponent implements OnInit {
     this.loadData();
     this.loadRoles();
   }
+  
   public add(): void {
-    this.router.navigate(['/app/users/add']);
+    this.nav.push(APP_ROUTES.nav.users.add);
   }
 
   private loadData() {
@@ -168,11 +168,12 @@ export class ListUserComponent implements OnInit {
   private goToEdit(user: User) {
     if (user.roles?.find((r) => r === 'ROLE_CLIENTE')) {
       this.logger.log('Navegando a editar cliente con ID:', user.clientId);
-      this.router.navigate(['/app/clients/edit', user.clientId]);
+      const idClient = user.clientId ? user.clientId : '';
+      this.nav.push(APP_ROUTES.nav.clients.edit(idClient));
       return;
     }
     this.logger.log('Navegando a editar usuario con ID:', user.id);
-    this.router.navigate(['/app/users/edit', user.id]);
+    this.nav.push(APP_ROUTES.nav.users.edit(user.id));
   }
 
   private async confirmDelete(data: User) {
@@ -202,12 +203,12 @@ export class ListUserComponent implements OnInit {
   private goToView(user: User) {
     if (user.roles?.find((r) => r === 'ROLE_CLIENTE')) {
       this.logger.log('Navegando a ver cliente con ID:', user.clientId);
-      this.router.navigate(['/app/clients/view', user.clientId]);
+      this.nav.push(APP_ROUTES.nav.clients.view(user.clientId ?? ''));
       return;
     }
 
     this.logger.log('Navegando a ver usuario con ID:', user.id);
-    this.router.navigate(['/app/users/view', user.id]);
+    this.nav.push(APP_ROUTES.nav.users.view(user.id));
   }
 
   handleFilter(filterUpdate: Record<string, any>) {

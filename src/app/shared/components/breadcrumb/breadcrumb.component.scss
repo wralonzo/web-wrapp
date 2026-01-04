@@ -1,0 +1,20 @@
+.breadcrumb-list {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  gap: 8px;
+  font-size: 14px;
+}
+.breadcrumb-item + .breadcrumb-item::before {
+  content: '/';
+  color: #ccc;
+  margin-right: 8px;
+}
+.active {
+  color: #666;
+  font-weight: bold;
+}
+a {
+  color: #007bff;
+  text-decoration: none;
+}

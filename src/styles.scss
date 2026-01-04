@@ -1,6 +1,15 @@
 /* You can add global styles to this file, and also import other style files */
 @use 'tailwindcss';
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Opcional: para forzar que el navegador use Inter por defecto */
+body {
+  font-family: 'Inter', sans-serif;
+}
+
 @theme {
   /* --- COLORES DE MARCA (Detail Shop) --- */
   --color-primary: #db2777; /* Rosa intenso (pink-600) */

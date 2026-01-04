@@ -5,6 +5,7 @@ import { tap } from 'rxjs';
 import { AuthResponse, User } from '../../shared/models/user/user.model';
 import { environment } from '../../../environments/environment.development';
 import { LoggerService } from '../services/logger.service';
+import { APP_ROUTES } from '@core/constants/routes.constants';
 
 @Injectable({
   providedIn: 'root',
@@ -38,6 +39,18 @@ export class AuthService {
     );
   }
 
+  loginGoogle(idToken: string) {
+    return this.http.post<AuthResponse>(`${this.API_URL}auth/google`, { idToken }).pipe(
+      tap((response) => {
+        if (response.success && response.data) {
+          // Si el login es correcto, actualizamos el estado global automáticamente
+          this.setCurrentUser(response.data);
+          this.logger.info('User logged in with Google', response.data);
+        }
+      })
+    );
+  }
+
   public setCurrentUser(user: User): void {
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(user));
     this.userSignal.set(user);
@@ -47,7 +60,7 @@ export class AuthService {
     try {
       localStorage.removeItem(this.STORAGE_KEY);
       this.userSignal.set(null);
-      this.router.navigate(['/auth/login']);
+      this.router.navigate([`${APP_ROUTES.nav.login}`]);
     } catch (error) {
       this.logger.error('Error during logout', error);
     }

@@ -1,13 +1,21 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  signal,
+  AfterViewInit,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LottieComponent, AnimationOptions } from 'ngx-lottie';
-import { AuthService } from '../../core/auth/auth.service';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { InputComponent } from '../../shared/components/input/input.component';
-
+import { PageConfiguration } from 'src/app/page-configurations';
+import { GoogleService } from '@core/services/google.service';
+declare var google: any;
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -19,16 +27,15 @@ import { InputComponent } from '../../shared/components/input/input.component';
     FormsModule,
     InputComponent,
   ],
+  providers: [GoogleService],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
-export class LoginComponent implements OnInit {
-  private authService = inject(AuthService);
-  private router = inject(Router);
-
+export class LoginComponent extends PageConfiguration implements OnInit, AfterViewInit {
   public email: string = '';
   public password: string = 'n3z00N@beQ7(';
   public isLoading = signal(false);
+  private googleService = inject(GoogleService);
 
   // 1. Creamos un signal para el mensaje de error
   public errorMessage = signal<string | null>(null);
@@ -39,8 +46,27 @@ export class LoginComponent implements OnInit {
     autoplay: true,
   };
 
+  @ViewChild('googleBtnContainer') googleBtnContainer!: ElementRef;
+
+  constructor() {
+    super();
+  }
+
   public ngOnInit(): void {
     this.authService.deleteSession();
+    this.getGoogleClientId();
+  }
+
+  public ngAfterViewInit(): void {
+    setTimeout(() => {
+      if (this.googleBtnContainer) {
+        google.accounts.id.renderButton(this.googleBtnContainer.nativeElement, {
+          theme: 'filled_blue',
+          size: 'large',
+          shape: 'pill',
+        });
+      }
+    }, 100);
   }
 
   public onLogin() {
@@ -50,26 +76,46 @@ export class LoginComponent implements OnInit {
     this.authService.login({ username: this.email, password: this.password }).subscribe({
       next: (response) => {
         this.isLoading.set(false);
-        // El guardado del usuario ya ocurre en el 'tap' del servicio
-        this.router.navigate(['/app/dashboard']);
+        this.nav.setRoot(this.ROUTES.nav.dashboard, { welcomeMessage: '¡Hola de nuevo!' });
       },
       error: (err) => {
         this.isLoading.set(false);
+      },
+    });
+  }
 
-        // 2. Lógica para identificar el error
-        if (err.status === 401) {
-          this.errorMessage.set(err.error.message || 'Credenciales inválidas. Intenta de nuevo.');
-        } else if (err.status === 0) {
-          this.errorMessage.set('No se pudo conectar con el servidor. Revisa tu conexión.');
-        } else if (err.status === 400) {
-          this.errorMessage.set(
-            err.error.data.message ?? 'No se pudo conectar con el servidor. Revisa tu conexión.'
-          );
-        } else {
-          // Intentamos obtener el mensaje que envía tu HttpResponseApi desde el backend
-          const backendMessage = err.error?.message || 'Ocurrió un error inesperado.';
-          this.errorMessage.set(backendMessage);
-        }
+  handleLogin(response: any) {
+    // El 'credential' es un ID Token de Google (JWT)
+    const idToken = response.credential;
+
+    this.authService.loginGoogle(idToken).subscribe({
+      next: (res) => {
+        this.nav.setRoot(this.ROUTES.nav.dashboard, { welcomeMessage: '¡Hola de nuevo!' });
+      },
+      error: (err) => {
+        this.errorMessage.set('Error al iniciar sesión con Google. Intenta de nuevo.');
+      },
+    });
+  }
+
+  getGoogleClientId() {
+    return this.googleService.getIdGoogleClient().subscribe({
+      next: (response) => {
+        const { clientId } = response.data.clientId;
+        this.logger.log('Google Client ID:', clientId);
+        google.accounts.id.initialize({
+          client_id: clientId,
+          callback: (response: any) => this.handleLogin(response),
+        });
+
+        google.accounts.id.renderButton(document.getElementById('google-btn'), {
+          theme: 'filled_blue',
+          size: 'large',
+          shape: 'pill',
+        });
+      },
+      error: (err) => {
+        console.error('Error fetching Google Client ID:', err);
       },
     });
   }

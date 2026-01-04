@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
+import { APP_ROUTES } from '@core/constants/routes.constants';
 import { ClientService } from '@core/services/client.service';
 import { ToastService } from '@core/services/toast.service';
 import { ButtonComponent } from '@shared/components/button/button.component';
@@ -11,6 +12,7 @@ import { ClientTypes } from '@shared/enums/clients/Client-type.enum';
 import { Client } from '@shared/models/client/client.interface';
 import { SelectOption } from '@shared/models/select/option.interface';
 import { finalize } from 'rxjs';
+import { PageConfiguration } from 'src/app/page-configurations';
 
 @Component({
   selector: 'app-edit-client',
@@ -25,7 +27,7 @@ import { finalize } from 'rxjs';
   templateUrl: './edit-client.component.html',
   styleUrl: './edit-client.component.scss',
 })
-export class EditClientComponent implements OnInit {
+export class EditClientComponent extends PageConfiguration implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private clientService = inject(ClientService);
@@ -59,6 +61,10 @@ export class EditClientComponent implements OnInit {
     { value: ClientTypes.PREMIUM, label: 'PREMIUM' },
   ];
 
+  constructor() {
+    super();
+  }
+  
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -76,7 +82,7 @@ export class EditClientComponent implements OnInit {
         next: (res: any) => {
           this.client = { ...res.data };
         },
-        error: () => this.router.navigate(['/app/clients']),
+        error: () => this.nav.pop(),
       });
   }
 
@@ -92,7 +98,7 @@ export class EditClientComponent implements OnInit {
       .pipe(finalize(() => this.submitting.set(false)))
       .subscribe({
         next: () => {
-          this.router.navigate(['/app/clients']);
+          this.nav.pop();
           this.toast.show('¡Cliente actualizado correctamente!', 'success');
         },
         error: (err) => {

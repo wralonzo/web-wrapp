@@ -15,6 +15,8 @@ import { ClientTypes } from '@shared/enums/clients/Client-type.enum';
 import { toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop'; // Importante
 import { debounceTime, distinctUntilChanged, skip } from 'rxjs';
 import { SelectOption } from '../../shared/models/select/option.interface';
+import { APP_ROUTES } from '@core/constants/routes.constants';
+import { PageConfiguration } from 'src/app/page-configurations';
 
 @Component({
   selector: 'app-clients',
@@ -22,10 +24,9 @@ import { SelectOption } from '../../shared/models/select/option.interface';
   imports: [CommonModule, FormsModule, ButtonComponent, TableListComponent],
   templateUrl: './clients.component.html',
 })
-export class ClientsComponent implements OnInit {
+export class ClientsComponent extends PageConfiguration implements OnInit {
   // Datos de prueba (esto vendría de tu ClientsService)
   private clientService = inject(ClientService);
-  private logger = inject(LoggerService);
   private router = inject(Router);
   private confirmService = inject(ConfirmService);
   private toast = inject(ToastService);
@@ -54,7 +55,7 @@ export class ClientsComponent implements OnInit {
       ],
     },
   ];
-  
+
   public totalItems = signal(0);
   public currentPage = signal(0);
   public totlPages = signal(0);
@@ -70,6 +71,7 @@ export class ClientsComponent implements OnInit {
   public clientType = signal<ClientTypes | null>(null);
 
   constructor() {
+    super();
     toObservable(this.searchQuery)
       .pipe(
         skip(1), // <--- IMPORTANTE: Ignora el valor inicial al cargar
@@ -104,7 +106,7 @@ export class ClientsComponent implements OnInit {
   });
 
   public addClient(): void {
-    this.router.navigate(['/app/clients/add']);
+    this.nav.push(`${APP_ROUTES.nav.clients.add}`);
     this.logger.log('Agregar nuevo cliente');
   }
 
@@ -153,12 +155,12 @@ export class ClientsComponent implements OnInit {
 
   private goToEditClient(id: string) {
     this.logger.log('Navegando a editar cliente con ID:', id);
-    this.router.navigate(['/app/clients/edit', id]);
+    this.nav.push(APP_ROUTES.nav.clients.edit(id));
   }
 
   private goToViewClient(id: string) {
     this.logger.log('Navegando a editar cliente con ID:', id);
-    this.router.navigate(['/app/clients/view', id]);
+    this.nav.push(APP_ROUTES.nav.clients.view(id));
   }
 
   private async confirmDeleteClient(client: any) {

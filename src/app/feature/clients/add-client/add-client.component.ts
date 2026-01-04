@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { APP_ROUTES } from '@core/constants/routes.constants';
 import { ClientService } from '@core/services/client.service';
 import { ToastService } from '@core/services/toast.service';
 import { ButtonComponent } from '@shared/components/button/button.component';
@@ -11,6 +12,7 @@ import { CustomSelectComponent } from '@shared/components/select/select.componen
 import { ClientTypes } from '@shared/enums/clients/Client-type.enum';
 import { AddClient } from '@shared/models/client/add-client.interface';
 import { SelectOption } from '@shared/models/select/option.interface';
+import { PageConfiguration } from 'src/app/page-configurations';
 
 @Component({
   selector: 'app-add-client',
@@ -26,7 +28,7 @@ import { SelectOption } from '@shared/models/select/option.interface';
   templateUrl: './add-client.component.html',
   styleUrl: './add-client.component.scss',
 })
-export class AddClientComponent {
+export class AddClientComponent extends PageConfiguration {
   private clientService = inject(ClientService);
   private router = inject(Router);
   private toastService = inject(ToastService);
@@ -68,7 +70,7 @@ export class AddClientComponent {
         this.loading.set(false);
         this.toastService.show('Cliente creado exitosamente', 'success');
 
-        this.router.navigate(['/app/clients']);
+        this.nav.setRoot(`${APP_ROUTES.nav.clients}`);
       },
     });
     this.loading.set(false);

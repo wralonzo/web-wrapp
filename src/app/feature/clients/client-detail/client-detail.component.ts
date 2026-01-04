@@ -5,8 +5,9 @@ import { ClientService } from '@core/services/client.service';
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { Client } from '@shared/models/client/client.interface';
 import { Reservation } from '@shared/models/reservation/reservation.interface';
-import { LoggerService } from '@core/services/logger.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { APP_ROUTES } from '@core/constants/routes.constants';
+import { PageConfiguration } from 'src/app/page-configurations';
 
 @Component({
   selector: 'app-client-detail',
@@ -14,11 +15,10 @@ import { ToastService } from '../../../core/services/toast.service';
   imports: [CommonModule, RouterModule, ButtonComponent],
   templateUrl: './client-detail.component.html',
 })
-export class ClientDetailComponent implements OnInit {
+export class ClientDetailComponent extends PageConfiguration implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private clientService = inject(ClientService);
-  private logger = inject(LoggerService);
   private toastService = inject(ToastService);
 
   public client = signal<Client | null>(null);
@@ -46,7 +46,7 @@ export class ClientDetailComponent implements OnInit {
         this.logger.info('Cliente:: ', res);
         this.client.set(res.data as Client);
       },
-      error: () => this.router.navigate(['/app/clients']),
+      error: () => this.nav.setRoot(`${APP_ROUTES.nav.clients}`),
     });
     this.loadReservations('');
   }
@@ -85,11 +85,14 @@ export class ClientDetailComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/app/clients']);
+    this.nav.pop();
   }
 
   goToEdit() {
-    this.router.navigate(['/app/clients/edit', this.client()?.id]);
+    const client = this.client();
+    if (client) {
+      this.nav.push(APP_ROUTES.nav.clients.edit(client.id ?? ''));
+    }
   }
 
   createUser() {

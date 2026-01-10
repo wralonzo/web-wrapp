@@ -30,16 +30,19 @@ export class CustomSelectComponent {
 
   public onSelectionChange = output<SelectOption>();
 
-  private eRef = inject(ElementRef);
+  private readonly eRef = inject(ElementRef);
   public isOpen = signal(false);
 
   // Esta señal computada ahora reaccionará instantáneamente
   // cuando hagamos this.selected.set(...)
   public selectedLabel = computed(() => {
     const currentOptions = this.options();
-    const currentValue = this.selected()?.toString();
+    const currentValue = this.selected();
 
-    const found = currentOptions.find((opt) => opt.value === currentValue);
+    // Comparamos usando == para permitir coerción de tipos (string vs number)
+    // o convertimos ambos a String para asegurar la comparación.
+    const found = currentOptions.find((opt) => String(opt.value) === String(currentValue));
+
     return found ? found.label : 'Seleccionar...';
   });
 

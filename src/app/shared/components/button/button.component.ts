@@ -15,6 +15,7 @@ export class ButtonComponent {
   isDisabled = input<boolean>(false);
   icon = input<string | null>(null);
   btnType = input<string | null>('primary');
+  classCustom = input<string | null>();
 
   // Definimos el evento de salida
   btnClick = output<void>(); // 👈 Esto reemplaza al antiguo @Output

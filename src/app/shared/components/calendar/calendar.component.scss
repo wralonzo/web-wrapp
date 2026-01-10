@@ -1,0 +1,27 @@
+/* Quitar bordes azules del calendario semanal */
+.cal-week-view .cal-day-headers {
+  border-color: #f4f4f5 !important;
+}
+
+.cal-week-view .cal-hour-segment {
+  border-bottom: thin solid #f4f4f5 !important;
+}
+
+.cal-week-view .cal-day-column {
+  border-left-color: #f4f4f5 !important;
+}
+
+/* Estilo de las citas en modo columna */
+.cal-week-view .cal-event {
+  background-color: #18181b !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: 8px !important;
+  font-size: 11px !important;
+  color: white !important;
+}
+
+/* Indicador de tiempo actual (la línea roja/negra que cruza el día) */
+.cal-week-view .cal-current-time-marker {
+  background-color: #18181b !important;
+  height: 2px !important;
+}

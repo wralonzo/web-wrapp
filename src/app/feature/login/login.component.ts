@@ -15,6 +15,7 @@ import { FormsModule } from '@angular/forms';
 import { InputComponent } from '../../shared/components/input/input.component';
 import { PageConfiguration } from 'src/app/page-configurations';
 import { GoogleService } from '@core/services/google.service';
+import { RustService } from '@core/rust/rust.service';
 declare var google: any;
 @Component({
   selector: 'app-login',
@@ -35,7 +36,7 @@ export class LoginComponent extends PageConfiguration implements OnInit, AfterVi
   public email: string = '';
   public password: string = 'n3z00N@beQ7(';
   public isLoading = signal(false);
-  private googleService = inject(GoogleService);
+  private readonly rust = inject(RustService);
 
   // 1. Creamos un signal para el mensaje de error
   public errorMessage = signal<string | null>(null);
@@ -52,12 +53,11 @@ export class LoginComponent extends PageConfiguration implements OnInit, AfterVi
     super();
   }
 
-  public ngOnInit(): void {
-    this.authService.deleteSession();
+  public async ngOnInit(): Promise<void> {
     this.getGoogleClientId();
   }
 
-  public ngAfterViewInit(): void {
+  public async ngAfterViewInit(): Promise<void> {
     setTimeout(() => {
       if (this.googleBtnContainer) {
         google.accounts.id.renderButton(this.googleBtnContainer.nativeElement, {
@@ -69,54 +69,53 @@ export class LoginComponent extends PageConfiguration implements OnInit, AfterVi
     }, 100);
   }
 
-  public onLogin() {
-    this.errorMessage.set(null);
-    this.isLoading.set(true);
+  public async onLogin() {
+    try {
+      if (this.isLoading()) return;
+      this.isLoading.set(true);
+      const response = await this.authService.login(this.email, this.password);
+      this.logger.info('Login', response);
+      this.isLoading.set(false);
+      this.toast.show('Authenticación exitosa', 'success');
+      await this.nav.push(this.ROUTES.nav.dashboard, { welcomeMessage: '¡Hola de nuevo!' });
+    } catch (error: any) {
+      this.isLoading.set(false);
+      this.logger.error('Error en Login', error);
 
-    this.authService.login({ username: this.email, password: this.password }).subscribe({
-      next: (response) => {
-        this.isLoading.set(false);
-        this.nav.setRoot(this.ROUTES.nav.dashboard, { welcomeMessage: '¡Hola de nuevo!' });
-      },
-      error: (err) => {
-        this.isLoading.set(false);
-      },
-    });
+      // Manejo seguro del mensaje de error que viene de Rust/Java
+      const msg = error?.payload?.message || 'Error de conexión con el servidor';
+      this.toast.show(msg, 'error');
+    }
   }
 
-  handleLogin(response: any) {
-    // El 'credential' es un ID Token de Google (JWT)
-    const idToken = response.credential;
-
-    this.authService.loginGoogle(idToken).subscribe({
-      next: (res) => {
-        this.nav.setRoot(this.ROUTES.nav.dashboard, { welcomeMessage: '¡Hola de nuevo!' });
-      },
-      error: (err) => {
-        this.errorMessage.set('Error al iniciar sesión con Google. Intenta de nuevo.');
-      },
-    });
+  async handleLogin(response: any) {
+    try {
+      const idToken = response.credential;
+      const loginUser = await this.authService.loginGoogle(idToken);
+      this.logger.info('Login', loginUser);
+      this.nav.setRoot(this.ROUTES.nav.dashboard, { welcomeMessage: '¡Hola de nuevo!' });
+      this.toast.show('Authenticación exitosa', 'success');
+    } catch (error: any) {
+      this.toast.show(error.toString(), 'error');
+    }
   }
 
-  getGoogleClientId() {
-    return this.googleService.getIdGoogleClient().subscribe({
-      next: (response) => {
-        const { clientId } = response.data.clientId;
-        this.logger.log('Google Client ID:', clientId);
-        google.accounts.id.initialize({
-          client_id: clientId,
-          callback: (response: any) => this.handleLogin(response),
-        });
-
-        google.accounts.id.renderButton(document.getElementById('google-btn'), {
-          theme: 'filled_blue',
-          size: 'large',
-          shape: 'pill',
-        });
-      },
-      error: (err) => {
-        console.error('Error fetching Google Client ID:', err);
-      },
-    });
+  async getGoogleClientId() {
+    try {
+      const { clientId } = await this.rust.auth.getIdGoogleClient();
+      this.logger.log('Google Client ID:', clientId);
+      google.accounts.id.initialize({
+        client_id: clientId,
+        callback: (response: any) => this.handleLogin(response),
+      });
+      google.accounts.id.renderButton(document.getElementById('google-btn'), {
+        theme: 'filled_blue',
+        size: 'large',
+        shape: 'pill',
+      });
+    } catch (error: any) {
+      this.toast.show(error?.payload?.message ?? 'Sin conexión con el servidro', 'error');
+      console.error('Error fetching Google Client ID:', error);
+    }
   }
 }

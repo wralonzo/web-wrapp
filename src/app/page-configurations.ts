@@ -1,8 +1,11 @@
-import { inject, Directive } from '@angular/core';
+import { inject, Directive, OnInit } from '@angular/core';
+import { AppError } from '@assets/retail-shop/AppError';
 import { AuthService } from '@core/auth/auth.service';
 import { APP_ROUTES } from '@core/constants/routes.constants';
+import { RustService } from '@core/rust/rust.service';
 import { LoggerService } from '@core/services/logger.service';
 import { NavigationService } from '@core/services/navigation.service';
+import { ToastService } from '@core/services/toast.service';
 
 @Directive() // Requerido por Angular para clases base que usan inyección
 export abstract class PageConfiguration {
@@ -10,9 +13,11 @@ export abstract class PageConfiguration {
   protected nav = inject(NavigationService);
   protected authService = inject(AuthService);
   protected logger = inject(LoggerService);
+  protected toast = inject(ToastService);
+  protected readonly rustSerive = inject(RustService);
 
   // Acceso fácil al diccionario de rutas
-  public readonly ROUTES = APP_ROUTES;
+  protected readonly ROUTES = APP_ROUTES;
 
   // Lógica común, por ejemplo, verificar si el usuario tiene permiso
   /**
@@ -30,5 +35,38 @@ export abstract class PageConfiguration {
 
     // Retorna true si AL MENOS UNO de los roles del usuario coincide con los requeridos
     return userRoles.some((role) => rolesArray.includes(role));
+  }
+
+  public async provideError(error: any) {
+    // ❌ sin conexión
+    // Si el error no tiene la estructura de AppError
+    if (!error || !error.type) {
+      return 'Ha ocurrido un error inesperado.';
+    }
+
+    const appError = error as AppError;
+
+    switch (appError.type) {
+      case 'ApiError':
+        if(appError.payload.code === 401){
+
+          //redirect login 
+        }
+        return `${appError.payload.message} (${appError.payload.error_api})`;
+      case 'NetworkError':
+        return 'Sin conexión con el servidor. Revisa tu internet.';
+      case 'AuthError':
+        return appError?.payload?.message ?? 'Error en el servidor. Inténtalo más tarde.';
+      case 'Unauthorized':
+        return 'Sesión expirada o no autorizada.';
+      case 'ServerError':
+        return appError?.payload?.message ?? 'Error en el servidor. Inténtalo más tarde.';
+      case 'Conflict':
+        return appError.payload.message;
+      case 'BadRequest':
+        return 'La solicitud es inválida.';
+      default:
+        return 'Error desconocido en el sistema.';
+    }
   }
 }

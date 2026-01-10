@@ -3,20 +3,19 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Client } from '../../shared/models/client/client.interface';
 import { ButtonComponent } from '../../shared/components/button/button.component';
-import { Router } from '@angular/router';
 import { ClientService } from '../../core/services/client.service';
 import { ColumnConfig, FilterConfig } from '@shared/models/table/column-config';
 import { TableActionEvent } from '@shared/models/table/table-event.interface';
 import { TableListComponent } from '@shared/components/table-list/table-list.component';
-import { LoggerService } from '@core/services/logger.service';
 import { ConfirmService } from '@core/services/confirm.service';
-import { ToastService } from '@core/services/toast.service';
 import { ClientTypes } from '@shared/enums/clients/Client-type.enum';
 import { toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop'; // Importante
 import { debounceTime, distinctUntilChanged, skip } from 'rxjs';
 import { SelectOption } from '../../shared/models/select/option.interface';
 import { APP_ROUTES } from '@core/constants/routes.constants';
 import { PageConfiguration } from 'src/app/page-configurations';
+import { ClientResponse } from '@assets/retail-shop/ClientResponse';
+import { PaginatedResponse } from '@assets/retail-shop/PaginatedResponse';
 
 @Component({
   selector: 'app-clients',
@@ -27,9 +26,7 @@ import { PageConfiguration } from 'src/app/page-configurations';
 export class ClientsComponent extends PageConfiguration implements OnInit {
   // Datos de prueba (esto vendría de tu ClientsService)
   private clientService = inject(ClientService);
-  private router = inject(Router);
   private confirmService = inject(ConfirmService);
-  private toast = inject(ToastService);
 
   public clientColumns: ColumnConfig[] = [
     { key: 'code', label: 'Código', type: 'text', sortable: true },
@@ -110,27 +107,27 @@ export class ClientsComponent extends PageConfiguration implements OnInit {
     this.logger.log('Agregar nuevo cliente');
   }
 
-  public loadClients(): void {
+  public async loadClients() {
     this.loading.set(true);
-    const params = {
-      ...this.activeParams(),
-      term: this.searchQuery() ?? '', // Enviamos el término al backend
-      page: this.currentPage(),
-      size: this.pageSize(),
-    };
-    this.clientService.getClients(params).subscribe({
-      next: (clients) => {
-        this.clients.set(clients.data.content);
-        this.totalItems.set(clients.data.totalElements);
-        this.totlPages.set(clients.data.totalPages);
-        this.loading.set(false);
-        this.logger.log('Clientes cargados:', this.clients());
-      },
-      error: (err) => {
-        this.clients.set([]);
-        this.logger.error('Error al cargar los clientes:', err);
-      },
-    });
+    try {
+      const url = `/client?term=${this.searchQuery()}&clientType=${
+        this.activeParams()['clientType'] ?? ''
+      }&page=${this.currentPage()}&size=${this.pageSize()}&sort=${
+        this.activeParams()['sort'] ?? 'name,desc'
+      }`;
+
+      const clients: PaginatedResponse<Client> = await this.rustSerive.call(async (bridge) => {
+        return await bridge.get(url);
+      });
+      this.clients.set(clients.content);
+      this.totalItems.set(clients.totalElements);
+      this.totlPages.set(clients.totalPages);
+      this.loading.set(false);
+      this.logger.log('Clientes cargados:', this.clients());
+    } catch (error: any) {
+      this.logger.error(this.loadClients.name, error);
+      this.toast.show(error?.payload?.message ?? 'Internal Server Error', 'error');
+    }
   }
 
   handleTableAction(event: TableActionEvent) {

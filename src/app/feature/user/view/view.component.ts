@@ -1,13 +1,12 @@
-import { Component, inject, input, signal, OnInit, computed } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ToastService } from '@core/services/toast.service';
 import { UserService } from '@core/services/user.service';
 import { User } from '@shared/models/user/user.model';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { ModalComponent } from '@shared/components/modal-form/modal.component';
 import { FormsModule } from '@angular/forms';
 import { InputComponent } from '@shared/components/input/input.component';
-import { Router } from '@angular/router';
+import { PageConfiguration } from 'src/app/page-configurations';
 
 @Component({
   selector: 'app-view-user',
@@ -15,7 +14,7 @@ import { Router } from '@angular/router';
   imports: [CommonModule, RouterLink, ModalComponent, FormsModule, InputComponent],
   templateUrl: './view.component.html',
 })
-export class ViewUserComponent implements OnInit {
+export class ViewUserComponent extends PageConfiguration implements OnInit {
   // Recibe el :id de la URL automáticamente gracias a withComponentInputBinding
   id = signal<number>(0);
   // Estado del componente
@@ -33,10 +32,9 @@ export class ViewUserComponent implements OnInit {
   showModal = signal(false);
   loading = signal(false);
 
-  private userService = inject(UserService);
-  private toast = inject(ToastService);
-  private route = inject(ActivatedRoute);
-    private router = inject(Router);
+  private readonly userService = inject(UserService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');

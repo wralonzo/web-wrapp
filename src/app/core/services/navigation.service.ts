@@ -13,18 +13,18 @@ export class NavigationService {
   /**
    * Navega a una ruta y la agrega al historial (Push)
    */
-  push(path: string, params?: any) {
+  async push(path: string, params?: any) {
     console.log('Navigating to:', path, 'with params:', params);
     this.history.update((h) => [...h, path]);
-    this.router.navigate([path], { state: params });
+    await this.router.navigate([path], { state: params });
   }
 
   /**
    * Limpia el historial y establece una nueva raíz (SetRoot)
    */
-  setRoot(path: string, params?: any) {
+  async setRoot(path: string, params?: any) {
     this.history.set([path]);
-    this.router.navigate([path], {
+    await this.router.navigate([path], {
       replaceUrl: true,
       state: params,
     });

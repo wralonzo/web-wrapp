@@ -1,11 +1,10 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ClientService } from '@core/services/client.service';
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { Client } from '@shared/models/client/client.interface';
 import { Reservation } from '@shared/models/reservation/reservation.interface';
-import { ToastService } from '../../../core/services/toast.service';
 import { APP_ROUTES } from '@core/constants/routes.constants';
 import { PageConfiguration } from 'src/app/page-configurations';
 
@@ -17,9 +16,7 @@ import { PageConfiguration } from 'src/app/page-configurations';
 })
 export class ClientDetailComponent extends PageConfiguration implements OnInit {
   private route = inject(ActivatedRoute);
-  private router = inject(Router);
   private clientService = inject(ClientService);
-  private toastService = inject(ToastService);
 
   public client = signal<Client | null>(null);
   public reservations = signal<Reservation[]>([]);
@@ -55,22 +52,6 @@ export class ClientDetailComponent extends PageConfiguration implements OnInit {
     // Aquí llamarías a tu servicio: this.reservationService.getByClientId(clientId)...
     // Simulamos datos:
     this.reservations.set([
-      {
-        id: 101,
-        date: '2025-01-15',
-        time: '10:00 AM',
-        status: 'CONFIRMED',
-        service: 'Asesoría Premium',
-        total: 50.0,
-      },
-      {
-        id: 102,
-        date: '2025-02-10',
-        time: '02:30 PM',
-        status: 'PENDING',
-        service: 'Mantenimiento General',
-        total: 120.0,
-      },
     ]);
   }
 
@@ -99,7 +80,7 @@ export class ClientDetailComponent extends PageConfiguration implements OnInit {
     this.clientService.createUser(Number(this.client()?.id)).subscribe({
       next: (res) => {
         this.logger.info('Cliente:: ', res);
-        this.toastService.show('Usuario Creado', 'success');
+        this.toast.show('Usuario Creado', 'success');
         this.client.set(res.data as Client);
       },
     });

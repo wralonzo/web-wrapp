@@ -1,0 +1,43 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-5">
+
+  @for (field of fields(); track field.name) {
+  <div [class.md:col-span-2]="field.colSpan === 2" [class.md:col-span-1]="field.colSpan !== 2"
+    class="flex flex-col gap-1.5">
+    @switch (field.type) {
+
+    @case ('select') {
+      <div class="relative w-full"> 
+        <app-custom-select 
+          class="w-full"
+          [label]="field.label" 
+          [options]="getOptions(field)" 
+          [selected]="form.get(field.name)?.value"
+          (onSelectionChange)="onSelectChange(field.name, $event)" 
+        />
+      </div>
+    }
+
+    @case ('date') {
+      <div class="w-full relative">
+        <app-datepicker 
+          [label]="field.label" 
+          [control]="$any(form.get(field.name))"
+          [showErrors]="formSubmitted()"
+        />
+      </div>
+    }
+
+    @default {
+    <app-input [name]="field.name" [label]="field.label" [type]="$any(field.type)" [formControlName]="field.name"
+      [required]="!!field.required" [showErrors]="formSubmitted()" />
+    }
+    }
+  </div>
+  }
+
+  <div class="col-span-1 md:col-span-2 mt-4">
+    <app-button type="submit" [label]="isSubmitting() ? 'Guardando...' : 'Guardar Información'"
+      [isLoading]="isSubmitting()" [isDisabled]="form.invalid" icon="add-plus" class="w-full" />
+  </div>
+
+</form>

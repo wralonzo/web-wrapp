@@ -1,0 +1,65 @@
+<div class="p-6 bg-white rounded-[2.5rem] border border-zinc-200 shadow-sm overflow-hidden">
+  
+  <div class="flex items-center justify-between mb-8">
+    <div class="flex flex-col">
+      <h2 class="text-2xl font-black text-zinc-900 capitalize tracking-tighter leading-none">
+        {{ calendarTitle() }}
+      </h2>
+      <p class="text-zinc-400 text-[10px] font-bold uppercase tracking-widest mt-2">Agenda Semanal</p>
+    </div>
+
+    <div class="flex items-center gap-2 bg-zinc-50 p-1.5 rounded-2xl border border-zinc-100">
+      <button (click)="prev()" class="p-2 hover:bg-white hover:shadow-sm rounded-xl transition-all">
+        <svg class="w-5 h-5 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      
+      <button (click)="setToday()" class="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-zinc-900">
+        Hoy
+      </button>
+
+      <button (click)="next()" class="p-2 hover:bg-white hover:shadow-sm rounded-xl transition-all">
+        <svg class="w-5 h-5 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="relative rounded-3xl overflow-hidden border border-zinc-100">
+    <mwl-calendar-week-view
+      [viewDate]="viewDate()"
+      [events]="events()"
+      [hourSegmentHeight]="60"
+      [dayStartHour]="8"
+      [dayEndHour]="20"
+      [weekStartsOn]="1"
+      [headerTemplate]="zincHeaderTemplate"
+      locale="es"
+    >
+    </mwl-calendar-week-view>
+  </div>
+</div>
+
+<ng-template #zincHeaderTemplate let-days="days" let-locale="locale">
+  <div class="flex border-b border-zinc-100 bg-zinc-50/50">
+    @for (day of days; track day.date) {
+      <div 
+        class="flex-1 py-4 text-center border-r border-zinc-100 last:border-r-0"
+        [class.bg-white]="day.isToday"
+      >
+        <p class="text-[10px] font-black uppercase tracking-widest" 
+           [class.text-zinc-900]="day.isToday" 
+           [class.text-zinc-400]="!day.isToday">
+          {{ day.date | date:'EEE':undefined:'es' }}
+        </p>
+        <p class="text-lg font-bold" 
+           [class.text-zinc-900]="day.isToday" 
+           [class.text-zinc-500]="!day.isToday">
+          {{ day.date | date:'d' }}
+        </p>
+        
+        @if (day.isToday) {
+          <div class="w-1 h-1 bg-zinc-900 rounded-full mx-auto mt-1"></div>
+        }
+      </div>
+    }
+  </div>
+</ng-template>

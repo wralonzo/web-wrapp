@@ -56,6 +56,22 @@ body {
            disabled:opacity-50 disabled:pointer-events-none;
   }
 
+  .btn-blue {
+    /* Fondo azul sólido y texto blanco para contraste */
+    @apply bg-blue-600 text-white font-semibold py-3 px-6;
+    
+    /* Bordes y Redondeado (usando tu variable o rounded-full para el estilo circular) */
+    @apply border-none rounded-[var(--radius-btn,9999px)]; 
+    
+    /* Animaciones y Sombras */
+    @apply transition-all duration-200 shadow-lg shadow-blue-100;
+    
+    /* Estados: Hover (encima), Active (clic) y Disabled */
+    @apply hover:bg-blue-700 hover:scale-[1.02] shadow-blue-200;
+    @apply active:scale-[0.98];
+    @apply disabled:opacity-50 disabled:pointer-events-none;
+  }
+
   // Inputs del Sistema
   .input-field {
     @apply w-full px-5 py-3 rounded-(--radius-btn) bg-slate-50 border border-slate-200 
@@ -80,4 +96,12 @@ body {
   .login-subtitle {
     @apply text-(--color-neutral-500) text-lg mb-8;
   }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

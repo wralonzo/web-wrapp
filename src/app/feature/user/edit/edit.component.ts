@@ -2,10 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { LoggerService } from '@core/services/logger.service';
 import { PositionTypeService } from '@core/services/position-type.service';
 import { RoleService } from '@core/services/roles.service';
-import { ToastService } from '@core/services/toast.service';
 import { UserService } from '@core/services/user.service';
 import { WarehouseService } from '@core/services/warehouse.service';
 import { ButtonComponent } from '@shared/components/button/button.component';
@@ -17,6 +15,7 @@ import { UserAdd } from '@shared/models/user/add-user.interface';
 import { User } from '@shared/models/user/user.model';
 import { Warehouse } from '@shared/models/warehouse/warehouse.interface';
 import { Subscription } from 'rxjs';
+import { PageConfiguration } from 'src/app/page-configurations';
 
 @Component({
   selector: 'app-edit',
@@ -32,15 +31,13 @@ import { Subscription } from 'rxjs';
   templateUrl: './edit.component.html',
   styleUrl: './edit.component.scss',
 })
-export class EditUserComponponent implements OnInit {
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private userService = inject(UserService);
-  private positionTypeService = inject(PositionTypeService);
-  private roleService = inject(RoleService);
-  private warehouseService = inject(WarehouseService);
-  private toastService = inject(ToastService);
-  private logger = inject(LoggerService);
+export class EditUserComponponent extends PageConfiguration implements OnInit {
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly userService = inject(UserService);
+  private readonly positionTypeService = inject(PositionTypeService);
+  private readonly roleService = inject(RoleService);
+  private readonly warehouseService = inject(WarehouseService);
 
   public loading = signal(false);
   public loadingData = signal(false);
@@ -156,7 +153,7 @@ export class EditUserComponponent implements OnInit {
     this.userAdd.warehouse = this.user?.employee?.warehouseId;
     this.userService.update(+this.idRecord()!, this.userAdd).subscribe(() => {
       this.router.navigate(['/app/users']);
-      this.toastService.show('Usuario actualizado correctamente!', 'success');
+      this.toast.show('Usuario actualizado correctamente!', 'success');
     });
     this.submitting.set(false);
   }

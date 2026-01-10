@@ -2,11 +2,9 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { PositionTypeService } from '@core/services/position-type.service';
 import { RoleService } from '@core/services/roles.service';
-import { ToastService } from '@core/services/toast.service';
 import { UserService } from '@core/services/user.service';
 import { SelectOption } from '@shared/models/select/option.interface';
 import { UserAdd } from '@shared/models/user/add-user.interface';
-import { AddViewModule } from '@shared/modules/add-view/add-view.module';
 import { FormsModule, NgForm } from '@angular/forms';
 import { WarehouseService } from '@core/services/warehouse.service';
 import { Subscription } from 'rxjs';
@@ -17,6 +15,7 @@ import { CustomSelectComponent } from '@shared/components/select/select.componen
 import { Warehouse } from '@shared/models/warehouse/warehouse.interface';
 import { LoggerService } from '@core/services/logger.service';
 import { MultiSelectRolesComponent } from '@shared/components/multi-select/multi-select-roles.component';
+import { PageConfiguration } from 'src/app/page-configurations';
 
 @Component({
   selector: 'app-add',
@@ -32,14 +31,12 @@ import { MultiSelectRolesComponent } from '@shared/components/multi-select/multi
   templateUrl: './add.component.html',
   styleUrl: './add.component.scss',
 })
-export class AddUserComponent implements OnInit {
-  private router = inject(Router);
-  private userService = inject(UserService);
-  private positionTypeService = inject(PositionTypeService);
-  private roleService = inject(RoleService);
-  private warehouseService = inject(WarehouseService);
-  private toastService = inject(ToastService);
-  private logger = inject(LoggerService);
+export class AddUserComponent extends PageConfiguration implements OnInit {
+  private readonly router = inject(Router);
+  private readonly userService = inject(UserService);
+  private readonly positionTypeService = inject(PositionTypeService);
+  private readonly roleService = inject(RoleService);
+  private readonly warehouseService = inject(WarehouseService);
   
   public loading = signal(false);
   public formSubmitted = signal(false);
@@ -71,7 +68,6 @@ export class AddUserComponent implements OnInit {
   private loadWarehouses(): Subscription {
     return this.warehouseService.find().subscribe({
       next: (response) => {
-        this.logger.info('Warehouses', response);
         const data = response.data as Warehouse[];
         const mapping: SelectOption[] = data.map((item) => {
           return {
@@ -127,24 +123,24 @@ export class AddUserComponent implements OnInit {
   public register(form: NgForm): void {
     this.formSubmitted.set(true);
     if (form.invalid) {
-      this.toastService.show('Por favor, completa todos los campos requeridos.', 'error');
+      this.toast.show('Por favor, completa todos los campos requeridos.', 'error');
       return;
     }
 
     if (!this.user.warehouse) {
-      this.toastService.show('Por favor, selecciona un almacen.', 'error');
+      this.toast.show('Por favor, selecciona un almacen.', 'error');
       return;
     }
 
     if (!this.user.positionType) {
-      this.toastService.show('Por favor, selecciona una posición.', 'error');
+      this.toast.show('Por favor, selecciona una posición.', 'error');
       return;
     }
     this.loading.set(true);
     this.user.roles = this.userRoles();
     this.userService.create(this.user).subscribe({
       next: (response) => {
-        this.toastService.show('Usuario agregado correctamente');
+        this.toast.show('Usuario agregado correctamente');
         this.router.navigate(['/app/users']);
       },
     });

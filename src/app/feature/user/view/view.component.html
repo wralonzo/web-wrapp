@@ -45,7 +45,7 @@
   </form>
 </app-modal>
 
-<div class="max-w-2xl mx-auto p-6">
+<div class="max-w-4xl mx-auto p-6">
   @if (isLoading()) {
   <div class="animate-pulse bg-white rounded-[32px] p-8 space-y-4 shadow-sm border border-zinc-100">
     <div class="flex items-center gap-4">
@@ -128,7 +128,7 @@
       </button>
       <a
         title="Volver a usuarios"
-        routerLink="/app/users"
+        [routerLink]="ROUTES.nav.users.list"
         class="text-zinc-500 hover:text-zinc-700 transition-colors flex items-center gap-1 font-medium text-sm px-10"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

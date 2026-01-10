@@ -1,8 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { Router } from '@angular/router';
 import { ConfirmService } from '@core/services/confirm.service';
-import { LoggerService } from '@core/services/logger.service';
-import { ToastService } from '@core/services/toast.service';
 import { ColumnConfig, FilterConfig, TableActionEvent } from '@shared/models/table';
 import { UserService } from '../../../core/services/user.service';
 import { User } from '@shared/models/user/user.model';
@@ -16,6 +13,8 @@ import { TableListComponent } from '@shared/components/table-list/table-list.com
 import { RoleService } from '@core/services/roles.service';
 import { PageConfiguration } from 'src/app/page-configurations';
 import { APP_ROUTES } from '@core/constants/routes.constants';
+import { HttpParams } from '@angular/common/http';
+import { PaginatedResponse } from '@assets/retail-shop/PaginatedResponse';
 @Component({
   selector: 'app-list',
   imports: [CommonModule, FormsModule, ButtonComponent, TableListComponent],
@@ -24,11 +23,9 @@ import { APP_ROUTES } from '@core/constants/routes.constants';
   standalone: true,
 })
 export class ListUserComponent extends PageConfiguration implements OnInit {
-  private router = inject(Router);
-  private confirmService = inject(ConfirmService);
-  private toast = inject(ToastService);
-  private userService = inject(UserService);
-  private roleService = inject(RoleService);
+  private readonly confirmService = inject(ConfirmService);
+  private readonly userService = inject(UserService);
+  private readonly roleService = inject(RoleService);
 
   public totalItems = signal(0);
   public currentPage = signal(0);
@@ -36,7 +33,7 @@ export class ListUserComponent extends PageConfiguration implements OnInit {
   public pageSize = signal(10);
   public loading = signal(false);
 
-  private activeParams = signal<Record<string, any>>({
+  private readonly activeParams = signal<Record<string, any>>({
     sort: 'username,asc',
   });
 
@@ -91,32 +88,34 @@ export class ListUserComponent extends PageConfiguration implements OnInit {
     this.loadData();
     this.loadRoles();
   }
-  
+
   public add(): void {
     this.nav.push(APP_ROUTES.nav.users.add);
   }
 
-  private loadData() {
-    this.loading.set(true);
-    const params = {
-      ...this.activeParams(),
-      term: this.searchQuery() ?? '', // Enviamos el término al backend
-      page: this.currentPage(),
-      size: this.pageSize(),
-    };
+  private async loadData() {
+    try {
+      this.loading.set(true);
+      const params = {
+        ...this.activeParams(),
+        term: this.searchQuery() ?? '', // Enviamos el término al backend
+        page: this.currentPage(),
+        size: this.pageSize(),
+      };
 
-    this.userService.get(params).subscribe({
-      next: (response) => {
-        this.users.set(response.data.content);
-        this.totalItems.set(response.data.totalElements);
-        this.totlPages.set(response.data.totalPages);
-        this.loading.set(false);
-        this.logger.log('Usuarios cargados:', this.users());
-      },
-      error: (err) => {
-        this.logger.error('Error al cargar los datos:', err);
-      },
-    });
+      const queryString = new HttpParams({ fromObject: params }).toString();
+      const url = `/user?${queryString}`;
+      const response: PaginatedResponse<User> = await this.rustSerive.call(async (bridge) => {
+        return await bridge.get(url);
+      });
+      this.users.set(response.content);
+      this.totalItems.set(response.totalElements);
+      this.totlPages.set(response.totalPages);
+      this.logger.log('Usuarios cargados:', this.users());
+    } catch (error: any) {
+      this.logger.error(this.loadData.name, error);
+      this.toast.show(error?.payload?.message);
+    }
   }
 
   private loadRoles() {

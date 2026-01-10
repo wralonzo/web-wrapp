@@ -23,7 +23,7 @@
 
       <div #googleBtnContainer></div>
       
-      <form class="space-y-6" (submit)="onLogin()">
+      <form class="space-y-6" (ngSubmit)="onLogin()">
         <div class="space-y-5">
           <div class="group">
             @if (errorMessage()) {

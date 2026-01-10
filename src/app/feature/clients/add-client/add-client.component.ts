@@ -4,7 +4,6 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { APP_ROUTES } from '@core/constants/routes.constants';
 import { ClientService } from '@core/services/client.service';
-import { ToastService } from '@core/services/toast.service';
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { CheckboxComponent } from '@shared/components/checkbox/checkbox.component';
 import { InputComponent } from '@shared/components/input/input.component';
@@ -29,10 +28,6 @@ import { PageConfiguration } from 'src/app/page-configurations';
   styleUrl: './add-client.component.scss',
 })
 export class AddClientComponent extends PageConfiguration {
-  private clientService = inject(ClientService);
-  private router = inject(Router);
-  private toastService = inject(ToastService);
-
   public loading = signal(false);
   public formSubmitted = signal(false);
 
@@ -52,28 +47,32 @@ export class AddClientComponent extends PageConfiguration {
     { value: ClientTypes.PREMIUM, label: 'PREMIUM' },
   ];
 
-  public register(form: NgForm) {
+  public async register(form: NgForm) {
     this.formSubmitted.set(true);
 
     if (form.invalid) {
-      this.toastService.show('Por favor, completa todos los campos requeridos.', 'error');
+      this.toast.show('Por favor, completa todos los campos requeridos.', 'error');
       return;
     }
     if (!this.client.clientType) {
-      this.toastService.show('Por favor, selecciona un tipo de cliente.', 'error');
+      this.toast.show('Por favor, selecciona un tipo de cliente.', 'error');
       return;
     }
 
     this.loading.set(true);
-    this.clientService.createClient(this.client).subscribe({
-      next: () => {
-        this.loading.set(false);
-        this.toastService.show('Cliente creado exitosamente', 'success');
-
-        this.nav.setRoot(`${APP_ROUTES.nav.clients}`);
-      },
-    });
-    this.loading.set(false);
+    try {
+      const response = await this.rustSerive.call(async (bridge) => {
+        return await bridge.post('/client', this.client);
+      });
+      this.logger.info(this.register.name, response);
+      this.nav.setRoot(`${APP_ROUTES.nav.clients}`);
+      this.toast.show('Cliente creado exitosamente', 'success');
+    } catch (error: any) {
+      this.logger.error(this.register.name, error);
+      this.toast.show(error?.payload?.message ?? 'El servidor no response', 'error');
+    } finally {
+      this.loading.set(false);
+    }
   }
 
   selectTypeClient(option: SelectOption) {

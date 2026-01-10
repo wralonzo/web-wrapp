@@ -22,8 +22,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         switch (error.status) {
           case 401:
             // Verificamos si ya estamos en logout para evitar bucles
-            errorMessage = 'Sesión expirada. Redirigiendo...';
-            authService.logout();
+            errorMessage = 'Sesión expirada inicie sesión...';
             break;
           case 400:
             errorMessage = error.error?.data?.message || error.error?.message || 'Datos inválidos.';

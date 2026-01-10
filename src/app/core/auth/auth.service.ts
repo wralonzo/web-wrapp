@@ -1,65 +1,59 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { tap } from 'rxjs';
-import { AuthResponse, User } from '../../shared/models/user/user.model';
-import { environment } from '../../../environments/environment.development';
 import { LoggerService } from '../services/logger.service';
 import { APP_ROUTES } from '@core/constants/routes.constants';
+import { RustService } from '@core/rust/rust.service';
+import { User } from '@assets/retail-shop/User';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private http = inject(HttpClient);
   private router = inject(Router);
   private logger = inject(LoggerService);
-
-  private readonly API_URL = environment.apiUrl;
-
-  // Clave única para el localStorage
-  private readonly STORAGE_KEY = 'user_data';
+  private readonly rustBridge = inject(RustService);
 
   // 1. Fuente de verdad privada
-  private userSignal = signal<User | null>(this.getUserFromStorage());
+  private userSignal = signal<User | null>(null);
 
   // 2. Exponemos el estado de forma pública y reactiva (Solo lectura)
   public currentUser = computed(() => this.userSignal());
   public isAuthenticated = computed(() => !!this.userSignal());
 
-  login(credentials: { username: string; password: string }) {
-    return this.http.post<AuthResponse>(`${this.API_URL}auth/login`, credentials).pipe(
-      tap((response) => {
-        if (response.success && response.data) {
-          // Si el login es correcto, actualizamos el estado global automáticamente
-          this.setCurrentUser(response.data);
-          this.logger.info('User logged in', response.data);
-        }
-      })
-    );
+  constructor() {
+    // 3. Disparamos la carga asíncrona inmediatamente
+    this.initializeSession();
   }
 
-  loginGoogle(idToken: string) {
-    return this.http.post<AuthResponse>(`${this.API_URL}auth/google`, { idToken }).pipe(
-      tap((response) => {
-        if (response.success && response.data) {
-          // Si el login es correcto, actualizamos el estado global automáticamente
-          this.setCurrentUser(response.data);
-          this.logger.info('User logged in with Google', response.data);
-        }
-      })
-    );
+  async login(user: string, password: string): Promise<User> {
+    const auth = this.rustBridge.auth;
+    return new Promise<User>((resolve, reject) => {
+      auth
+        .login(user, password)
+        .then((response) => {
+          resolve(response);
+        })
+        .catch((e) => reject(e));
+    });
   }
 
-  public setCurrentUser(user: User): void {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(user));
-    this.userSignal.set(user);
+  async loginGoogle(idToken: string): Promise<User> {
+    const auth = this.rustBridge.auth;
+
+    return new Promise<any>((resolve, reject) => {
+      auth
+        .loginGoogle(idToken)
+        .then((response) => {
+          resolve(response);
+        })
+        .catch((e) => reject(e));
+    });
   }
 
-  public logout(): void {
+  public async logout() {
     try {
-      localStorage.removeItem(this.STORAGE_KEY);
-      this.userSignal.set(null);
+      const auth = this.rustBridge.auth;
+      await auth.logout();
       this.router.navigate([`${APP_ROUTES.nav.login}`]);
     } catch (error) {
       this.logger.error('Error during logout', error);
@@ -67,20 +61,22 @@ export class AuthService {
   }
 
   public deleteSession(): void {
-    localStorage.removeItem(this.STORAGE_KEY);
     this.userSignal.set(null);
   }
 
-  private getUserFromStorage(): User | null {
-    const storedUser = localStorage.getItem(this.STORAGE_KEY);
-    if (storedUser) {
-      try {
-        return JSON.parse(storedUser) as User;
-      } catch (e) {
-        this.logger.error('Error al parsear el usuario del storage', e);
-        return null;
-      }
+  private async initializeSession(): Promise<void> {
+    try {
+      // IMPORTANTE: Primero hidratamos el HttpClient de Rust con el token
+      await this.rustBridge.auth.hydrate();
+
+      // Luego recuperamos los datos del usuario para la UI
+      const storedUser = await this.rustBridge.auth.getUserLocal();
+
+      console.info('✅ Sesión recuperada de Rust:', storedUser);
+      this.userSignal.set(storedUser);
+    } catch (e) {
+      console.error('❌ Error al recuperar la sesión de Rust:', e);
+      this.userSignal.set(null);
     }
-    return null;
   }
 }

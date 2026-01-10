@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
 import { APP_ROUTES } from '@core/constants/routes.constants';
 import { UserRole } from '@shared/enums/roles/roles.enum';
+import { ReservationCalendarComponent } from '@shared/components/calendar/calendar.component';
 
 export const routes: Routes = [
   // 1. Redirección inicial
@@ -52,54 +53,27 @@ export const routes: Routes = [
         loadChildren: () => import('./feature/user/user.routes').then((m) => m.USER_ROUTES),
       },
 
-      // Módulo de Reservaciones
-      {
-        path: 'reservations',
-        data: {
-          rols: [UserRole.ADMIN, UserRole.SALES],
-        },
-        title: 'Reservaciones',
-        children: [
-          {
-            path: '',
-            loadComponent: () =>
-              import('./feature/reservations/list/list-reservation.component').then(
-                (m) => m.ListReservationComponent
-              ),
-          },
-          {
-            path: 'add',
-            title: 'Nueva Reservación',
-            loadComponent: () =>
-              import('./feature/reservations/add/add-reservation.component').then(
-                (m) => m.AddReservationComponent
-              ),
-          },
-          {
-            path: 'edit/:id',
-            title: 'Editar Reservación',
-            loadComponent: () =>
-              import('./feature/reservations/add/add-reservation.component').then(
-                (m) => m.AddReservationComponent
-              ),
-          },
-          {
-            path: 'view/:id',
-            title: 'Ver Reservación',
-            loadComponent: () =>
-              import('./feature/reservations/add/add-reservation.component').then(
-                (m) => m.AddReservationComponent
-              ),
-          },
-        ],
-      },
-
-      // Otras Rutas
       {
         path: 'products',
         title: 'Productos',
-        loadComponent: () => import('./feature/home/home').then((m) => m.HomeComponent),
+        loadChildren: () =>
+          import('./feature/products/products.routes').then((m) => m.PRODUCTS_ROUTES),
       },
+
+      // Módulo de Reservaciones
+      {
+        path: 'reservations',
+        title: 'Reservaciones',
+        loadChildren: () =>
+          import('./feature/reservations/reservations.routes').then((m) => m.RESERVATIONS_ROUTES),
+      },
+      {
+        path: 'reservations/calendar',
+        component: ReservationCalendarComponent,
+      },
+
+      // Otras Rutas
+
       {
         path: 'suppliers',
         title: 'Proveedores',

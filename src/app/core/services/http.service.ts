@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { LoggerService } from './logger.service';
@@ -10,12 +10,12 @@ import { LoggerService } from './logger.service';
 export class HttpService {
   private http = inject(HttpClient);
   private logger = inject(LoggerService);
-  private baseUrl = environment.apiUrl;
+  private baseUrl = environment.apiUrl+"/";
 
   // Método GENÉRICO para GET
   doGet<T>(
     endpoint: string,
-    params?: Record<string, string | number | boolean | ReadonlyArray<string | number | boolean >>
+    params?: Record<string, string | number | boolean | ReadonlyArray<string | number | boolean>>
   ): Observable<T> {
     return this.http
       .get<T>(`${this.baseUrl}${endpoint}`, {
@@ -56,6 +56,14 @@ export class HttpService {
       map((response) => response),
       catchError((error) => this.handleError(error))
     );
+  }
+
+  // Dentro de tu clase ApiService (o similar)
+  public doGetFile(endpoint: string): Observable<HttpResponse<Blob>> {
+    return this.http.get(`${this.baseUrl}${endpoint}`, {
+      responseType: 'blob', // <--- Esto es vital para archivos
+      observe: 'response',
+    });
   }
 
   // Manejo de errores centralizado

@@ -10,7 +10,7 @@ export const USER_ROUTES: Routes = [
     title: 'Lista de Usuarios',
   },
   {
-    path: APP_ROUTES.definitions.users,
+    path: APP_ROUTES.definitions.add,
     title: 'Nuevo Usuario',
     data: { rols: [UserRole.ADMIN] },
     loadComponent: () => import('./add/add.component').then((m) => m.AddUserComponent),

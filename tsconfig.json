@@ -19,7 +19,9 @@
       "@shared/*": ["src/app/shared/*"],
       "@core/*": ["src/app/core/*"],
       "@env/*": ["src/environments/*"],
-      "@assets/*": ["src/assets/*"]
+      "@assets/*": ["src/assets/*"],
+      "rust-retail": ["./src/assets/rust-retail/rust_retail.js"]
+      
     }
   },
   "angularCompilerOptions": {

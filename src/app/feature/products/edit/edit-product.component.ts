@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { GenericHttpBridge } from '@assets/retail-shop/rust_retail';
 import { ProductService } from '@core/services/product.service';
 import { DynamicFormComponent } from '@shared/components/dynamic-form/dynamic-form.component';
 import { FieldConfig } from '@shared/models/field/field-config.interface';
@@ -77,7 +78,7 @@ export class EditProductComponent extends PageConfiguration implements OnInit {
       endpoint: '/category', // Tu ruta de Spring Boot
       // Transformamos lo que viene del back al formato {label, value}
       mapResponse: (res: any) =>
-        res.data.content.map((cat: any) => ({
+        res.content.map((cat: any) => ({
           label: cat.name,
           value: cat.id,
         })),
@@ -99,34 +100,37 @@ export class EditProductComponent extends PageConfiguration implements OnInit {
   }
 
   // En tu componente .ts
-  onSaveProduct(formData: any) {
-    console.log('Objeto listo para el backend:', formData);
-    const payload: Product = {
-      name: formData.name,
-      description: formData.description,
-      sku: formData.sku,
-      barcode: formData.barcode,
-      pricePurchase: formData.pricePurchase,
-      priceSale: formData.priceSale,
-      stockMinim: formData.stockMinim,
-      categoryId: formData.categoryId,
-    };
-
-    this.productService.update(this.idRecord()!, payload).subscribe({
-      next: () => {
-        this.toast.show('Producto actualizado con éxito', 'success');
-        this.nav.push(this.ROUTES.nav.products.list);
-      },
-    });
+  async onSaveProduct(formData: any) {
+    try {
+      console.log('Objeto listo para el backend:', formData);
+      const payload: Product = {
+        name: formData.name,
+        description: formData.description,
+        sku: formData.sku,
+        barcode: formData.barcode,
+        pricePurchase: formData.pricePurchase,
+        priceSale: formData.priceSale,
+        stockMinim: formData.stockMinim,
+        categoryId: formData.categoryId,
+      };
+      await this.rustService.call(async (bridge: GenericHttpBridge) => {
+        return bridge.patch(`/products/${this.idRecord()}`, payload);
+      });
+      this.nav.push(this.ROUTES.nav.products.list);
+    } catch (error) {
+      this.provideError(error);
+    }
   }
 
-  getData() {
-    this.productService.findById(this.idRecord()!).subscribe({
-      next: (response: ProductResponse) => {
-        this.logger.info('Producto cargado', response.data);
-        this.initialData.set(response.data);
-      },
-      error: () => void this.router.navigate(['/app/products']),
-    });
+  async getData() {
+    try {
+      const response: Product = await this.rustService.call(async (bridge: GenericHttpBridge) => {
+        return bridge.get(`/products/${this.idRecord()}`);
+      });
+      this.logger.info('Producto cargado', response);
+      this.initialData.set(response);
+    } catch (error) {
+      this.provideError(error);
+    }
   }
 }

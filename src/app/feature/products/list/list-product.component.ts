@@ -30,8 +30,6 @@ import { GenericHttpBridge } from '@assets/retail-shop/rust_retail';
 })
 export class ListProductComponent extends PageConfiguration {
   private readonly confirmService = inject(ConfirmService);
-  private readonly productService = inject(ProductService);
-  private readonly downloadExcelTemplateService = inject(DownloadExcelTemplateService);
 
   public totalItems = signal(0);
   public currentPage = signal(0);
@@ -137,26 +135,28 @@ export class ListProductComponent extends PageConfiguration {
   }
 
   private async confirmDelete(data: Product) {
-    const confirmed = await this.confirmService.open({
-      title: 'Desactivar Producto',
-      message: `¿Estás seguro de desactivar ${data.sku} ${data.name}?`,
-      btnConfirmText: 'Sí, desactivar',
-      btnCancelText: 'No, cancelar',
-      variant: 'danger',
-    });
-    if (confirmed) {
-      this.productService.delete(data.id!).subscribe({
-        next: () => {
-          this.products.update((currentProducts) =>
-            currentProducts.map((product) => {
-              product.active = false;
-              data.active = false;
-              return product.id === data.id ? { ...product, ...data } : product;
-            })
-          );
-          this.toast.show('Producto Desactivado', 'success');
-        },
+    try {
+      const confirmed = await this.confirmService.open({
+        title: 'Desactivar Producto',
+        message: `¿Estás seguro de desactivar ${data.sku} ${data.name}?`,
+        btnConfirmText: 'Sí, desactivar',
+        btnCancelText: 'No, cancelar',
+        variant: 'danger',
       });
+      if (confirmed) {
+        await this.rustService.call(async (bridge: GenericHttpBridge) => {
+          return bridge.delete(`/products/activate/${data.id}`);
+        });
+        this.products.update((currentProducts) =>
+          currentProducts.map((product) => {
+            product.active = false;
+            data.active = false;
+            return product.id === data.id ? { ...product, ...data } : product;
+          })
+        );
+      }
+    } catch (error) {
+      this.provideError(error);
     }
   }
 
@@ -202,7 +202,7 @@ export class ListProductComponent extends PageConfiguration {
       this.totlPages.set(response.totalPages);
     } catch (error: any) {
       this.logger.error(this.loadData.name, error);
-      this.toast.show(error?.payload.message! ?? 'El servidor no response');
+      this.provideError(error);
     } finally {
       this.loading.set(true);
     }

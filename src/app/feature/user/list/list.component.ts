@@ -180,23 +180,22 @@ export class ListUserComponent extends PageConfiguration implements OnInit {
       const confirmed = await this.confirmService.open({
         title: 'Desactivar usuario',
         message: `¿Estás seguro de desactivar ${data.fullName}?.`,
-        btnConfirmText: 'Sí, desactivar ahora',
+        btnConfirmText: 'desactivar ahora',
         btnCancelText: 'No, cancelar',
         variant: 'danger',
       });
       if (confirmed) {
         const response = await this.rustService.call(async (bridge) => {
-          return await bridge.patch(`/user/${data.id}/activate`);
+          return await bridge.patch(`/user/${data.id}/deactivate`);
         });
         this.logger.info(this.confirmDelete.name, response);
         this.users.update((currentUsers) =>
           currentUsers.map((user) => {
-            user.enabled = false;
             data.enabled = false;
             return user.id === data.id ? { ...user, ...data } : user;
           })
         );
-        this.toast.show('Usuario eliminado', 'success');
+        this.toast.show('Usuario Desactivado', 'success');
       }
     } catch (error) {
       this.provideError(error);

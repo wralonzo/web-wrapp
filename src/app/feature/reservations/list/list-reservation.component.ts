@@ -11,6 +11,8 @@ import { debounceTime, distinctUntilChanged, skip } from 'rxjs';
 import { PageConfiguration } from 'src/app/page-configurations';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '@shared/components/button/button.component';
+import { GenericHttpBridge } from '@assets/retail-shop/rust_retail';
+import { PaginatedResponse } from '@assets/retail-shop/PaginatedResponse';
 
 @Component({
   selector: 'app-list',
@@ -174,26 +176,30 @@ export class ListReservationComponent extends PageConfiguration {
     this.loadData();
   }
 
-  public loadData() {
-    this.loading.set(true);
-    const params: Record<string, string | number> = {
-      ...this.activeParams(),
-      term: this.searchQuery() ?? '',
-      page: this.currentPage(),
-      size: this.pageSize(),
-    };
+  public async loadData() {
+    try {
+      this.loading.set(true);
+      const params: Record<string, string | number> = {
+        ...this.activeParams(),
+        term: this.searchQuery() ?? '',
+        page: this.currentPage(),
+        size: this.pageSize(),
+      };
 
-    this.reservationService.find(params).subscribe({
-      next: (response) => {
-        this.reservations.set(response.data.content);
-        this.totalItems.set(response.data.totalElements);
-        this.totlPages.set(response.data.totalPages);
-        this.logger.log('Productos cargados:', this.reservations());
-      },
-      complete: () => {
-        this.loading.set(false);
-      },
-    });
+      const urlQuery = this.objectToStringQuery(params);
+
+      const response: PaginatedResponse<Reservation> = await this.rustService.call(
+        async (bridge: GenericHttpBridge) => {
+          return bridge.get(`/reservations?${urlQuery}`);
+        }
+      );
+      this.reservations.set(response.content);
+      this.totalItems.set(response.totalElements);
+      this.totlPages.set(response.totalPages);
+      this.logger.log('Productos cargados:', this.reservations());
+    } catch (error) {
+      this.provideError(error);
+    }
   }
 
   // 1. Capturar el archivo cuando el usuario lo selecciona

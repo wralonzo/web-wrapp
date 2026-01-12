@@ -7,6 +7,7 @@ import { ModalComponent } from '@shared/components/modal-form/modal.component';
 import { FormsModule } from '@angular/forms';
 import { InputComponent } from '@shared/components/input/input.component';
 import { PageConfiguration } from 'src/app/page-configurations';
+import { GenericHttpBridge } from '@assets/retail-shop/rust_retail';
 
 @Component({
   selector: 'app-view-user',
@@ -42,41 +43,41 @@ export class ViewUserComponent extends PageConfiguration implements OnInit {
     this.loadUser();
   }
 
-  loadUser() {
-    this.isLoading.set(true);
-    this.userService.getById(Number(this.id())).subscribe({
-      next: (data) => {
-        this.user.set(data.data);
-        this.isLoading.set(false);
-      },
-      error: () => {
-        this.toast.show('Error al cargar el usuario', 'error');
-        this.isLoading.set(false);
-      },
-    });
+  async loadUser() {
+    try {
+      const response: User = await this.rustService.call(async (brige: GenericHttpBridge) => {
+        return brige.get(`/user/${this.id()}/profile`);
+      });
+      this.logger.info(this.loadUser.name, response);
+      this.user.set(response);
+      this.isLoading.set(false);
+    } catch (error) {
+      this.provideError(error);
+    }
   }
 
   // MÉTODO: Activar / Desactivar
-  toggleStatus() {
-    const currentUser = this.user();
-    if (!currentUser) return;
+  async toggleStatus() {
+    try {
+      const currentUser = this.user();
+      if (!currentUser) return;
 
-    const newStatus = !currentUser.enabled;
-    if (!newStatus) {
-      this.userService.deActivate(currentUser.id).subscribe({
-        next: () => {
-          this.user.update((u) => (u ? { ...u, enabled: newStatus } : null));
-          this.toast.show(`Usuario desactivado`, 'success');
-        },
-      });
-      return;
-    }
-    this.userService.activate(currentUser.id).subscribe({
-      next: () => {
+      const newStatus = !currentUser.enabled;
+      if (!newStatus) {
+        await this.rustService.call(async (bridge: GenericHttpBridge) => {
+          return await bridge.patch(`/user/${currentUser.id}/deactivate`, {});
+        });
         this.user.update((u) => (u ? { ...u, enabled: newStatus } : null));
-        this.toast.show(`Usuario activado' : 'desactivado'}`, 'success');
-      },
-    });
+        return this.toast.show(`Usuario desactivado`, 'success');
+      }
+      await this.rustService.call(async (bridge: GenericHttpBridge) => {
+        return await bridge.patch(`/user/${currentUser.id}/activate`, {});
+      });
+      this.user.update((u) => (u ? { ...u, enabled: newStatus } : null));
+      return this.toast.show(`Usuario desactivado`, 'success');
+    } catch (error) {
+      this.provideError(error);
+    }
   }
 
   // MÉTODO: Cambiar Contraseña
@@ -103,33 +104,37 @@ export class ViewUserComponent extends PageConfiguration implements OnInit {
     this.formData.set({ password: '', confirmPassword: '', reason: '' });
   }
 
-  submitForm() {
-    if (this.formData().password !== this.formData().confirmPassword) {
-      this.toast.show('Las contraseñas no coinciden.', 'error');
-      return;
-    }
-    if (this.formData().password.length < 8) {
-      this.toast.show('La contraseña debe tener al menos 8 caracteres.', 'error');
-      return;
-    }
-    if (!this.formData().reason.trim()) {
-      this.toast.show('Debe proporcionar un motivo para el cambio de contraseña.', 'error');
-      return;
-    }
-    console.log('Valores capturados:', this.formData());
-    const currentUser = this.user();
-    if (!currentUser) return;
-    const newPassword = this.formData().password;
-    if (newPassword && newPassword.length >= 8) {
-      this.userService
-        .changePassword(currentUser.id, newPassword, this.formData().reason)
-        .subscribe({
-          next: () => {
-            this.formData.set({ password: '', confirmPassword: '', reason: '' });
-            this.toast.show('Contraseña actualizada correctamente', 'success');
-            this.showModal.set(false);
-          },
+  async submitForm() {
+    try {
+      if (this.formData().password !== this.formData().confirmPassword) {
+        this.toast.show('Las contraseñas no coinciden.', 'error');
+        return;
+      }
+      if (this.formData().password.length < 8) {
+        this.toast.show('La contraseña debe tener al menos 8 caracteres.', 'error');
+        return;
+      }
+      if (!this.formData().reason.trim()) {
+        this.toast.show('Debe proporcionar un motivo para el cambio de contraseña.', 'error');
+        return;
+      }
+      console.log('Valores capturados:', this.formData());
+      const currentUser = this.user();
+      if (!currentUser) return;
+      const newPassword = this.formData().password;
+      if (newPassword && newPassword.length >= 8) {
+        await this.rustService.call(async (bridge: GenericHttpBridge) => {
+          return bridge.patch(`/user/${currentUser.id}/password`, {
+            newPassword,
+            motive: this.formData().reason,
+          });
         });
+        this.formData.set({ password: '', confirmPassword: '', reason: '' });
+        this.toast.show('Contraseña actualizada correctamente', 'success');
+        this.showModal.set(false);
+      }
+    } catch (error) {
+      this.provideError(error);
     }
   }
 

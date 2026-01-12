@@ -5,7 +5,7 @@ import {
   provideAppInitializer,
   inject,
 } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withHashLocation } from '@angular/router';
 
 import { routes } from './app.routes';
 
@@ -44,5 +44,6 @@ export const appConfig: ApplicationConfig = {
       const rustData = inject(RustDataService);
       return rustData.initialize();
     }),
+    provideRouter(routes, withHashLocation()),
   ],
 };

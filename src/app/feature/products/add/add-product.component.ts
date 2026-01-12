@@ -68,10 +68,10 @@ export class AddProductComponent extends PageConfiguration {
       type: 'select',
       required: true,
       colSpan: 1,
-      endpoint: 'category', // Tu ruta de Spring Boot
+      endpoint: '/category', // Tu ruta de Spring Boot
       // Transformamos lo que viene del back al formato {label, value}
       mapResponse: (res: any) =>
-        res.data.content.map((cat: any) => ({
+        res.content.map((cat: any) => ({
           label: cat.name,
           value: cat.id,
         })),
@@ -86,20 +86,25 @@ export class AddProductComponent extends PageConfiguration {
 
   // En tu componente .ts
   async onSaveProduct(formData: any) {
-    console.log('Objeto listo para el backend:', formData);
-    const payload: Product = {
-      name: formData.name,
-      description: formData.description,
-      sku: formData.sku,
-      barcode: formData.barcode,
-      pricePurchase: formData.pricePurchase,
-      priceSale: formData.priceSale,
-      stockMinim: formData.stockMinim,
-      active: true,
-      categoryId: formData.categoryId.value,
-    };
-    await this.rustSerive.call(async (bridge) => {
-      return await bridge.post('/products', payload);
-    });
+    try {
+      const payload: Product = {
+        name: formData.name,
+        description: formData.description,
+        sku: formData.sku,
+        barcode: formData.barcode,
+        pricePurchase: formData.pricePurchase,
+        priceSale: formData.priceSale,
+        stockMinim: formData.stockMinim,
+        active: true,
+        categoryId: formData.categoryId,
+      };
+      const response = await this.rustService.call(async (bridge) => {
+        return await bridge.post('/products', payload);
+      });
+      this.logger.log(this.onSaveProduct.name, response);
+      this.nav.pop();
+    } catch (error) {
+      this.provideError(error);
+    }
   }
 }

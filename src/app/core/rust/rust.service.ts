@@ -7,12 +7,15 @@ import init, {
 import { LoaderService } from '@core/services/loader.service';
 import { environment } from '@env/environment.development.js';
 import rustPaht from 'rust-retail/rust_retail_bg.wasm?url';
+import { BehaviorSubject } from 'rxjs';
+import { filter, take } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class RustService {
   private http: GenericHttpBridge | null = null;
   private _auth: AuthBridge | null = null;
-  loaderService = inject(LoaderService);
+  private readonly loaderService = inject(LoaderService);
+  private readonly isReady$ = new BehaviorSubject<boolean>(false);
   async initConfig(): Promise<void> {
     try {
       await init(rustPaht); // Carga WASM
@@ -26,6 +29,7 @@ export class RustService {
       this._auth = new AuthBridge(); // <--- Aquí es donde ocurre el pánico ahora
       this.http = new GenericHttpBridge();
       console.log('Rust Ready');
+      this.isReady$.next(true);
     } catch (e) {
       // Si entra aquí, es porque initCoreConfig o el constructor de AuthBridge falló
       console.error('❌ Error en inicialización de Rust:', e);
@@ -36,13 +40,13 @@ export class RustService {
   // Mantenemos el getter pero ahora es más informativo
   get auth(): AuthBridge {
     const value = this._auth;
-    if (!value) throw new Error('AuthBridge no está listo. Usa getAuth() en su lugar.');
+    if (!value) throw new Error('AuthBridge no está listo.');
     return value;
   }
 
   get httpRust(): GenericHttpBridge {
     const value = this.http;
-    if (!value) throw new Error('AuthBridge no está listo. Usa getAuth() en su lugar.');
+    if (!value) throw new Error('AuthBridge no está listo.');
     return value;
   }
 
@@ -54,5 +58,13 @@ export class RustService {
     } finally {
       this.loaderService.hide();
     }
+  }
+
+  // Helper para que otros esperen
+  ready() {
+    return this.isReady$.asObservable().pipe(
+      filter((ready) => ready),
+      take(1)
+    );
   }
 }

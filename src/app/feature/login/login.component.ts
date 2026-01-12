@@ -28,7 +28,7 @@ declare var google: any;
     FormsModule,
     InputComponent,
   ],
-  providers: [GoogleService],
+  providers: [],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
@@ -36,7 +36,6 @@ export class LoginComponent extends PageConfiguration implements OnInit, AfterVi
   public email: string = '';
   public password: string = 'n3z00N@beQ7(';
   public isLoading = signal(false);
-  private readonly rust = inject(RustService);
 
   // 1. Creamos un signal para el mensaje de error
   public errorMessage = signal<string | null>(null);
@@ -77,14 +76,12 @@ export class LoginComponent extends PageConfiguration implements OnInit, AfterVi
       this.logger.info('Login', response);
       this.isLoading.set(false);
       this.toast.show('Authenticación exitosa', 'success');
-      await this.nav.push(this.ROUTES.nav.dashboard, { welcomeMessage: '¡Hola de nuevo!' });
-    } catch (error: any) {
+      const dataLocal = await this.rustService.auth.getUserLocal();
+      this.logger.info('dataLocal', dataLocal);
+      return this.nav.setRoot(this.ROUTES.nav.dashboard);
+    } catch (error) {
       this.isLoading.set(false);
-      this.logger.error('Error en Login', error);
-
-      // Manejo seguro del mensaje de error que viene de Rust/Java
-      const msg = error?.payload?.message || 'Error de conexión con el servidor';
-      this.toast.show(msg, 'error');
+      this.provideError(error);
     }
   }
 
@@ -96,13 +93,13 @@ export class LoginComponent extends PageConfiguration implements OnInit, AfterVi
       this.nav.setRoot(this.ROUTES.nav.dashboard, { welcomeMessage: '¡Hola de nuevo!' });
       this.toast.show('Authenticación exitosa', 'success');
     } catch (error: any) {
-      this.toast.show(error.toString(), 'error');
+      this.provideError(error);
     }
   }
 
   async getGoogleClientId() {
     try {
-      const { clientId } = await this.rust.auth.getIdGoogleClient();
+      const { clientId } = await this.rustService.auth.getIdGoogleClient();
       this.logger.log('Google Client ID:', clientId);
       google.accounts.id.initialize({
         client_id: clientId,
@@ -114,8 +111,7 @@ export class LoginComponent extends PageConfiguration implements OnInit, AfterVi
         shape: 'pill',
       });
     } catch (error: any) {
-      this.toast.show(error?.payload?.message ?? 'Sin conexión con el servidro', 'error');
-      console.error('Error fetching Google Client ID:', error);
+      this.provideError(error);
     }
   }
 }

@@ -8,18 +8,19 @@ import {
   ResourceRef,
   Injector,
   effect,
-} from '@angular/core'; // 1. Importa Injector
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { map, of } from 'rxjs';
+import { map, of, from } from 'rxjs';
 import { FieldConfig, SelectOption } from '@shared/models/field/field-config.interface';
 import { InputComponent } from '@shared/components/input/input.component';
 import { CustomSelectComponent } from '@shared/components/select/select.component';
-import { HttpService } from '@core/services/http.service';
 import { ButtonComponent } from '../button/button.component';
 import { DatepickerComponent } from '../datepicker/datepicker.component';
-
+import { PageConfiguration } from 'src/app/page-configurations';
+import { GenericHttpBridge } from '@assets/retail-shop/rust_retail';
+import { catchError } from 'rxjs/operators';
 @Component({
   selector: 'app-dynamic-form',
   standalone: true,
@@ -29,27 +30,23 @@ import { DatepickerComponent } from '../datepicker/datepicker.component';
     InputComponent,
     CustomSelectComponent,
     ButtonComponent,
-    DatepickerComponent
+    DatepickerComponent,
   ],
   templateUrl: './dynamic-form.component.html',
 })
-export class DynamicFormComponent implements OnInit {
-  private readonly http = inject(HttpService);
+export class DynamicFormComponent extends PageConfiguration implements OnInit {
   private readonly injector = inject(Injector);
-  data = input<any>();
-
-  fields = input.required<FieldConfig[]>();
-  onSubmit = output<any>();
-  onCancel = output<void>();
-
+  public data = input<any>();
+  public fields = input.required<FieldConfig[]>();
+  public onSubmit = output<any>();
+  public onCancel = output<void>();
   public isSubmitting = signal(false);
   public formSubmitted = signal(false);
   public form = new FormGroup<Record<string, FormControl>>({});
-
-  // ResourceRef también usa los genéricos <T>
   public selectResources = new Map<string, ResourceRef<SelectOption<any>[] | undefined>>();
 
   constructor() {
+    super();
     effect(() => {
       const values = this.data();
       if (values) {
@@ -85,13 +82,23 @@ export class DynamicFormComponent implements OnInit {
       stream: ({ request }: { request: string | undefined }) => {
         if (!request) return of([]);
 
-        return this.http.doGet<any>(request).pipe(
-          map((res) => {
-            // Si el usuario definió un mapResponse, se usa su lógica tipada
+        // 'from' convierte la Promesa de RustService en un Observable
+        return from(
+          this.rustService.call(async (bridge: GenericHttpBridge) => {
+            const response = await bridge.get(request);
+
+            this.logger.info(`Respuesta para ${field.name}:`, response);
+
             if (field.mapResponse) {
-              return field.mapResponse(res);
+              return field.mapResponse(response);
             }
-            return Array.isArray(res) ? res : [];
+            return Array.isArray(response) ? response : [];
+          })
+        ).pipe(
+          // Manejo de errores dentro del flujo de RxJS
+          catchError((error) => {
+            this.logger.error(`Error cargando select ${field.name}`, error);
+            return of([]); // Devuelve array vacío en caso de fallo
           })
         );
       },

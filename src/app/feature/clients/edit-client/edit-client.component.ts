@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import { ClientService } from '@core/services/client.service';
+import { GenericHttpBridge } from '@assets/retail-shop/rust_retail';
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { InputComponent } from '@shared/components/input/input.component';
 import { CustomSelectComponent } from '@shared/components/select/select.component';
@@ -27,8 +27,6 @@ import { PageConfiguration } from 'src/app/page-configurations';
 })
 export class EditClientComponent extends PageConfiguration implements OnInit {
   private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private clientService = inject(ClientService);
 
   // Estados
   loadingData = signal(false);
@@ -36,20 +34,7 @@ export class EditClientComponent extends PageConfiguration implements OnInit {
   clientId = signal<number | null>(null);
 
   // Objeto del cliente (Estructura inicial)
-  public client: Client = {
-    name: '',
-    phone: '',
-    email: '',
-    address: '',
-    birthDate: '',
-    clientType: ClientTypes.REGULAR,
-    notes: '',
-    id: 0,
-    lastVisit: '',
-    totalSpent: 0,
-    status: 1,
-    code: '',
-  };
+  public client = signal<Client | null>(null);
 
   optionsTypeClient = [
     { value: ClientTypes.REGULAR, label: 'Regular' },
@@ -61,7 +46,7 @@ export class EditClientComponent extends PageConfiguration implements OnInit {
   constructor() {
     super();
   }
-  
+
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -70,37 +55,33 @@ export class EditClientComponent extends PageConfiguration implements OnInit {
     }
   }
 
-  loadClient() {
-    this.loadingData.set(true);
-    this.clientService
-      .getById(this.clientId()!)
-      .pipe(finalize(() => this.loadingData.set(false)))
-      .subscribe({
-        next: (res: any) => {
-          this.client = { ...res.data };
-        },
-        error: () => this.nav.pop(),
+  async loadClient() {
+    try {
+      const response: Client = await this.rustService.call(async (bridge: GenericHttpBridge) => {
+        return await bridge.get(`/client/${this.clientId()!}`);
       });
+      this.logger.info('Cliente:: ', response);
+      this.client.set(response);
+    } catch (error) {
+      this.provideError(error);
+    }
   }
 
   selectTypeClient(option: SelectOption) {
     console.log('Tipo de cliente seleccionado:', option);
-    this.client.clientType = option.value.toString() as ClientTypes;
+    this.client()!.clientType = option.value.toString() as ClientTypes;
   }
 
-  onSubmit() {
-    this.submitting.set(true);
-    this.clientService
-      .updateClient(this.clientId()!, this.client)
-      .pipe(finalize(() => this.submitting.set(false)))
-      .subscribe({
-        next: () => {
-          this.nav.pop();
-          this.toast.show('¡Cliente actualizado correctamente!', 'success');
-        },
-        error: (err) => {
-          console.error('Error al actualizar', err);
-        },
+  async onSubmit() {
+    try {
+      this.submitting.set(true);
+      await this.rustService.call(async (bridge: GenericHttpBridge) => {
+        return bridge.patch(`/client/${this.clientId()!}`, this.client);
       });
+    } catch (error) {
+      this.provideError(error);
+    } finally {
+      this.submitting.set(false);
+    }
   }
 }

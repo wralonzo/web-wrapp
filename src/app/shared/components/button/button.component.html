@@ -13,10 +13,10 @@
   }
   <span>{{ label() }}</span>
 
-  @if (iconButton()) {
+  @if (iconUrl()) {
   <span class="opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
-    <div class="w-5 h-5 bg-current" [style.mask-image]="'url(' + iconButton() + ')'"
-      [style.-webkit-mask-image]="'url(' + iconButton() + ')'" style="
+    <div class="w-5 h-5 bg-current" [style.mask-image]="'url(' + iconUrl() + ')'"
+      [style.-webkit-mask-image]="'url(' + iconUrl() + ')'" style="
         mask-size: contain;
         mask-repeat: no-repeat;
         mask-position: center;

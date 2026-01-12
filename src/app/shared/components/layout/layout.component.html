@@ -21,7 +21,7 @@
     </div>
 
     <nav class="flex-1 px-3 space-y-1 overflow-y-auto custom-scrollbar">
-      @for (item of menuItems; track item.label) {
+      @for (item of menuItems; track $index) {
       @if (!item.roles || hasRole(item.roles)) {
 
       @if (!item.children) {

@@ -74,7 +74,7 @@ export class EditProductComponent extends PageConfiguration implements OnInit {
       type: 'select',
       required: true,
       colSpan: 1,
-      endpoint: 'category', // Tu ruta de Spring Boot
+      endpoint: '/category', // Tu ruta de Spring Boot
       // Transformamos lo que viene del back al formato {label, value}
       mapResponse: (res: any) =>
         res.data.content.map((cat: any) => ({

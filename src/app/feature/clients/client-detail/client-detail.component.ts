@@ -1,12 +1,12 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { ClientService } from '@core/services/client.service';
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { Client } from '@shared/models/client/client.interface';
 import { Reservation } from '@shared/models/reservation/reservation.interface';
 import { APP_ROUTES } from '@core/constants/routes.constants';
 import { PageConfiguration } from 'src/app/page-configurations';
+import { GenericHttpBridge } from '@assets/retail-shop/rust_retail';
 
 @Component({
   selector: 'app-client-detail',
@@ -16,7 +16,6 @@ import { PageConfiguration } from 'src/app/page-configurations';
 })
 export class ClientDetailComponent extends PageConfiguration implements OnInit {
   private route = inject(ActivatedRoute);
-  private clientService = inject(ClientService);
 
   public client = signal<Client | null>(null);
   public reservations = signal<Reservation[]>([]);
@@ -37,22 +36,25 @@ export class ClientDetailComponent extends PageConfiguration implements OnInit {
     return `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
   });
 
-  private loadClient(id: string): void {
-    this.clientService.getById(Number(id)).subscribe({
-      next: (res) => {
-        this.logger.info('Cliente:: ', res);
-        this.client.set(res.data as Client);
-      },
-      error: () => this.nav.setRoot(`${APP_ROUTES.nav.clients}`),
-    });
+  private async loadClient(id: string) {
+    try {
+      const response: Client = await this.rustService.call(async (bridge: GenericHttpBridge) => {
+        return await bridge.get(`/client/${id}`);
+      });
+      this.logger.info('Cliente:: ', response);
+      this.client.set(response);
+      this.loadReservations('');
+    } catch (error) {
+      this.provideError(error);
+    }
+
     this.loadReservations('');
   }
 
   private loadReservations(clientId: string) {
     // Aquí llamarías a tu servicio: this.reservationService.getByClientId(clientId)...
     // Simulamos datos:
-    this.reservations.set([
-    ]);
+    this.reservations.set([]);
   }
 
   getStatusClass(status: string) {
@@ -76,13 +78,16 @@ export class ClientDetailComponent extends PageConfiguration implements OnInit {
     }
   }
 
-  createUser() {
-    this.clientService.createUser(Number(this.client()?.id)).subscribe({
-      next: (res) => {
-        this.logger.info('Cliente:: ', res);
-        this.toast.show('Usuario Creado', 'success');
-        this.client.set(res.data as Client);
-      },
-    });
+  async createUser() {
+    try {
+      const response: Client = await this.rustService.call(async (bridge: GenericHttpBridge) => {
+        return bridge.get(`/client/${this.client()?.id}/user`);
+      });
+      this.logger.info('Cliente:: ', response);
+      this.toast.show('Usuario Creado', 'success');
+      this.client.set(response);
+    } catch (error) {
+      this.provideError(error);
+    }
   }
 }

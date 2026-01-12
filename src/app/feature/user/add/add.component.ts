@@ -1,21 +1,21 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { PositionTypeService } from '@core/services/position-type.service';
-import { RoleService } from '@core/services/roles.service';
 import { UserService } from '@core/services/user.service';
 import { SelectOption } from '@shared/models/select/option.interface';
 import { UserAdd } from '@shared/models/user/add-user.interface';
 import { FormsModule, NgForm } from '@angular/forms';
-import { WarehouseService } from '@core/services/warehouse.service';
-import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { InputComponent } from '@shared/components/input/input.component';
 import { CustomSelectComponent } from '@shared/components/select/select.component';
 import { Warehouse } from '@shared/models/warehouse/warehouse.interface';
-import { LoggerService } from '@core/services/logger.service';
 import { MultiSelectRolesComponent } from '@shared/components/multi-select/multi-select-roles.component';
 import { PageConfiguration } from 'src/app/page-configurations';
+import { GenericHttpBridge } from '@assets/retail-shop/rust_retail';
+import { PaginatedResponse } from '@assets/retail-shop/PaginatedResponse';
+import { PositionType } from '@shared/models/position-type/postion-type.interface';
+import { Role } from '@shared/models/role/role.interface';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-add',
@@ -34,17 +34,14 @@ import { PageConfiguration } from 'src/app/page-configurations';
 export class AddUserComponent extends PageConfiguration implements OnInit {
   private readonly router = inject(Router);
   private readonly userService = inject(UserService);
-  private readonly positionTypeService = inject(PositionTypeService);
-  private readonly roleService = inject(RoleService);
-  private readonly warehouseService = inject(WarehouseService);
-  
+
   public loading = signal(false);
   public formSubmitted = signal(false);
 
   public optionsWarehouses = signal<SelectOption[]>([]);
   public optionsRoles: SelectOption[] = [];
   public optionsPositionTypes: SelectOption[] = [];
-  public roleOptions: SelectOption[] = [];
+  public roleOptions = signal<SelectOption[]>([]);
   public userRoles = signal<string[]>([]);
 
   public user: UserAdd = {
@@ -65,62 +62,79 @@ export class AddUserComponent extends PageConfiguration implements OnInit {
     this.loadRoles();
   }
 
-  private loadWarehouses(): Subscription {
-    return this.warehouseService.find().subscribe({
-      next: (response) => {
-        const data = response.data as Warehouse[];
-        const mapping: SelectOption[] = data.map((item) => {
-          return {
-            value: item.id.toString(),
-            label: item.name,
-          };
-        });
-        this.optionsWarehouses.set(mapping);
-      },
-    });
+  private async loadWarehouses() {
+    try {
+      const response: Warehouse[] = await this.rustService.call(
+        async (bridge: GenericHttpBridge) => {
+          return await bridge.get('/warehouse');
+        }
+      );
+      this.logger.info(this.loadWarehouses.name, response);
+      const mapping: SelectOption[] = response.map((item) => {
+        return {
+          value: item.id.toString(),
+          label: item.name,
+        };
+      });
+      this.optionsWarehouses.set(mapping);
+    } catch (error) {
+      this.provideError(error);
+    }
   }
 
-  private loadPositionTypes(): Subscription {
-    const params = {
-      page: 0,
-      size: 100,
-      sort: 'name,asc',
-    };
-    return this.positionTypeService.find(params).subscribe({
-      next: (response) => {
-        this.logger.info('PositionType', response);
-        const mapping: SelectOption[] = response.data.content.map((item) => {
-          return {
-            value: item.id.toString(),
-            label: item.name,
-          };
-        });
-        this.optionsPositionTypes = mapping;
-      },
-    });
+  private async loadPositionTypes(): Promise<void> {
+    try {
+      const query = {
+        page: 0,
+        size: 100,
+        sort: 'name,asc',
+      };
+      const queryString = this.objectToStringQuery(query);
+      const response: PaginatedResponse<PositionType> = await this.rustService.call(
+        async (bridge: GenericHttpBridge) => {
+          return await bridge.get('/position-type?' + queryString);
+        }
+      );
+      this.logger.info(this.loadPositionTypes.name, response);
+      const mapping: SelectOption[] = response.content.map((item) => {
+        return {
+          value: item.id.toString(),
+          label: item.name,
+        };
+      });
+      this.optionsPositionTypes = mapping;
+    } catch (error) {
+      this.provideError(error);
+    }
   }
 
-  private loadRoles(): Subscription {
-    const params = {
-      page: 0,
-      size: 100,
-      sort: 'name,asc',
-    };
-    return this.roleService.find(params).subscribe({
-      next: (response) => {
-        this.logger.info('Roles', response);
-        const mapping: SelectOption[] = response.data.content.map((item) => {
-          return {
-            value: item.name,
-            label: item.name,
-          };
-        });
-        this.roleOptions = mapping;
-      },
-    });
+  private async loadRoles() {
+    try {
+      const query = {
+        page: 0,
+        size: 100,
+        sort: 'name,asc',
+      };
+      const urlQuery = this.objectToStringQuery(query);
+      const response: PaginatedResponse<Role> = await this.rustService.call(
+        async (bridge: GenericHttpBridge) => {
+          return await bridge.get(`/role?${urlQuery}`);
+        }
+      );
+      this.logger.info(this.loadRoles.name, response);
+      const mapping: SelectOption[] = response.content.map((item) => {
+        return {
+          value: item.name,
+          label: item.name,
+        };
+      });
+      this.roleOptions.set(mapping);
+    } catch (error) {
+      this.provideError(error);
+    }
   }
 
-  public register(form: NgForm): void {
+  public async register(form: NgForm) {
     this.formSubmitted.set(true);
     if (form.invalid) {
       this.toast.show('Por favor, completa todos los campos requeridos.', 'error');
@@ -138,13 +152,17 @@ export class AddUserComponent extends PageConfiguration implements OnInit {
     }
     this.loading.set(true);
     this.user.roles = this.userRoles();
-    this.userService.create(this.user).subscribe({
-      next: (response) => {
-        this.toast.show('Usuario agregado correctamente');
-        this.router.navigate(['/app/users']);
-      },
-    });
-    this.loading.set(false);
+    try {
+      await this.rustService.call(async (bridge: HttpClient) => {
+        return bridge.post('/user', this.user);
+      });
+      this.toast.show('Usuario agregado correctamente');
+      this.router.navigate(['/app/users']);
+    } catch (error) {
+      this.provideError(error);
+    } finally {
+      this.loading.set(false);
+    }
   }
 
   selectWarehouse(option: SelectOption) {

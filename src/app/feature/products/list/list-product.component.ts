@@ -16,9 +16,9 @@ import { PageConfiguration } from 'src/app/page-configurations';
 import { ModalComponent } from '@shared/components/modal-form/modal.component';
 import { ImportProduct } from '@shared/models/product/response-import.interface';
 import { CategoryService } from '@core/services/products/category.service';
-import { HttpResponseApi } from '@assets/retail-shop/HttpResponseApi';
 import { PaginatedResponse } from '@assets/retail-shop/PaginatedResponse';
 import { Category } from '@shared/models/category/category.interface';
+import { GenericHttpBridge } from '@assets/retail-shop/rust_retail';
 
 @Component({
   selector: 'app-list',
@@ -32,7 +32,6 @@ export class ListProductComponent extends PageConfiguration {
   private readonly confirmService = inject(ConfirmService);
   private readonly productService = inject(ProductService);
   private readonly downloadExcelTemplateService = inject(DownloadExcelTemplateService);
-  private readonly categoryService = inject(CategoryService);
 
   public totalItems = signal(0);
   public currentPage = signal(0);
@@ -194,7 +193,7 @@ export class ListProductComponent extends PageConfiguration {
       const url = `/products?term=${this.searchQuery()}&active=${true}&page=${this.currentPage()}&size=${this.pageSize()}&sort=${
         this.activeParams()['sort'] ?? 'name,desc'
       }`;
-      const response: PaginatedResponse<Product> = await this.rustSerive.call(async (bridge) => {
+      const response: PaginatedResponse<Product> = await this.rustService.call(async (bridge) => {
         return await bridge.get(url);
       });
       this.logger.log('response', response);
@@ -211,7 +210,7 @@ export class ListProductComponent extends PageConfiguration {
 
   public async loadCategories() {
     try {
-      const response: PaginatedResponse<Category> = await this.rustSerive.call(async (bridge) => {
+      const response: PaginatedResponse<Category> = await this.rustService.call(async (bridge) => {
         return await bridge.get('/category');
       });
       this.logger.info('Categorias', response);
@@ -225,8 +224,37 @@ export class ListProductComponent extends PageConfiguration {
     }
   }
 
-  public download() {
-    return this.downloadExcelTemplateService.getFile();
+  public async download() {
+    // 1. Rust hace la magia (descarga, nombra y guarda/codifica)
+    const result: any = await this.rustService.call((b) =>
+      b.download_file('/batch/products/template')
+    );
+
+    if (result.startsWith('data:')) {
+      // --- COMPORTAMIENTO WEB (Excel/Word/etc) ---
+
+      // Creamos un link temporal en el DOM
+      const link = document.createElement('a');
+      link.href = result;
+
+      // Extraemos la extensión del MIME type si es posible, o usamos el nombre sugerido
+      link.download = 'Plantilla.xlsx';
+
+      // Añadimos al cuerpo, clickeamos y removemos
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      console.log('Descarga de Excel iniciada en el navegador');
+      //  const win = window.open();
+      // win?.document.write(
+      //   `<iframe src="${pathOrBase64}" frameborder="0" style="width:100%; height:100%;" allowfullscreen></iframe>`
+      // );
+    } else {
+      // --- COMPORTAMIENTO NATIVO (Mobile/Desktop) ---
+      // En Mobile, el SO abrirá Excel si la app está instalada
+      await this.rustService.call((b) => b.open_file_externally(result));
+    }
   }
 
   // 1. Capturar el archivo cuando el usuario lo selecciona
@@ -238,23 +266,66 @@ export class ListProductComponent extends PageConfiguration {
     return this.selectedFile.set(null);
   }
 
-  onUpload() {
+  // En tu DocumentService o Componente
+  async onImportProducts() {
+    const file = this.selectedFile();
+
+    if (!file) {
+      this.toast.show('Seleccione un archivo', 'warning');
+      return;
+    }
+
+    this.isUploading = true;
+
+    try {
+      // 1. Convertir archivo a Bytes (Uint8Array)
+      const arrayBuffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(arrayBuffer);
+
+      // 2. Llamada al Bridge de Rust
+      // Nota: Usamos Array.from si tu bridge de wasm-bindgen no acepta TypedArrays directamente
+      const report = await this.rustService.call((bridge: GenericHttpBridge) =>
+        bridge.upload(
+          '/batch/products/import', // Endpoint de tu backend
+          bytes,
+          file.name,
+          file.type
+        )
+      );
+      this.logger.info(this.onImportProducts.name, report);
+
+      // 3. Manejo de la respuesta (Rust ya devuelve la data parseada)
+      this.importResponse.set(report as ImportProduct);
+      this.toast.show('Importación completada', 'success');
+
+      this.resetFileInput();
+      this.loadData();
+    } catch (error: any) {
+      console.error('Error en la importación:', error);
+      this.toast.show(error.message || 'Error al importar productos', 'error');
+    } finally {
+      this.isUploading = false;
+    }
+  }
+
+  async onUpload() {
     if (!this.selectedFile()) {
       this.toast.show('Seleccione un archivo', 'success');
       return;
     }
 
     this.isUploading = true;
-    this.productService.importProducts(this.selectedFile()!).subscribe({
-      next: (report) => {
-        this.importResponse.set(report.data as ImportProduct);
-        this.resetFileInput();
-        this.loadData();
-      },
-      complete: () => {
-        this.isUploading = false;
-      },
-    });
+    await this.onImportProducts();
+    // this.productService.importProducts(this.selectedFile()!).subscribe({
+    //   next: (report) => {
+    //     this.importResponse.set(report.data as ImportProduct);
+    //     this.resetFileInput();
+    //     this.loadData();
+    //   },
+    //   complete: () => {
+    //     this.isUploading = false;
+    //   },
+    // });
   }
 
   onCancel() {

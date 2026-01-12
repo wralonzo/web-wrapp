@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Client } from '../../shared/models/client/client.interface';
 import { ButtonComponent } from '../../shared/components/button/button.component';
-import { ClientService } from '../../core/services/client.service';
 import { ColumnConfig, FilterConfig } from '@shared/models/table/column-config';
 import { TableActionEvent } from '@shared/models/table/table-event.interface';
 import { TableListComponent } from '@shared/components/table-list/table-list.component';
@@ -14,8 +13,8 @@ import { debounceTime, distinctUntilChanged, skip } from 'rxjs';
 import { SelectOption } from '../../shared/models/select/option.interface';
 import { APP_ROUTES } from '@core/constants/routes.constants';
 import { PageConfiguration } from 'src/app/page-configurations';
-import { ClientResponse } from '@assets/retail-shop/ClientResponse';
 import { PaginatedResponse } from '@assets/retail-shop/PaginatedResponse';
+import { GenericHttpBridge } from '@assets/retail-shop/rust_retail';
 
 @Component({
   selector: 'app-clients',
@@ -24,8 +23,6 @@ import { PaginatedResponse } from '@assets/retail-shop/PaginatedResponse';
   templateUrl: './clients.component.html',
 })
 export class ClientsComponent extends PageConfiguration implements OnInit {
-  // Datos de prueba (esto vendría de tu ClientsService)
-  private clientService = inject(ClientService);
   private confirmService = inject(ConfirmService);
 
   public clientColumns: ColumnConfig[] = [
@@ -34,7 +31,7 @@ export class ClientsComponent extends PageConfiguration implements OnInit {
     { key: 'phone', label: 'Teléfono', type: 'text', sortable: true },
     { key: 'email', label: 'Correo', type: 'text', sortable: true },
     { key: 'address', label: 'Dirección', type: 'text', sortable: true },
-    { key: 'clientType', label: 'Tipo', type: 'badge', sortable: true },
+    { key: 'clientType', label: 'Tipo', type: 'badge', sortable: true, color: 'blue' },
     { key: 'actions', label: '', type: 'action' },
   ];
 
@@ -116,7 +113,7 @@ export class ClientsComponent extends PageConfiguration implements OnInit {
         this.activeParams()['sort'] ?? 'name,desc'
       }`;
 
-      const clients: PaginatedResponse<Client> = await this.rustSerive.call(async (bridge) => {
+      const clients: PaginatedResponse<Client> = await this.rustService.call(async (bridge) => {
         return await bridge.get(url);
       });
       this.clients.set(clients.content);
@@ -161,22 +158,24 @@ export class ClientsComponent extends PageConfiguration implements OnInit {
   }
 
   private async confirmDeleteClient(client: any) {
-    const confirmed = await this.confirmService.open({
-      title: 'Eliminar Cliente',
-      message: `¿Estás seguro de eliminar a ${client.name}? Esta acción borrará permanentemente sus facturas y registros.`,
-      btnConfirmText: 'Sí, eliminar ahora',
-      btnCancelText: 'No, cancelar',
-      variant: 'danger',
-    });
-    if (confirmed) {
-      this.clientService.deleteClient(client.id).subscribe({
-        next: () => {
-          const clientDeteleted = this.clients().filter((c) => c.id !== client.id);
-          this.clients.set(clientDeteleted);
-          this.toast.show('Cliente eliminado', 'error');
-        },
-        error: () => this.toast.show('Error al eliminar', 'error'),
+    try {
+      const confirmed = await this.confirmService.open({
+        title: 'Eliminar Cliente',
+        message: `¿Estás seguro de eliminar a ${client.name}? Esta acción borrará permanentemente sus facturas y registros.`,
+        btnConfirmText: 'Sí, eliminar ahora',
+        btnCancelText: 'No, cancelar',
+        variant: 'danger',
       });
+      if (confirmed) {
+        await this.rustService.call(async (bridge: GenericHttpBridge) => {
+          return await bridge.patch(`/client/${client.id}/delete`, null);
+        });
+        const clientDeteleted = this.clients().filter((c) => c.id !== client.id);
+        this.clients.set(clientDeteleted);
+        this.toast.show('Cliente eliminado', 'error');
+      }
+    } catch (error) {
+      this.provideError(error);
     }
   }
 

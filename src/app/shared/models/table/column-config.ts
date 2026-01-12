@@ -3,6 +3,7 @@ export interface ColumnConfig {
   label: string; // El título que verá el usuario (ej: 'Nombre')
   type?: 'text' | 'currency' | 'date' | 'badge' | 'action' | 'boolean';
   sortable?: boolean; // Si la columna es ordenable
+  color?: string;
 }
 
 export interface FilterConfig {

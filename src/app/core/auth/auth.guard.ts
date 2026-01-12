@@ -1,20 +1,32 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthService } from './auth.service';
 import { APP_ROUTES } from '@core/constants/routes.constants';
+import { RustDataService } from '@core/rust/rust-data.service';
+import { filter, firstValueFrom } from 'rxjs';
 
-export const authGuard: CanActivateFn = (route, state) => {
-  const authService = inject(AuthService);
+export const authGuard: CanActivateFn = async (route, state) => {
   const router = inject(Router);
-  const user = authService.currentUser();
+  const rustData = inject(RustDataService);
+  // Obtenemos el usuario directamente del Signal sincronizado con Rust
+  const user = rustData.currentUser();
+  const isAuthenticated = rustData.isAuthenticated();
+  
 
-  // 1. SI NO HAY USUARIO: Redirigir al Login
-  if (!user) {
+  // ESPERA ACTIVA: Si el bridge no está listo, esperamos a que initialize() termine.
+  // Esto resuelve el problema de "AuthBridge no está listo"
+  if (!rustData.initialize()) {
+    await firstValueFrom(
+      rustData.initialized$.pipe(filter(ready => ready))
+    );
+  }
+
+  // 1. SI NO HAY USUARIO O NO ESTÁ AUTENTICADO
+  if (!user || !isAuthenticated) {
+    console.warn('Sesión no encontrada o expirada. Redirigiendo al login...');
     return router.parseUrl(APP_ROUTES.nav.login);
   }
 
-  // 2. OBTENER ROLES REQUERIDOS DE LA RUTA
-  // Angular hereda la 'data' de las rutas padres a las hijas
+  // 2. OBTENER ROLES REQUERIDOS
   const requiredRoles = route.data['rols'] as string[];
 
   // Si la ruta no pide roles específicos (ej: Dashboard), permitir acceso
@@ -22,23 +34,18 @@ export const authGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  // 3. LOGICA DE INTERSECCIÓN (Array vs Array)
-  // Verificamos si al menos uno de los roles del usuario está en la lista permitida
-  const hasPermission = user.roles!.some((role) => requiredRoles.includes(role));
-  console.log(
-    'Roles requeridos:',
-    requiredRoles,
-    'Roles del usuario:',
-    user.roles,
-    'Acceso permitido:',
-    hasPermission
-  );
+  // 3. VERIFICACIÓN DE ROLES (Safe navigation con roles!)
+  // Usamos el operador ? para evitar errores si roles viene indefinido por algún motivo
+  const userRoles = user.roles ?? [];
+  const hasPermission = userRoles.some((role) => requiredRoles.includes(role));
+
   if (hasPermission) {
     return true;
   }
 
-  // 4. SI NO TIENE PERMISO: Redirigir al Dashboard para romper el loop
-  // Importante: El Dashboard debe ser accesible para todos los roles
-  console.error(`Acceso denegado a ${state.url}. Roles del usuario:`, user.roles);
+  // 4. ACCESO DENEGADO
+  console.error(`Acceso denegado. Se requiere: ${requiredRoles}. Usuario tiene: ${userRoles}`);
+
+  // Redirigir al dashboard para evitar que el usuario se quede "atrapado"
   return router.parseUrl(APP_ROUTES.nav.dashboard);
 };

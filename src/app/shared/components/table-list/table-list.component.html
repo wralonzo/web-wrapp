@@ -42,7 +42,7 @@
   </div>
 
   @if (filters().length > 0) {
-  <div class="flex flex-wrap gap-4 w-full lg:w-auto">
+  <div class="w-full lg:flex-1 relative">
     @for (filter of filters(); track filter.key) {
     <div class="min-w-[180px] flex-1 lg:flex-none">
       <app-custom-select
@@ -106,7 +106,7 @@
             ('date') { <span class="text-zinc-500">{{ row[col.key] | date: 'dd/MM/yyyy' }}</span> }
             @case ('badge') {
             <span
-              class="px-3 py-1 rounded-full text-xs font-bold bg-zinc-100 text-zinc-800 uppercase tracking-tight"
+              [class]="'px-3 py-1 rounded-full text-xs font-bold bg-'+col.color+'-100 text-'+col.color+'-800 uppercase tracking-tight'"
             >
               {{ row[col.key] }}
             </span>

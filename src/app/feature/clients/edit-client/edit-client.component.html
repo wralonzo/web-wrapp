@@ -36,7 +36,7 @@
         <app-input
           name="nombreCliente"
           label="Nombre Completo"
-          [(ngModel)]="client.name"
+          [(ngModel)]="client()!.name"
         ></app-input>
 
         <div class="grid grid-cols-2 gap-4">
@@ -44,14 +44,14 @@
             name="phone"
             placeholder="0000-0000"
             label="Teléfono"
-            [(ngModel)]="client.phone"
+            [(ngModel)]="client()!.phone"
           ></app-input>
 
           <app-input
             name="fechaNacimiento"
             label="Fecha de Nacimiento"
             type="date"
-            [(ngModel)]="client.birthDate"
+            [(ngModel)]="client()!.birthDate"
           ></app-input>
         </div>
 
@@ -59,14 +59,14 @@
           name="email"
           label="Correo Electrónico"
           type="email"
-          [(ngModel)]="client.email"
+          [(ngModel)]="client()!.email"
           placeholder="example@gmail.com"
         ></app-input>
 
         <app-custom-select
           [label]="'Tipo de Cliente'"
           [options]="optionsTypeClient"
-          [selected]="client.clientType"
+          [selected]="client()!.clientType"
           (onSelectionChange)="selectTypeClient($event)"
         ></app-custom-select>
       </div>
@@ -75,7 +75,7 @@
         <app-input
           name="direccionCliente"
           label="Dirección"
-          [(ngModel)]="client.address"
+          [(ngModel)]="client()!.address"
         ></app-input>
 
         <div class="flex flex-col gap-2">
@@ -83,7 +83,7 @@
             >Notas Adicionales</label
           >
           <textarea
-            [(ngModel)]="client.notes"
+            [(ngModel)]="client()!.notes"
             name="notasAdicionales"
             rows="4"
             placeholder="Alergias, preferencias de color, etc..."

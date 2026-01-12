@@ -3,7 +3,6 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { APP_ROUTES } from '@core/constants/routes.constants';
-import { ClientService } from '@core/services/client.service';
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { CheckboxComponent } from '@shared/components/checkbox/checkbox.component';
 import { InputComponent } from '@shared/components/input/input.component';
@@ -61,7 +60,7 @@ export class AddClientComponent extends PageConfiguration {
 
     this.loading.set(true);
     try {
-      const response = await this.rustSerive.call(async (bridge) => {
+      const response = await this.rustService.call(async (bridge) => {
         return await bridge.post('/client', this.client);
       });
       this.logger.info(this.register.name, response);

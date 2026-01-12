@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core'; // 👈 Importamos output
+import { Component, computed, input, output } from '@angular/core'; // 👈 Importamos output
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -17,6 +17,11 @@ export class ButtonComponent {
   btnType = input<string | null>('primary');
   classCustom = input<string | null>();
 
+  iconUrl = computed(() => {
+    const iconName = this.icon();
+    if (!iconName) return '';
+    return `/assets/icons/${iconName}.svg`;
+  });
   // Definimos el evento de salida
   btnClick = output<void>(); // 👈 Esto reemplaza al antiguo @Output
 
@@ -28,13 +33,5 @@ export class ButtonComponent {
       event.stopPropagation();
       this.btnClick.emit(); // 👈 Ejecutamos la acción en el padre
     }
-  }
-
-  iconButton(): string {
-    if (this.icon() === null) {
-      return '';
-    }
-    console.log(this.icon());
-    return this.icon() ? `/assets/icons/${this.icon()}.svg` : '';
   }
 }

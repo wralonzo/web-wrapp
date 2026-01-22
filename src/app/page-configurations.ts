@@ -27,7 +27,7 @@ export abstract class PageConfiguration {
    * @param requiredRoles Puede ser un string único 'admin' o un array ['admin', 'vendor']
    */
   public hasRole(requiredRoles: string | string[]): boolean {
-    const userRoles = this.authService.currentUser()?.roles;
+    const userRoles = this.authService.currentUser()?.user.roles;
 
     // Si no hay usuario o no tiene roles, denegar
     if (!userRoles) return false;

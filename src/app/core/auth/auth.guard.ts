@@ -10,7 +10,7 @@ export const authGuard: CanActivateFn = async (route, state) => {
   // Obtenemos el usuario directamente del Signal sincronizado con Rust
   const user = rustData.currentUser();
   const isAuthenticated = rustData.isAuthenticated();
-  
+
 
   // ESPERA ACTIVA: Si el bridge no está listo, esperamos a que initialize() termine.
   // Esto resuelve el problema de "AuthBridge no está listo"
@@ -36,8 +36,8 @@ export const authGuard: CanActivateFn = async (route, state) => {
 
   // 3. VERIFICACIÓN DE ROLES (Safe navigation con roles!)
   // Usamos el operador ? para evitar errores si roles viene indefinido por algún motivo
-  const userRoles = user.roles ?? [];
-  const hasPermission = userRoles.some((role) => requiredRoles.includes(role));
+  const userRoles = user?.user?.roles ?? [];
+  const hasPermission = userRoles.some((role: string) => requiredRoles.includes(role));
 
   if (hasPermission) {
     return true;

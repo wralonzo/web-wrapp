@@ -88,8 +88,8 @@ export class LayoutComponent extends PageConfiguration {
 
   profile() {
     if (this.hasRole(ROLES.CLIENT)) {
-      return this.nav.push(this.ROUTES.nav.clients.view(this.authService.currentUser()!.clientId!));
+      return this.nav.push(this.ROUTES.nav.clients.view(this.authService.currentUser()!.user.id));
     }
-    return this.nav.push(this.ROUTES.nav.users.view(this.authService.currentUser()!.id));
+    return this.nav.push(this.ROUTES.nav.users.view(this.authService.currentUser()!.user.id));
   }
 }

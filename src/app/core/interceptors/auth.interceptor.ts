@@ -5,7 +5,7 @@ import { AuthService } from '../auth/auth.service';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService); // Inject siempre fuera de cualquier bloque
   const user = authService.currentUser();
-  const token = user?.token;
+  const token = user?.user?.token;
 
   let authReq = req;
 

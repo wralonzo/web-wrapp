@@ -70,12 +70,12 @@
 
         <div
           class="w-8 h-8 rounded-xl bg-zinc-900 text-white flex items-center justify-center font-bold shrink-0 text-xs shadow-inner">
-          {{ authService.currentUser()?.fullName?.charAt(0) }}
+          {{ authService.currentUser()?.profile?.fullName?.charAt(0) }}
         </div>
 
         <div [class.hidden]="isCollapsed()" class="flex-1 min-w-0 animate-in fade-in duration-300">
           <p class="text-xs font-bold text-zinc-900 truncate">
-            {{ authService.currentUser()?.username }}
+            {{ authService.currentUser()?.profile?.username }}
           </p>
           <p class="text-[10px] text-zinc-500 truncate uppercase tracking-tighter">
             Administrador

@@ -33,8 +33,8 @@ declare var google: any;
   styleUrl: './login.component.scss',
 })
 export class LoginComponent extends PageConfiguration implements OnInit, AfterViewInit {
-  public email: string = '';
-  public password: string = 'n3z00N@beQ7(';
+  public email: string = 'smisssth_staff';
+  public password: string = 'Test9090?';
   public isLoading = signal(false);
 
   // 1. Creamos un signal para el mensaje de error

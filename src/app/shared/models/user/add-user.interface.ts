@@ -1,4 +1,4 @@
-import { User } from './user.model';
+import { Profile } from '@assets/retail-shop/Profile';
 
 export interface UserAdd {
   warehouse?: number;
@@ -7,4 +7,4 @@ export interface UserAdd {
   user: UserContactInfo;
 }
 
-type UserContactInfo = Pick<User, 'fullName' | 'username' | 'phone' | 'address'>;
+type UserContactInfo = Pick<Profile, 'fullName' | 'username' | 'phone' | 'address'>;

@@ -1,6 +1,5 @@
 import {
   Component,
-  inject,
   OnInit,
   signal,
   AfterViewInit,
@@ -14,8 +13,6 @@ import { ButtonComponent } from '../../shared/components/button/button.component
 import { FormsModule } from '@angular/forms';
 import { InputComponent } from '../../shared/components/input/input.component';
 import { PageConfiguration } from 'src/app/page-configurations';
-import { GoogleService } from '@core/services/google.service';
-import { RustService } from '@core/rust/rust.service';
 declare var google: any;
 @Component({
   selector: 'app-login',
@@ -34,7 +31,7 @@ declare var google: any;
 })
 export class LoginComponent extends PageConfiguration implements OnInit, AfterViewInit {
   public email: string = 'smisssth_staff';
-  public password: string = 'Test9090?';
+  public password: string = 'TestG9090?';
   public isLoading = signal(false);
 
   // 1. Creamos un signal para el mensaje de error

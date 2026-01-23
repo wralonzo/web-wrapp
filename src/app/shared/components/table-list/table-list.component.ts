@@ -89,4 +89,9 @@ export class TableListComponent {
     this.searchSubject.next('');
     this.onSearch.emit('');
   }
+
+  getCellValue(item: any, key: string): any {
+    if (!key) return null;
+    return key.split('.').reduce((obj, segment) => obj?.[segment], item);
+  }
 }

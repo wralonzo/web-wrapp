@@ -1,7 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ConfirmService } from '@core/services/confirm.service';
 import { ColumnConfig, FilterConfig, TableActionEvent } from '@shared/models/table';
-import { User } from '@shared/models/user/user.model';
 import { toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { skip, debounceTime, distinctUntilChanged } from 'rxjs';
 import { SelectOption } from '@shared/models/select/option.interface';
@@ -14,9 +13,11 @@ import { APP_ROUTES } from '@core/constants/routes.constants';
 import { HttpParams } from '@angular/common/http';
 import { PaginatedResponse } from '@assets/retail-shop/PaginatedResponse';
 import { Role } from '@shared/models/role/role.interface';
+import { User } from '@assets/retail-shop/User';
+import { CheckboxComponent } from '@shared/components/checkbox/checkbox.component';
 @Component({
   selector: 'app-list',
-  imports: [CommonModule, FormsModule, ButtonComponent, TableListComponent],
+  imports: [CommonModule, FormsModule, ButtonComponent, TableListComponent, CheckboxComponent],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
   standalone: true,
@@ -24,9 +25,11 @@ import { Role } from '@shared/models/role/role.interface';
 export class ListUserComponent extends PageConfiguration implements OnInit {
   private readonly confirmService = inject(ConfirmService);
 
+  public showInactive = signal(false);
+
   public totalItems = signal(0);
   public currentPage = signal(0);
-  public totlPages = signal(0);
+  public totalPages = signal(0);
   public pageSize = signal(10);
   public loading = signal(false);
 
@@ -38,11 +41,11 @@ export class ListUserComponent extends PageConfiguration implements OnInit {
   public searchQuery = signal('');
 
   public tableColumns: ColumnConfig[] = [
-    { key: 'fullName', label: 'Nombres', type: 'text', sortable: true },
-    { key: 'username', label: 'usuario', type: 'text', sortable: true },
-    { key: 'phone', label: 'Teléfono', type: 'text', sortable: true },
-    { key: 'address', label: 'Dirección', type: 'text', sortable: true },
-    { key: 'enabled', label: 'Estado', type: 'boolean', sortable: true },
+    { key: 'profile.fullName', label: 'Nombres', type: 'text', sortable: true },
+    { key: 'profile.username', label: 'usuario', type: 'text', sortable: true },
+    { key: 'profile.phone', label: 'Teléfono', type: 'text', sortable: true },
+    { key: 'profile.address', label: 'Dirección', type: 'text', sortable: true },
+    { key: 'user.enabled', label: 'Estado', type: 'boolean', sortable: true },
     { key: 'actions', label: '', type: 'action' },
   ];
 
@@ -98,6 +101,7 @@ export class ListUserComponent extends PageConfiguration implements OnInit {
         term: this.searchQuery() ?? '', // Enviamos el término al backend
         page: this.currentPage(),
         size: this.pageSize(),
+        userType: this.showInactive() ? 'CLIENT' : 'EMPLOYEE',
       };
 
       const queryString = new HttpParams({ fromObject: params }).toString();
@@ -107,7 +111,7 @@ export class ListUserComponent extends PageConfiguration implements OnInit {
       });
       this.users.set(response.content);
       this.totalItems.set(response.totalElements);
-      this.totlPages.set(response.totalPages);
+      this.totalPages.set(response.totalPages); // Fixed typo: totlPages -> totalPages
       this.logger.log('Usuarios cargados:', this.users());
     } catch (error) {
       this.provideError(error);
@@ -146,6 +150,10 @@ export class ListUserComponent extends PageConfiguration implements OnInit {
     return this.users();
   });
 
+  public handleCheckboxChange() {
+    this.loadData();
+  }
+
   handleTableAction(event: TableActionEvent) {
     const { type, item } = event;
 
@@ -165,34 +173,34 @@ export class ListUserComponent extends PageConfiguration implements OnInit {
   }
 
   private goToEdit(user: User) {
-    if (user.roles?.find((r) => r === 'ROLE_CLIENTE')) {
-      this.logger.log('Navegando a editar cliente con ID:', user.clientId);
-      const idClient = user.clientId ? user.clientId : '';
+    if (user.user.roles?.find((r) => r === 'ROLE_CLIENTE')) {
+      this.logger.log('Navegando a editar cliente con ID:', user.user.id ?? '');
+      const idClient = user.user.id ?? '';
       this.nav.push(APP_ROUTES.nav.clients.edit(idClient));
       return;
     }
-    this.logger.log('Navegando a editar usuario con ID:', user.id);
-    this.nav.push(APP_ROUTES.nav.users.edit(user.id));
+    this.logger.log('Navegando a editar usuario con ID:', user.user.id ?? '');
+    this.nav.push(APP_ROUTES.nav.users.edit(user.user.id ?? ''));
   }
 
   private async confirmDelete(data: User) {
     try {
       const confirmed = await this.confirmService.open({
         title: 'Desactivar usuario',
-        message: `¿Estás seguro de desactivar ${data.fullName}?.`,
+        message: `¿Estás seguro de desactivar ${data.profile.fullName}?.`,
         btnConfirmText: 'desactivar ahora',
         btnCancelText: 'No, cancelar',
         variant: 'danger',
       });
       if (confirmed) {
         const response = await this.rustService.call(async (bridge) => {
-          return await bridge.patch(`/user/${data.id}/deactivate`);
+          return await bridge.patch(`/user/${data.user.id}/deactivate`);
         });
         this.logger.info(this.confirmDelete.name, response);
         this.users.update((currentUsers) =>
           currentUsers.map((user) => {
-            data.enabled = false;
-            return user.id === data.id ? { ...user, ...data } : user;
+            data.user.enabled = false;
+            return user.user.id === data.user.id ? { ...user, ...data } : user;
           })
         );
         this.toast.show('Usuario Desactivado', 'success');
@@ -203,14 +211,14 @@ export class ListUserComponent extends PageConfiguration implements OnInit {
   }
 
   private goToView(user: User) {
-    if (user.roles?.find((r) => r === 'ROLE_CLIENTE')) {
-      this.logger.log('Navegando a ver cliente con ID:', user.clientId);
-      this.nav.push(APP_ROUTES.nav.clients.view(user.clientId ?? ''));
+    if (user.user.roles?.find((r) => r === 'ROLE_CLIENTE')) {
+      this.logger.log('Navegando a ver cliente con ID:', user.user.id ?? '');
+      this.nav.push(APP_ROUTES.nav.clients.view(user.user.id ?? ''));
       return;
     }
 
-    this.logger.log('Navegando a ver usuario con ID:', user.id);
-    this.nav.push(APP_ROUTES.nav.users.view(user.id));
+    this.logger.log('Navegando a ver usuario con ID:', user.user.id ?? '');
+    this.nav.push(APP_ROUTES.nav.users.view(user.user.id ?? ''));
   }
 
   handleFilter(filterUpdate: Record<string, any>) {

@@ -38,15 +38,6 @@ export class LayoutComponent extends PageConfiguration {
   public menuItems: MenuItem[] = [
     { label: 'Dashboard', route: this.ROUTES.nav.dashboard, iconPath: 'dashboard' },
     {
-      label: 'Productos', // Ejemplo con Submenú
-      iconPath: 'handbag',
-      roles: [ROLES.ADMIN, ROLES.SALES],
-      children: [
-        { label: 'Lista de Productos', route: '/app/products', iconPath: 'list' },
-        { label: 'Categorías', route: '/app/products/categories', iconPath: 'category' },
-      ],
-    },
-    {
       label: 'Clientes',
       route: this.ROUTES.nav.clients.list,
       roles: [ROLES.ADMIN, ROLES.SALES],
@@ -69,6 +60,17 @@ export class LayoutComponent extends PageConfiguration {
       route: '/app/products',
       roles: [ROLES.ADMIN, ROLES.SALES],
       iconPath: 'handbag',
+    },
+    {
+      label: 'Configuraciones', // Ejemplo con Submenú
+      iconPath: 'config',
+      roles: [ROLES.ADMIN, ROLES.SALES],
+      children: [
+        { label: 'Roles', route: '/app/roles', iconPath: 'list' },
+        { label: 'Permisos', route: '/app/permissions', iconPath: 'category' },
+        { label: 'Sucursales', route: '/app/sucursales', iconPath: 'category' },
+        { label: 'Almacenes', route: '/app/almacenes', iconPath: 'category' },
+      ],
     },
   ];
 

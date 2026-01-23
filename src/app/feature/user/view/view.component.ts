@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { InputComponent } from '@shared/components/input/input.component';
 import { PageConfiguration } from 'src/app/page-configurations';
 import { GenericHttpBridge } from '@assets/retail-shop/rust_retail';
+import { IpService } from '@core/services/ip.service';
 
 @Component({
   selector: 'app-view-user',
@@ -36,6 +37,7 @@ export class ViewUserComponent extends PageConfiguration implements OnInit {
   private readonly userService = inject(UserService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly ipService = inject(IpService);
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -48,9 +50,23 @@ export class ViewUserComponent extends PageConfiguration implements OnInit {
       const response: User = await this.rustService.call(async (brige: GenericHttpBridge) => {
         return brige.get(`/user/${this.id()}/profile`);
       });
+      const warehouse = await this.loadWarehouse(response.employee?.warehouseId!);
+      response.employee!.warehouseName = warehouse.name ?? "";
       this.logger.info(this.loadUser.name, response);
       this.user.set(response);
       this.isLoading.set(false);
+    } catch (error) {
+      this.provideError(error);
+    }
+  }
+
+  private async loadWarehouse(id: number) {
+    try {
+      const response = await this.rustService.call(async (brige: GenericHttpBridge) => {
+        return brige.get(`/warehouse/${id}`);
+      });
+      this.logger.info(this.loadWarehouse.name, response);
+      return response;
     } catch (error) {
       this.provideError(error);
     }
@@ -62,19 +78,19 @@ export class ViewUserComponent extends PageConfiguration implements OnInit {
       const currentUser = this.user();
       if (!currentUser) return;
 
-      const newStatus = !currentUser.enabled;
+      const newStatus = !currentUser.user.enabled;
       if (!newStatus) {
         await this.rustService.call(async (bridge: GenericHttpBridge) => {
-          return await bridge.patch(`/user/${currentUser.id}/deactivate`, {});
+          return await bridge.patch(`/user/${currentUser.user.id}/deactivate`, {});
         });
-        this.user.update((u) => (u ? { ...u, enabled: newStatus } : null));
+        this.user.update((u) => (u ? { ...u, user: { ...u.user, enabled: newStatus } } : null));
         return this.toast.show(`Usuario desactivado`, 'success');
       }
       await this.rustService.call(async (bridge: GenericHttpBridge) => {
-        return await bridge.patch(`/user/${currentUser.id}/activate`, {});
+        return await bridge.patch(`/user/${currentUser.user.id}/activate`, {});
       });
-      this.user.update((u) => (u ? { ...u, enabled: newStatus } : null));
-      return this.toast.show(`Usuario desactivado`, 'success');
+      this.user.update((u) => (u ? { ...u, user: { ...u.user, enabled: newStatus } } : null));
+      return this.toast.show(`Usuario activado`, 'success');
     } catch (error) {
       this.provideError(error);
     }
@@ -91,11 +107,11 @@ export class ViewUserComponent extends PageConfiguration implements OnInit {
   getInitials(name: string): string {
     return name
       ? name
-          .split(' ')
-          .map((n) => n[0])
-          .join('')
-          .toUpperCase()
-          .substring(0, 2)
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .substring(0, 2)
       : '??';
   }
 
@@ -118,15 +134,20 @@ export class ViewUserComponent extends PageConfiguration implements OnInit {
         this.toast.show('Debe proporcionar un motivo para el cambio de contraseña.', 'error');
         return;
       }
-      console.log('Valores capturados:', this.formData());
+      this.logger.info(this.submitForm.name, 'Valores capturados:', this.formData());
       const currentUser = this.user();
       if (!currentUser) return;
       const newPassword = this.formData().password;
       if (newPassword && newPassword.length >= 8) {
+        const localIp = await this.ipService.getLocalIp();
+        this.logger.info(this.submitForm.name, 'IP local detectada:', localIp);
+
         await this.rustService.call(async (bridge: GenericHttpBridge) => {
-          return bridge.patch(`/user/${currentUser.id}/password`, {
+          return bridge.patch(`/user/${currentUser.user.id}/password`, {
             newPassword,
+            channel: 'App-Top-Fashion-Web',
             motive: this.formData().reason,
+            ipLocal: localIp,
           });
         });
         this.formData.set({ password: '', confirmPassword: '', reason: '' });
@@ -147,6 +168,6 @@ export class ViewUserComponent extends PageConfiguration implements OnInit {
   }
 
   editUser() {
-    this.router.navigate(['/app/users/edit', this.user()?.id]);
+    this.router.navigate(['/app/users/edit', this.user()?.user.id]);
   }
 }

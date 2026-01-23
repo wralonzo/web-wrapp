@@ -27,10 +27,10 @@ export class ClientsComponent extends PageConfiguration implements OnInit {
 
   public clientColumns: ColumnConfig[] = [
     { key: 'code', label: 'Código', type: 'text', sortable: true },
-    { key: 'name', label: 'Nombre', type: 'text', sortable: true },
-    { key: 'phone', label: 'Teléfono', type: 'text', sortable: true },
-    { key: 'email', label: 'Correo', type: 'text', sortable: true },
-    { key: 'address', label: 'Dirección', type: 'text', sortable: true },
+    { key: 'profile.fullName', label: 'Nombre', type: 'text', sortable: true },
+    { key: 'profile.phone', label: 'Teléfono', type: 'text', sortable: true },
+    { key: 'profile.email', label: 'Correo', type: 'text', sortable: true },
+    { key: 'profile.address', label: 'Dirección', type: 'text', sortable: true },
     { key: 'clientType', label: 'Tipo', type: 'badge', sortable: true, color: 'blue' },
     { key: 'actions', label: '', type: 'action' },
   ];
@@ -56,7 +56,7 @@ export class ClientsComponent extends PageConfiguration implements OnInit {
   public pageSize = signal(10);
   public loading = signal(false);
   private activeParams = signal<Record<string, any>>({
-    sort: 'name,asc',
+    sort: 'code,desc',
   });
 
   public clients = signal<Client[]>([]);
@@ -107,11 +107,9 @@ export class ClientsComponent extends PageConfiguration implements OnInit {
   public async loadClients() {
     this.loading.set(true);
     try {
-      const url = `/client?term=${this.searchQuery()}&clientType=${
-        this.activeParams()['clientType'] ?? ''
-      }&page=${this.currentPage()}&size=${this.pageSize()}&sort=${
-        this.activeParams()['sort'] ?? 'name,desc'
-      }`;
+      const url = `/client?term=${this.searchQuery()}&clientType=${this.activeParams()['clientType'] ?? ''
+        }&page=${this.currentPage()}&size=${this.pageSize()}&sort=${this.activeParams()['sort'] ?? 'code,desc'
+        }`;
 
       const clients: PaginatedResponse<Client> = await this.rustService.call(async (bridge) => {
         return await bridge.get(url);
@@ -123,7 +121,7 @@ export class ClientsComponent extends PageConfiguration implements OnInit {
       this.logger.log('Clientes cargados:', this.clients());
     } catch (error: any) {
       this.logger.error(this.loadClients.name, error);
-      this.toast.show(error?.payload?.message ?? 'Internal Server Error', 'error');
+      this.provideError(error);
     }
   }
 
@@ -171,8 +169,10 @@ export class ClientsComponent extends PageConfiguration implements OnInit {
           return await bridge.patch(`/client/${client.id}/delete`, null);
         });
         const clientDeteleted = this.clients().filter((c) => c.id !== client.id);
+        this.logger.info('Cliente eliminado:', clientDeteleted);
+        this.totalItems.set(clientDeteleted.length);
         this.clients.set(clientDeteleted);
-        this.toast.show('Cliente eliminado', 'error');
+        this.toast.show('Cliente eliminado', 'success');
       }
     } catch (error) {
       this.provideError(error);

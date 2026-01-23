@@ -1,32 +1,21 @@
+import { Profile } from '@assets/retail-shop/Profile';
+import { UserAuth } from '@assets/retail-shop/UserAuth';
 import { HttpResponseApi, HttpResponseApiFindOne } from '../http/http-response';
 
-// auth.model.ts
 export interface User {
-  id: number;
-  user: string;
-  name: string;
-  role: string;
-  token: string;
-  fullName: string;
-  username: string;
-  phone: string;
-  address: string;
-  avatar: string | null;
-  password: string | null;
-  createdAt: string;
-  updateAt: string | null;
-  deletedAt: string | null;
-  passwordInit?: string;
-  employee?: Employee;
-  roles?: string[];
+  profile: Profile;
+  user: UserAuth;
+  employee: Employee | null;
+  // Compatibility fields for some existing logic if needed
+  id?: number;
   enabled?: boolean;
-  clientId?: number;
+  roles?: string[];
 }
 
 export interface Employee {
   id: number;
   warehouseId: number;
-  warehouseName: string;
+  warehouseName?: string; // Optativo si viene del backend
   positionId: number;
   positionName: string;
 }
@@ -35,4 +24,4 @@ export interface AuthResponse extends HttpResponseApiFindOne<User> {
   data: User;
 }
 
-export interface AuthResponseAll extends HttpResponseApi<User> {}
+export interface AuthResponseAll extends HttpResponseApi<User> { }

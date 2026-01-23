@@ -60,11 +60,28 @@ export class AddClientComponent extends PageConfiguration {
 
     this.loading.set(true);
     try {
+      const payload = {
+        auth: {
+          fullName: this.client.name,
+          email: this.client.email,
+          phone: this.client.phone,
+          address: this.client.address,
+          birthDate: this.client.birthDate,
+          password: this.client.password ?? "Test123456",
+          username: this.client.email,
+        },
+        client: {
+          clientType: this.client.clientType,
+          taxId: this.client.taxId,
+          preferredDeliveryAddress: this.client.preferredDeliveryAddress,
+        },
+        flagUser: this.client.flagUser,
+      };
       const response = await this.rustService.call(async (bridge) => {
-        return await bridge.post('/client', this.client);
+        return await bridge.post('/client', payload);
       });
       this.logger.info(this.register.name, response);
-      this.nav.setRoot(`${APP_ROUTES.nav.clients}`);
+      this.nav.setRoot(`${APP_ROUTES.nav.clients.list}`);
       this.toast.show('Cliente creado exitosamente', 'success');
     } catch (error: any) {
       this.logger.error(this.register.name, error);
@@ -76,5 +93,26 @@ export class AddClientComponent extends PageConfiguration {
 
   selectTypeClient(option: SelectOption) {
     this.client.clientType = option.value.toString() as ClientTypes;
+  }
+
+  generatePassword() {
+    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const numbers = '0123456789';
+    const symbols = '!@#$&*()_+-=?';
+    const all = 'abcdefghijklmnopqrstuvwxyz' + upper + numbers + symbols;
+
+    const getRandom = (str: string) => str[Math.floor(Math.random() * str.length)];
+
+    let password = getRandom(upper) + getRandom(numbers) + getRandom(symbols);
+
+    for (let i = 0; i < 7; i++) {
+      password += getRandom(all);
+    }
+    this.client.password = password
+      .split('')
+      .sort(() => Math.random() - 0.5)
+      .join('');
+
+    this.toast.show('Contraseña generada exitosamente', 'success');
   }
 }

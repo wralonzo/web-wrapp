@@ -34,7 +34,6 @@ import { PageConfiguration } from 'src/app/page-configurations';
 export class EditUserComponponent extends PageConfiguration implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  private readonly userService = inject(UserService);
 
   public loading = signal(false);
   public loadingData = signal(false);
@@ -48,35 +47,8 @@ export class EditUserComponponent extends PageConfiguration implements OnInit {
   public userRoles = signal<string[]>([]);
   submitting = signal(false);
 
-  public user = signal<User | null>({
-    id: 0,
-    user: '',
-    name: '',
-    role: '',
-    token: '',
-    roles: [],
-    fullName: '',
-    username: '',
-    phone: '',
-    address: '',
-    avatar: null,
-    password: null,
-    createdAt: '',
-    updateAt: null,
-    deletedAt: null,
-  });
+  public user = signal<User | null>(null);
 
-  public userAdd: UserAdd = {
-    warehouse: 0,
-    positionType: 0,
-    roles: [],
-    user: {
-      fullName: '',
-      username: '',
-      phone: '',
-      address: '',
-    },
-  };
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -96,7 +68,7 @@ export class EditUserComponponent extends PageConfiguration implements OnInit {
       });
       this.logger.info('User', response);
       this.user.set(response);
-      this.userRoles.set(this.user()!.roles!);
+      this.userRoles.set(this.user()!.user.roles!);
       this.loadingData.set(false);
     } catch (error) {
       this.provideError(error);
@@ -175,26 +147,47 @@ export class EditUserComponponent extends PageConfiguration implements OnInit {
     }
   }
 
-  public onSubmit(): void {
-    this.submitting.set(true);
-    this.userAdd.roles = this.userRoles();
-    this.userAdd.user = this.user()!;
-    this.userAdd.positionType = this.user()!.employee?.positionId;
-    this.userAdd.warehouse = this.user()?.employee?.warehouseId;
-    this.userService.update(+this.idRecord()!, this.userAdd).subscribe(() => {
+  public async onSubmit(): Promise<void> {
+    try {
+      this.submitting.set(true);
+      const currentUser = this.user();
+      if (!currentUser) return;
+
+      const payload = {
+        username: currentUser.profile.username,
+        fullName: currentUser.profile.fullName,
+        birthDate: currentUser.profile.birthDate,
+        phone: currentUser.profile.phone || '',
+        address: currentUser.profile.address || '',
+        email: currentUser.profile.email || '',
+        positionTypeId: currentUser.employee?.positionId ?? 0,
+        warehouseId: currentUser.employee?.warehouseId ?? 0,
+        roles: this.userRoles(),
+        password: currentUser.profile.username,
+      };
+
+      this.logger.info('User', payload);
+      const response = await this.rustService.call(async (bridge: GenericHttpBridge) => {
+        return await bridge.patch(`/user/${this.idRecord()!}`, payload);
+      });
+
+      this.logger.info('User updated', response);
       this.router.navigate(['/app/users']);
       this.toast.show('Usuario actualizado correctamente!', 'success');
-    });
-    this.submitting.set(false);
+    } catch (error) {
+      this.provideError(error);
+    } finally {
+      this.submitting.set(false);
+    }
   }
 
   selectWarehouse(option: SelectOption): void {
     if (this.user()) {
-      this.userAdd.warehouse = Number(option.value);
+      this.user()!.employee!.warehouseId = Number(option.value);
     }
   }
 
   selectPositionType(option: SelectOption): void {
-    this.userAdd.positionType = Number(option.value);
+    this.user()!.employee!.positionId = Number(option.value);
   }
 }

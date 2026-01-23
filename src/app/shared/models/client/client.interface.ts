@@ -1,22 +1,28 @@
 import { ClientTypes } from '@shared/enums/clients/Client-type.enum';
 import { HttpResponseApi, HttpResponseApiFindOne } from '../http/http-response';
-import { User } from '../user/user.model';
 
 export interface Client {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  lastVisit: string;
-  birthDate?: string;
   clientType: ClientTypes;
-  totalSpent: number;
-  status: 1 | 2 | 2;
-  address?: string;
-  notes?: string;
   code: string;
-  user?: User;
+  companyId: number;
+  id: number;
+  birthDate: string;
+  preferredDeliveryAddress: string;
+  profile: {
+    address: string;
+    email: string;
+    fullName: string;
+    id: number;
+    phone: string;
+  },
+  taxId: string,
+  user: {
+    id: number;
+    username: string;
+    password: string;
+    passwordInit: string;
+  }
 }
 
-export interface ClientResponse extends HttpResponseApi<Client> {}
-export interface ClientResponseFindOne extends HttpResponseApiFindOne<Client> {}
+export interface ClientResponse extends HttpResponseApi<Client> { }
+export interface ClientResponseFindOne extends HttpResponseApiFindOne<Client> { }

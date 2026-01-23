@@ -28,9 +28,9 @@ export class ClientDetailComponent extends PageConfiguration implements OnInit {
   }
   public whatsappUrl = computed(() => {
     const data = this.client();
-    if (!data || !data.phone) return null;
-    const cleanPhone = data.phone.replace(/\D/g, '');
-    const message = `Hola ${data.name}, te contactamos de TOP FASHION SALON`;
+    if (!data || !data.profile.phone) return null;
+    const cleanPhone = data.profile.phone.replace(/\D/g, '');
+    const message = `Hola ${data.profile.fullName}, te contactamos de TOP FASHION SALON`;
     const encodedMessage = encodeURIComponent(message);
 
     return `https://wa.me/${cleanPhone}?text=${encodedMessage}`;

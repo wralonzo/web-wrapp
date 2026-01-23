@@ -1,8 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { UserService } from '@core/services/user.service';
 import { SelectOption } from '@shared/models/select/option.interface';
-import { UserAdd } from '@shared/models/user/add-user.interface';
 import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ButtonComponent } from '@shared/components/button/button.component';
@@ -15,7 +13,8 @@ import { GenericHttpBridge } from '@assets/retail-shop/rust_retail';
 import { PaginatedResponse } from '@assets/retail-shop/PaginatedResponse';
 import { PositionType } from '@shared/models/position-type/postion-type.interface';
 import { Role } from '@shared/models/role/role.interface';
-import { HttpClient } from '@angular/common/http';
+import { UserAdd } from '@shared/models/user/add-user.interface';
+import { User } from '@assets/retail-shop/User';
 
 @Component({
   selector: 'app-add',
@@ -33,7 +32,6 @@ import { HttpClient } from '@angular/common/http';
 })
 export class AddUserComponent extends PageConfiguration implements OnInit {
   private readonly router = inject(Router);
-  private readonly userService = inject(UserService);
 
   public loading = signal(false);
   public formSubmitted = signal(false);
@@ -44,15 +42,31 @@ export class AddUserComponent extends PageConfiguration implements OnInit {
   public roleOptions = signal<SelectOption[]>([]);
   public userRoles = signal<string[]>([]);
 
-  public user: UserAdd = {
-    warehouse: 0,
-    positionType: 0,
-    roles: [],
+  public user: User = {
     user: {
+      id: 0,
+      enabled: false,
+      provider: '',
+      roles: [],
+      token: null
+    },
+    employee: {
+      id: 0,
+      warehouseId: 0,
+      positionName: '',
+      positionId: 0
+    },
+    profile: {
       fullName: '',
       username: '',
       phone: '',
       address: '',
+      email: '',
+      id: 0,
+      provider: '',
+      passwordInit: null,
+      avatar: null,
+      birthDate: null
     },
   };
 
@@ -141,20 +155,32 @@ export class AddUserComponent extends PageConfiguration implements OnInit {
       return;
     }
 
-    if (!this.user.warehouse) {
+    if (!this.user?.employee?.warehouseId) {
       this.toast.show('Por favor, selecciona un almacen.', 'error');
       return;
     }
 
-    if (!this.user.positionType) {
+    if (!this.user?.employee?.positionId) {
       this.toast.show('Por favor, selecciona una posición.', 'error');
       return;
     }
     this.loading.set(true);
-    this.user.roles = this.userRoles();
+    this.user.user.roles = this.userRoles();
     try {
-      await this.rustService.call(async (bridge: HttpClient) => {
-        return bridge.post('/user', this.user);
+      const payload = {
+        username: this.user.profile.username,
+        fullName: this.user.profile.fullName,
+        birthDate: this.user.profile.birthDate,
+        phone: this.user.profile.phone || '',
+        address: this.user.profile.address || '',
+        email: this.user.profile.email || '',
+        positionTypeId: this.user.employee?.positionId ?? 0,
+        warehouseId: this.user.employee?.warehouseId ?? 0,
+        roles: this.userRoles(),
+        password: this.user.profile.passwordInit,
+      };
+      await this.rustService.call(async (bridge: GenericHttpBridge) => {
+        return bridge.post('/user', payload);
       });
       this.toast.show('Usuario agregado correctamente');
       this.router.navigate(['/app/users']);
@@ -166,10 +192,10 @@ export class AddUserComponent extends PageConfiguration implements OnInit {
   }
 
   selectWarehouse(option: SelectOption) {
-    this.user.warehouse = Number(option.value); // Guardas el valor
+    this.user.employee!.warehouseId = Number(option.value); // Guardas el valor
   }
 
   selectPositionType(option: SelectOption) {
-    this.user.positionType = Number(option.value); // Guardas el valor
+    this.user.employee!.positionId = Number(option.value); // Guardas el valor
   }
 }

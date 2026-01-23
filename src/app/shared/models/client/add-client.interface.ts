@@ -5,9 +5,13 @@ export interface AddClient {
   email: string;
   phone: string;
   address: string;
-  notes?: number;
+  avatar?: string;
+  preferredDeliveryAddress?: string;
+  taxId?: string;
   birthDate?: string;
   clientType: ClientTypes;
-  warehouseId?: number;
+  companyId?: number;
   flagUser?: boolean;
+  username?: string;
+  password?: string;
 }

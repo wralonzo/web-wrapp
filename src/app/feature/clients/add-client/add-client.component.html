@@ -1,6 +1,4 @@
-<div
-  class="max-w-3xl mx-auto bg-white border border-zinc-200 rounded-[32px] shadow-sm overflow-hidden"
->
+<div class="max-w-3xl mx-auto bg-white border border-zinc-200 rounded-[32px]">
   <div class="mb-8 flex items-center bg-zinc-50/50 border-b border-zinc-100 justify-between">
     <div class="p-8">
       <h2 class="text-2xl font-bold text-zinc-900">Nuevo Cliente</h2>
@@ -8,97 +6,55 @@
         Completa los datos para dar de alta al cliente en el sistema.
       </p>
     </div>
-    <a
-      routerLink="/app/clients"
-      class="text-zinc-500 hover:text-zinc-700 transition-colors flex items-center gap-1 font-medium text-sm px-10"
-    >
+    <a routerLink="/app/clients"
+      class="text-zinc-500 hover:text-zinc-700 transition-colors flex items-center gap-1 font-medium text-sm px-10">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M10 19l-7-7m0 0l7-7m-7 7h18"
-        />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
       </svg>
       Volver a la lista
     </a>
   </div>
   <form class="px-4" #f="ngForm" (ngSubmit)="register(f)">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <app-input
-        name="nombreCliente"
-        label="Nombre Completo"
-        [(ngModel)]="client.name"
-        [required]="true"
-        [maxlength]="100"
-        [minLength]="3"
-        [showErrors]="formSubmitted()"
-      ></app-input>
+      <app-input name="nombreCliente" label="Nombre Completo" [(ngModel)]="client.name" [required]="true"
+        [maxlength]="100" placeholder="Nombre Completo" [minLength]="3" [showErrors]="formSubmitted()"></app-input>
 
-      <app-input
-        name="phone"
-        [placeholder]="'00000000'"
-        label="Teléfono"
-        [(ngModel)]="client.phone"
-        [required]="true"
-        [maxlength]="15"
-        [minLength]="8"
-        [showErrors]="formSubmitted()"
-      ></app-input>
+      <app-input name="phone" [placeholder]="'00000000'" label="Teléfono" [(ngModel)]="client.phone" [required]="true"
+        [maxlength]="15" [minLength]="8" [showErrors]="formSubmitted()"></app-input>
 
-      <app-input
-        name="email"
-        label="Correo Electrónico"
-        type="email"
-        [(ngModel)]="client.email"
-        [placeholder]="'example@gmail.com'"
-        [required]="true"
-        [showErrors]="formSubmitted()"
-      ></app-input>
+      <app-input name="email" label="Correo Electrónico" type="email" [(ngModel)]="client.email"
+        [placeholder]="'example@gmail.com'" [required]="true" [showErrors]="formSubmitted()"></app-input>
 
-      <app-input
-        name="direccionCliente"
-        label="Dirección"
-        [(ngModel)]="client.address"
-        [required]="true"
-        [showErrors]="formSubmitted()"
-      ></app-input>
+      <app-input name="direccionCliente" label="Dirección" [(ngModel)]="client.address" [required]="true"
+        [showErrors]="formSubmitted()"></app-input>
 
-      <app-input
-        label="Fecha de Nacimiento"
-        type="date"
-        [(ngModel)]="client.birthDate"
-        name="fechaNacimiento"
-        [required]="true"
-        [showErrors]="formSubmitted()"
-      ></app-input>
+      <app-input name="taxNumber" label="Número de NIT/DUI" placeholder="00000000" [(ngModel)]="client.taxId"
+        [required]="true" [showErrors]="formSubmitted()"></app-input>
 
-      <app-custom-select
-        [label]="'Tipo de Cliente'"
-        [options]="optionsTypeClient"
-        [selected]="'REGULAR'"
-        (onSelectionChange)="selectTypeClient($event)"
-      ></app-custom-select>
+      <app-input label="Fecha de Nacimiento" type="date" [(ngModel)]="client.birthDate" name="fechaNacimiento"
+        [required]="true" [showErrors]="formSubmitted()"></app-input>
 
-      <app-checkbox
-        [(ngModel)]="client.flagUser"
-        name="flagUser"
-        label="¿Deseas crear una cuenta de usuario para este cliente?"
-        [required]="false"
-      >
+      <app-input label="Dirección de Entrega Preferida" type="text" [(ngModel)]="client.preferredDeliveryAddress"
+        name="direccionEntregaPreferida" [required]="false" [showErrors]="formSubmitted()"></app-input>
+
+      <app-custom-select [label]="'Tipo de Cliente'" [options]="optionsTypeClient" [selected]="'REGULAR'"
+        (onSelectionChange)="selectTypeClient($event)"></app-custom-select>
+
+      <app-checkbox [(ngModel)]="client.flagUser" name="flagUser"
+        label="¿Deseas crear una cuenta de usuario para este cliente?" [required]="false">
       </app-checkbox>
-      <div class="flex flex-col gap-2">
-        <label class="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1"
-          >Notas Adicionales</label
-        >
-        <textarea
-          [(ngModel)]="client.notes"
-          name="notasAdicionales"
-          rows="3"
-          placeholder="Alergias, preferencias de color, etc..."
-          class="w-full px-5 py-3.5 bg-zinc-50 border border-zinc-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-zinc-800 resize-none"
-        ></textarea>
+
+      @if(client.flagUser){
+      <div class="flex items-center gap-2">
+        <app-input name="password" class="flex-1" placeholder="password" type="password" label="Contraseña"
+          [(ngModel)]="client.password" [required]="true" [showErrors]="formSubmitted()">
+        </app-input>
+        <app-button label="" size="sm" title="Generar contraseña" btnType="secondary" type="button" icon="refresh"
+          (btnClick)="generatePassword()" class="mt-7">
+        </app-button>
       </div>
+      }
+
     </div>
     <div class="py-3"></div>
     <app-button [type]="'submit'" label="Crear Cliente" icon="add-plus" [isLoading]="loading()">

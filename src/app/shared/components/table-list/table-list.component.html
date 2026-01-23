@@ -1,40 +1,20 @@
-<div
-  class="flex flex-col lg:flex-row gap-4 mb-6 p-4 bg-zinc-50 rounded-3xl border border-zinc-200 items-end"
->
+<div class="flex flex-col lg:flex-row gap-4 mb-6 p-4 bg-zinc-50 rounded-3xl border border-zinc-200 items-end">
   <div class="w-full lg:flex-1 relative">
-    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 px-3"
-      >Búsqueda rápida</label
-    >
+    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 px-3">Búsqueda rápida</label>
     <div class="relative py-1">
       <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none mb-1">
         <svg class="h-5 w-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
       </div>
-      <input
-        type="text"
-        [value]="searchTerm()"
-        (input)="handleSearch($event)"
-        placeholder="Buscar por nombre, correo o teléfono..."
-        class="px-10 input-field"
-      />
+      <input type="text" [value]="searchTerm()" (input)="handleSearch($event)"
+        placeholder="Buscar por nombre, correo o teléfono..." class="px-10 input-field" />
       @if (searchTerm()) {
-      <button
-        (click)="clearSearch()"
-        class="absolute inset-y-0 right-0 pr-4 flex items-center text-zinc-400 hover:text-zinc-600 transition-colors"
-      >
+      <button (click)="clearSearch()"
+        class="absolute inset-y-0 right-0 pr-4 flex items-center text-zinc-400 hover:text-zinc-600 transition-colors">
         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M6 18L18 6M6 6l12 12"
-          />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
       }
@@ -45,12 +25,8 @@
   <div class="w-full lg:flex-1 relative">
     @for (filter of filters(); track filter.key) {
     <div class="min-w-[180px] flex-1 lg:flex-none">
-      <app-custom-select
-        [label]="filter.label"
-        [options]="filter.options"
-        [selected]="filter.selectedName"
-        (onSelectionChange)="handleFilterChange(filter.key, $event)"
-      >
+      <app-custom-select [label]="filter.label" [options]="filter.options" [selected]="filter.selectedName"
+        (onSelectionChange)="handleFilterChange(filter.key, $event)">
       </app-custom-select>
     </div>
     }
@@ -58,17 +34,10 @@
   }
 
   <div class="w-full lg:flex-1 relative">
-    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 px"
-      >Registros por página</label
-    >
+    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 px">Registros por página</label>
     <div class="relative py-1">
-      <input
-        type="number"
-        [value]="pageSize()"
-        (input)="handlePageSizeChange($event)"
-        placeholder="5, 10, 20..."
-        class="px-5 input-field"
-      />
+      <input type="number" [value]="pageSize()" (input)="handlePageSizeChange($event)" placeholder="5, 10, 20..."
+        class="px-5 input-field" />
     </div>
   </div>
 </div>
@@ -79,11 +48,8 @@
       <thead>
         <tr class="bg-zinc-50/50 border-b border-zinc-200">
           @for (col of columns(); track col.key) {
-          <th
-            (click)="col.sortable ? toggleSort(col.key) : null"
-            [class.cursor-pointer]="col.sortable"
-            class="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-widest hover:text-zinc-600 transition-colors"
-          >
+          <th (click)="col.sortable ? toggleSort(col.key) : null" [class.cursor-pointer]="col.sortable"
+            class="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-widest hover:text-zinc-600 transition-colors">
             <div class="flex items-center gap-2">
               {{ col.label }}
               @if (col.sortable) {
@@ -102,90 +68,59 @@
           @for (col of columns(); track col.key) {
           <td class="px-6 py-4 text-sm text-zinc-600">
             @switch (col.type) { @case ('currency') {
-            <span class="font-medium text-zinc-900">{{ row[col.key] | currency }}</span> } @case
-            ('date') { <span class="text-zinc-500">{{ row[col.key] | date: 'dd/MM/yyyy' }}</span> }
+            <span class="font-medium text-zinc-900">{{ getCellValue(row, col.key) | currency }}</span> } @case
+            ('date') { <span class="text-zinc-500">{{ getCellValue(row, col.key) | date: 'dd/MM/yyyy' }}</span> }
             @case ('badge') {
             <span
-              [class]="'px-3 py-1 rounded-full text-xs font-bold bg-'+col.color+'-100 text-'+col.color+'-800 uppercase tracking-tight'"
-            >
-              {{ row[col.key] }}
+              [class]="'px-3 py-1 rounded-full text-xs font-bold bg-'+col.color+'-100 text-'+col.color+'-800 uppercase tracking-tight'">
+              {{ getCellValue(row, col.key) }}
             </span>
             } @case ('action') {
             <div class="flex items-center gap-3">
-              <button
-                (click)="emitAction('view', row)"
+              <button (click)="emitAction('view', row)"
                 class="p-2 text-zinc-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all duration-300 group"
-                title="Ver ficha"
-              >
-                <svg
-                  class="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-active:scale-95"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                  <path
-                    class="transition-all duration-500 group-hover:stroke-indigo-600"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                  />
+                title="Ver ficha">
+                <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-active:scale-95"
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path class="transition-all duration-500 group-hover:stroke-indigo-600" stroke-linecap="round"
+                    stroke-linejoin="round" stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
               </button>
-              <button
-                (click)="emitAction('edit', row)"
-                class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                title="Editar"
-              >
+              <button (click)="emitAction('edit', row)"
+                class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Editar">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                  />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                 </svg>
               </button>
-              <button
-                (click)="emitAction('delete', row)"
-                class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                title="Eliminar"
-              >
+              <button (click)="emitAction('delete', row)"
+                class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Eliminar">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                  />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
               </button>
             </div>
             } @case ('boolean') {
             <div class="flex items-center">
-              @if (row[col.key]) {
+              @if (getCellValue(row, col.key)) {
               <span
-                class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-100 uppercase tracking-tighter"
-              >
+                class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-100 uppercase tracking-tighter">
                 <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
                 Activo
               </span>
               } @else {
               <span
-                class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-zinc-100 text-zinc-500 border border-zinc-200 uppercase tracking-tighter"
-              >
+                class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-zinc-100 text-zinc-500 border border-zinc-200 uppercase tracking-tighter">
                 <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>
                 Inactivo
               </span>
               }
             </div>
-            } @default { <span>{{ row[col.key] }}</span> } }
+            } @default { <span>{{ getCellValue(row, col.key) }}</span> } }
           </td>
           }
         </tr>
@@ -198,20 +133,14 @@
     <span class="text-sm text-zinc-500">Página {{ currentPage() + 1 }} de {{ totalPages() }}</span>
     <span class="text-sm text-zinc-500">Total de registros {{ totalItems() }}</span>
     <div class="flex gap-2">
-      <button
-        (click)="onPageChange.emit(currentPage() - 1)"
-        [disabled]="currentPage() === 0"
-        class="p-2 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 disabled:opacity-30"
-      >
+      <button (click)="onPageChange.emit(currentPage() - 1)" [disabled]="currentPage() === 0"
+        class="p-2 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 disabled:opacity-30">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path d="M15 19l-7-7 7-7" />
         </svg>
       </button>
-      <button
-        (click)="onPageChange.emit(currentPage() + 1)"
-        [disabled]="currentPage() + 1 >= totalPages()"
-        class="p-2 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 disabled:opacity-30"
-      >
+      <button (click)="onPageChange.emit(currentPage() + 1)" [disabled]="currentPage() + 1 >= totalPages()"
+        class="p-2 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 disabled:opacity-30">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path d="M9 5l7 7-7 7" />
         </svg>

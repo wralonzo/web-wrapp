@@ -1,19 +1,21 @@
-<div class="flex h-screen bg-white font-sans text-zinc-900 relative">
+<div class="flex h-screen bg-bg-primary font-sans text-text-primary relative transition-colors duration-300">
 
   @if (isMobileOpen()) {
-  <div class="fixed inset-0 bg-zinc-900/50 z-40 lg:hidden backdrop-blur-sm" (click)="isMobileOpen.set(false)">
+  <div class="fixed inset-0 bg-text-primary/60 z-40 lg:hidden backdrop-blur-sm" (click)="isMobileOpen.set(false)">
   </div>
   }
 
   <aside [class.w-64]="!isCollapsed()" [class.w-16]="isCollapsed()" [class.translate-x-0]="isMobileOpen()"
-    class="fixed inset-y-0 left-0 z-50 flex flex-col bg-zinc-50 border-r border-zinc-200 transition-all duration-300 ease-in-out -translate-x-full lg:translate-x-0 lg:static">
+    class="fixed inset-y-0 left-0 z-50 flex flex-col bg-bg-secondary border-r border-border transition-all duration-300 ease-in-out -translate-x-full lg:translate-x-0 lg:static">
     <div class="p-4 flex items-center justify-between min-h-[64px]">
       <div class="flex items-center gap-3 overflow-hidden" [class.hidden]="isCollapsed()">
-        <img src="assets/icons/add-plus.svg" alt="Logo" class="w-8 h-8 object-contain" />
-        <span class="font-bold text-lg tracking-tight text-zinc-800 whitespace-nowrap">Top Fashion</span>
+        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
+          <span class="text-white font-black text-xs">TF</span>
+        </div>
+        <span class="font-black text-lg tracking-tight text-text-primary whitespace-nowrap uppercase">Top Fashion</span>
       </div>
-      <button class="p-2 hover:bg-zinc-200 rounded-full text-zinc-600" (click)="toggleSidebar()">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+      <button class="p-2 hover:bg-bg-primary rounded-full text-text-muted transition-colors" (click)="toggleSidebar()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"
           class="w-6 h-6">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
         </svg>
@@ -25,25 +27,25 @@
       @if (!item.roles || hasRole(item.roles)) {
 
       @if (!item.children) {
-      <a [routerLink]="item.route" routerLinkActive="bg-blue-100 text-blue-700"
-        class="flex items-center gap-4 p-3 rounded-xl text-zinc-600 hover:bg-zinc-200 transition-all group">
+      <a [routerLink]="item.route" routerLinkActive="bg-primary/10 text-primary font-black shadow-sm"
+        class="flex items-center gap-4 p-3 rounded-xl text-text-secondary hover:bg-bg-primary transition-all group">
         <div class="w-6 h-6 bg-current shrink-0" [style.mask-image]="'url(/assets/icons/' + item.iconPath + '.svg)'"
           [style.-webkit-mask-image]="'url(/assets/icons/' + item.iconPath + '.svg)'"></div>
-        <span [class.hidden]="isCollapsed()" class="font-medium truncate">{{ item.label }}</span>
+        <span [class.hidden]="isCollapsed()" class="font-bold truncate text-sm">{{ item.label }}</span>
       </a>
       }
 
       @else {
       <div>
-        <button (click)="toggleSubmenu(item.label)" [class.text-blue-700]="expandedMenu() === item.label"
-          class="w-full flex items-center justify-between p-3 rounded-xl text-zinc-600 hover:bg-zinc-200 transition-all group">
+        <button (click)="toggleSubmenu(item.label)" [class.text-primary]="expandedMenu() === item.label"
+          class="w-full flex items-center justify-between p-3 rounded-xl text-text-secondary hover:bg-bg-primary transition-all group">
           <div class="flex items-center gap-4">
             <div class="w-6 h-6 bg-current shrink-0" [style.mask-image]="'url(/assets/icons/' + item.iconPath + '.svg)'"
               [style.-webkit-mask-image]="'url(/assets/icons/' + item.iconPath + '.svg)'"></div>
-            <span [class.hidden]="isCollapsed()" class="font-medium">{{ item.label }}</span>
+            <span [class.hidden]="isCollapsed()" class="font-bold text-sm">{{ item.label }}</span>
           </div>
           <svg [class.hidden]="isCollapsed()" [class.rotate-180]="expandedMenu() === item.label"
-            class="w-4 h-4 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            class="w-4 h-4 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
             <path d="m19.5 8.25-7.5 7.5-7.5-7.5" />
           </svg>
         </button>
@@ -51,8 +53,8 @@
         @if (expandedMenu() === item.label && !isCollapsed()) {
         <div class="ml-9 mt-1 space-y-1 animate-in slide-in-from-top-2 duration-200">
           @for (child of item.children; track child.label) {
-          <a [routerLink]="child.route" routerLinkActive="text-blue-600 font-bold"
-            class="block p-2 text-sm text-zinc-500 hover:text-zinc-900 transition-colors">
+          <a [routerLink]="child.route" routerLinkActive="text-primary font-black"
+            class="block p-2 text-sm text-text-muted hover:text-text-primary transition-colors font-bold">
             {{ child.label }}
           </a>
           }
@@ -64,28 +66,29 @@
       }
     </nav>
 
-    <div class="p-3 border-t border-zinc-200 bg-zinc-50/50">
+    <div class="p-3 border-t border-border bg-bg-secondary/50">
       <div
-        class="flex items-center gap-3 p-2 rounded-2xl bg-white border border-zinc-100 shadow-sm transition-all duration-300">
+        class="flex items-center gap-3 p-2 rounded-2xl bg-bg-primary border border-border transition-all duration-300">
 
         <div
-          class="w-8 h-8 rounded-xl bg-zinc-900 text-white flex items-center justify-center font-bold shrink-0 text-xs shadow-inner">
+          class="w-10 h-10 rounded-xl bg-text-primary text-bg-primary flex items-center justify-center font-black shrink-0 text-sm shadow-inner uppercase">
           {{ authService.currentUser()?.profile?.fullName?.charAt(0) }}
         </div>
 
         <div [class.hidden]="isCollapsed()" class="flex-1 min-w-0 animate-in fade-in duration-300">
-          <p class="text-xs font-bold text-zinc-900 truncate">
+          <p class="text-xs font-black text-text-primary truncate">
             {{ authService.currentUser()?.profile?.username }}
           </p>
-          <p class="text-[10px] text-zinc-500 truncate uppercase tracking-tighter">
-            Administrador
+          <p class="text-[10px] text-text-muted truncate uppercase tracking-tighter font-black">
+            Acceso Corporativo
           </p>
         </div>
 
         <button (click)="authService.logout()" [class.hidden]="isCollapsed()"
-          class="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Salir">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-            class="w-4 h-4">
+          class="p-2 text-text-muted hover:text-red-600 hover:bg-red-500/10 rounded-lg transition-colors border border-transparent hover:border-red-500/20"
+          title="Salir">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+            stroke="currentColor" class="w-4 h-4">
             <path stroke-linecap="round" stroke-linejoin="round"
               d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H22.5" />
           </svg>
@@ -97,12 +100,12 @@
   <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
 
     <header
-      class="h-16 flex items-center justify-between px-4 lg:px-8 bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-zinc-100">
+      class="h-16 flex items-center justify-between px-4 lg:px-8 bg-bg-primary/80 backdrop-blur-md sticky top-0 z-10 border-b border-border shadow-sm">
       <div class="flex items-center gap-4 min-w-0 flex-1">
-        <button class="lg:hidden p-2 -ml-2 text-zinc-600 hover:bg-zinc-100 rounded-xl transition-colors"
+        <button class="lg:hidden p-2 -ml-2 text-text-secondary hover:bg-bg-secondary rounded-xl transition-colors"
           (click)="isMobileOpen.set(true)">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
 
@@ -111,28 +114,23 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-2 ml-4 shrink-0">
+      <div class="flex items-center gap-4 shrink-0">
+        <app-theme-toggle></app-theme-toggle>
+
+        <div class="h-6 w-px bg-border mx-1"></div>
+
         <button (click)="profile()" title="Mi Perfil"
-          class="w-10 h-10 flex items-center justify-center rounded-full text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 transition-all duration-200">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-            stroke="currentColor" class="w-5 h-5">
+          class="w-10 h-10 flex items-center justify-center rounded-xl bg-bg-secondary text-text-muted hover:text-text-primary transition-all duration-200 border border-border shadow-sm hover:scale-105 active:scale-95">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+            class="w-5 h-5">
             <path stroke-linecap="round" stroke-linejoin="round"
               d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
           </svg>
         </button>
-
-        <button (click)="authService.logout()" title="Cerrar Sesión"
-          class="w-10 h-10 flex items-center justify-center rounded-full text-zinc-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-            stroke="currentColor" class="w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H22.5" />
-          </svg>
-        </button>
       </div>
     </header>
-    <main class="flex-1 overflow-y-auto p-4 lg:p-8 bg-white">
-      <div class="w-full mx-auto">
+    <main class="flex-1 overflow-y-auto p-4 lg:p-8 bg-bg-primary custom-scrollbar transition-colors duration-300">
+      <div class="w-full mx-auto max-w-7xl">
         <router-outlet></router-outlet>
       </div>
     </main>

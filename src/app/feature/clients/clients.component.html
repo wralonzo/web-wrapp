@@ -1,32 +1,16 @@
 <div class="space-y-6">
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div>
-      <h1 class="text-2xl font-bold text-zinc-900">Directorio de Clientes</h1>
-      <p class="text-zinc-500 text-sm">Gestiona la información y el historial de tus clientes.</p>
+      <h1 class="text-2xl font-bold">Directorio de Clientes</h1>
+      <p class="text-text-secondary text-sm">Gestiona la información y el historial de tus clientes.</p>
     </div>
-    <app-button
-      label="Registrar Cliente"
-      type="button"
-      (btnClick)="addClient()"
-      [icon]="'add-plus'"
-    >
+    <app-button label="Registrar Cliente" type="button" (btnClick)="addClient()" [icon]="'add-plus'">
     </app-button>
   </div>
 
-  <app-table-list
-    [data]="filteredClients()"
-    [columns]="clientColumns"
-    [filters]="filters"
-    [totalItems]="totalItems()"
-    [currentPage]="currentPage()"
-    [totalPages]="totlPages()"
-    (onAction)="handleTableAction($event)"
-    (onFilter)="handleFilter($event)"
-    (onSort)="handleSort($event)"
-    (onPageChange)="handlePage($event)"
-    [searchTerm]="searchQuery()"
-    (onSearch)="searchQuery.set($event)"
-    (onPageSizeChange)="pageSize.set($event)"
-  >
+  <app-table-list [data]="filteredClients()" [columns]="clientColumns" [filters]="filters" [totalItems]="totalItems()"
+    [currentPage]="currentPage()" [totalPages]="totlPages()" (onAction)="handleTableAction($event)"
+    (onFilter)="handleFilter($event)" (onSort)="handleSort($event)" (onPageChange)="handlePage($event)"
+    [searchTerm]="searchQuery()" (onSearch)="searchQuery.set($event)" (onPageSizeChange)="pageSize.set($event)">
   </app-table-list>
 </div>

@@ -1,27 +1,30 @@
-<div class="min-h-screen bg-slate-50 flex flex-col">
-  
-  <nav class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-50">
+<div class="bg-bg-primary flex flex-col min-h-screen transition-colors duration-300">
+
+  <nav class="bg-bg-secondary border-b border-border shadow-sm sticky top-0 z-50 transition-colors duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16 items-center">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 bg-pink-500 rounded-lg flex items-center justify-center shadow-sm">
-             <span class="text-white font-bold text-xs">DS</span>
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+            <span class="text-white font-black text-xs">TF</span>
           </div>
-          <span class="text-xl font-bold text-slate-800 tracking-tight">Detail Shop</span>
+          <span class="text-xl font-black text-text-primary tracking-tight uppercase">Top Fashion</span>
         </div>
 
-        <div class="hidden md:flex space-x-8">
-          <a routerLink="/dashboard" routerLinkActive="text-pink-600 border-b-2 border-pink-600" class="text-slate-600 hover:text-pink-500 font-medium py-5 transition-colors">Dashboard</a>
-          <a routerLink="/clientes" routerLinkActive="text-pink-600 border-b-2 border-pink-600" class="text-slate-600 hover:text-pink-500 font-medium py-5 transition-colors">Clientes</a>
-          <a routerLink="/citas" routerLinkActive="text-pink-600 border-b-2 border-pink-600" class="text-slate-600 hover:text-pink-500 font-medium py-5 transition-colors">Calendario</a>
+        <div class="hidden md:flex items-center space-x-1">
+          <a routerLink="/dashboard" routerLinkActive="bg-primary text-white shadow-md shadow-primary/20"
+            class="text-text-secondary hover:text-text-primary font-bold px-4 py-2 rounded-lg transition-all text-sm uppercase tracking-wider">Dashboard</a>
+          <a routerLink="/clientes" routerLinkActive="bg-primary text-white shadow-md shadow-primary/20"
+            class="text-text-secondary hover:text-text-primary font-bold px-4 py-2 rounded-lg transition-all text-sm uppercase tracking-wider">Clientes</a>
+          <a routerLink="/citas" routerLinkActive="bg-primary text-white shadow-md shadow-primary/20"
+            class="text-text-secondary hover:text-text-primary font-bold px-4 py-2 rounded-lg transition-all text-sm uppercase tracking-wider">Calendario</a>
         </div>
       </div>
     </div>
   </nav>
 
   <main class="flex-grow">
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-     
+    <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+      <router-outlet></router-outlet>
     </div>
   </main>
 

@@ -15,6 +15,10 @@ export const APP_ROUTES = {
     users: 'users',
     reservations: 'reservations',
     products: 'products',
+    roles: 'roles',
+    branches: 'branches',
+    warehouses: 'warehouses',
+    permissions: 'permissions',
     // Sub-rutas
     add: 'add',
     edit: 'edit/:id',
@@ -53,6 +57,34 @@ export const APP_ROUTES = {
       add: `/${APP_BASE}/products/add`,
       edit: (id: string | number) => `/${APP_BASE}/products/edit/${id}`,
       view: (id: string | number) => `/${APP_BASE}/products/view/${id}`,
+    },
+
+    roles: {
+      list: `/${APP_BASE}/roles`,
+      add: `/${APP_BASE}/roles/add`,
+      edit: (id: string | number) => `/${APP_BASE}/roles/edit/${id}`,
+    },
+
+    branches: {
+      list: `/${APP_BASE}/branches`,
+      add: `/${APP_BASE}/branches/add`,
+      edit: (id: string | number) => `/${APP_BASE}/branches/edit/${id}`,
+    },
+
+    warehouses: {
+      list: `/${APP_BASE}/warehouses`,
+      add: `/${APP_BASE}/warehouses/add`,
+      edit: (id: string | number) => `/${APP_BASE}/warehouses/edit/${id}`,
+    },
+
+    positions: {
+      list: `/${APP_BASE}/positions`,
+      add: `/${APP_BASE}/positions/add`,
+      edit: (id: string | number) => `/${APP_BASE}/positions/edit/${id}`,
+    },
+
+    permissions: {
+      list: `/${APP_BASE}/permissions`,
     },
   },
 } as const;

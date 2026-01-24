@@ -1,0 +1,42 @@
+<div
+    class="max-w-3xl mx-auto bg-bg-secondary border border-border rounded-[32px] overflow-hidden transition-colors duration-300">
+    <div class="flex items-center bg-bg-primary/50 border-b border-border justify-between">
+        <div class="p-8">
+            <h2 class="text-2xl font-black text-text-primary uppercase tracking-tight">Editar Rol</h2>
+            <p class="text-text-muted text-sm font-medium">
+                Actualiza los privilegios y descripción del rol.
+            </p>
+        </div>
+        <a routerLink="/app/roles"
+            class="text-text-muted hover:text-text-primary transition-colors flex items-center gap-1 font-bold text-sm px-10">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Volver a la lista
+        </a>
+    </div>
+
+    @if (fetching()) {
+    <div class="flex justify-center items-center py-20">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-text-primary"></div>
+    </div>
+    } @else {
+    <form class="p-8" #f="ngForm" (ngSubmit)="update(f)">
+        <div class="space-y-6">
+            <app-input name="name" label="Nombre del Rol" [(ngModel)]="role.name" [required]="true" [maxlength]="50"
+                placeholder="Ej: Administrador" [minLength]="3" [showErrors]="formSubmitted()">
+            </app-input>
+
+            <app-input name="note" label="Descripción / Notas" [(ngModel)]="role.note" [required]="true"
+                [maxlength]="200" placeholder="Describe las responsabilidades de este rol"
+                [showErrors]="formSubmitted()">
+            </app-input>
+        </div>
+
+        <div class="py-6"></div>
+
+        <app-button [type]="'submit'" label="Actualizar Rol" icon="refresh" [isLoading]="loading()">
+        </app-button>
+    </form>
+    }
+</div>

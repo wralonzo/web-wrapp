@@ -6,6 +6,7 @@ import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
 import { UserRole as ROLES } from '@shared/enums/roles/roles.enum';
 import { PageConfiguration } from 'src/app/page-configurations';
 import beautyLottie from 'src/assets/lottie/beauty-salon-lottie.json';
+import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
 
 interface MenuItem {
   label: string;
@@ -17,7 +18,7 @@ interface MenuItem {
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, BreadcrumbComponent],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, BreadcrumbComponent, ThemeToggleComponent],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss',
 })
@@ -44,12 +45,6 @@ export class LayoutComponent extends PageConfiguration {
       iconPath: 'clients',
     },
     {
-      label: 'Usuarios',
-      route: this.ROUTES.nav.users.list,
-      roles: [ROLES.ADMIN],
-      iconPath: 'users',
-    },
-    {
       label: 'Reservaciones',
       route: '/app/reservations',
       roles: [ROLES.ADMIN, ROLES.SALES],
@@ -62,14 +57,21 @@ export class LayoutComponent extends PageConfiguration {
       iconPath: 'handbag',
     },
     {
+      label: 'Usuarios',
+      route: this.ROUTES.nav.users.list,
+      roles: [ROLES.ADMIN],
+      iconPath: 'users',
+    },
+    {
       label: 'Configuraciones', // Ejemplo con Submenú
       iconPath: 'config',
       roles: [ROLES.ADMIN, ROLES.SALES],
       children: [
-        { label: 'Roles', route: '/app/roles', iconPath: 'list' },
-        { label: 'Permisos', route: '/app/permissions', iconPath: 'category' },
-        { label: 'Sucursales', route: '/app/sucursales', iconPath: 'category' },
-        { label: 'Almacenes', route: '/app/almacenes', iconPath: 'category' },
+        { label: 'Roles', route: this.ROUTES.nav.roles.list, iconPath: 'list' },
+        { label: 'Permisos', route: this.ROUTES.nav.permissions.list, iconPath: 'category' },
+        { label: 'Sucursales', route: this.ROUTES.nav.branches.list, iconPath: 'category' },
+        { label: 'Almacenes', route: this.ROUTES.nav.warehouses.list, iconPath: 'category' },
+        { label: 'Puestos de trabajo', route: this.ROUTES.nav.positions.list, iconPath: 'positions' },
       ],
     },
   ];

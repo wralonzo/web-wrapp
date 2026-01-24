@@ -60,12 +60,34 @@ export const routes: Routes = [
           import('./feature/products/products.routes').then((m) => m.PRODUCTS_ROUTES),
       },
 
-      // Módulo de Reservaciones
       {
         path: 'reservations',
         title: 'Reservaciones',
         loadChildren: () =>
           import('./feature/reservations/reservations.routes').then((m) => m.RESERVATIONS_ROUTES),
+      },
+      {
+        path: APP_ROUTES.definitions.roles,
+        title: 'Roles',
+        loadChildren: () => import('./feature/roles/roles.routes').then((m) => m.ROLES_ROUTES),
+      },
+      {
+        path: APP_ROUTES.definitions.branches,
+        title: 'Sucursales',
+        loadChildren: () =>
+          import('./feature/branches/branches.routes').then((m) => m.BRANCHES_ROUTES),
+      },
+      {
+        path: APP_ROUTES.definitions.warehouses,
+        title: 'Almacenes',
+        loadChildren: () =>
+          import('./feature/warehouses/warehouses.routes').then((m) => m.WAREHOUSES_ROUTES),
+      },
+      {
+        path: APP_ROUTES.definitions.permissions,
+        title: 'Permisos',
+        loadChildren: () =>
+          import('./feature/permissions/permissions.routes').then((m) => m.PERMISSIONS_ROUTES),
       },
       {
         path: 'reservations/calendar',

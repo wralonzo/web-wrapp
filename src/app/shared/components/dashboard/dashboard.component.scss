@@ -1,49 +1,22 @@
-// .animate-fade-in {
-//   animation: fadeIn 0.5s ease-out;
-// }
-
-// @keyframes fadeIn {
-//   from {
-//     opacity: 0;
-//     transform: translateY(10px);
-//   }
-//   to {
-//     opacity: 1;
-//     transform: translateY(0);
-//   }
-// }
-
-// /* Ocultar barra de scroll en la tabla pero permitir el movimiento */
-// .overflow-x-auto {
-//   scrollbar-width: none;
-//   &::-webkit-scrollbar {
-//     display: none;
-//   }
-// }
-
-// Variables de color (puedes moverlas a styles.scss global)
-$primary: #0ea5e9;
-$success: #22c55e;
-$warning: #f59e0b;
-$danger: #ef4444;
-$dark: #1e293b;
-$light-gray: #f1f5f9;
-$card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+// dashboard.component.scss
 
 .dashboard-container {
   padding: 2rem;
-  background-color: #f8fafc; // Un fondo gris muy claro para el dashboard
+  background-color: var(--bg-primary);
   min-height: 100vh;
+  transition: background-color 0.3s ease;
 
   h1 {
-    color: $dark;
+    color: var(--text-primary);
     margin-bottom: 1.5rem;
+    font-family: var(--font-display);
   }
 
   h2 {
-    color: $dark;
+    color: var(--text-primary);
     font-size: 1.25rem;
     margin-bottom: 1rem;
+    font-family: var(--font-display);
   }
 }
 
@@ -55,16 +28,18 @@ $card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   margin-bottom: 2rem;
 
   .kpi-card {
-    background: white;
+    background: var(--bg-secondary);
     padding: 1.5rem;
-    border-radius: 1rem;
-    box-shadow: $card-shadow;
+    border-radius: var(--radius-card);
+    border: 1px border-border;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
     display: flex;
     align-items: center;
-    transition: transform 0.2s;
+    transition: all 0.3s ease;
 
     &:hover {
       transform: translateY(-3px);
+      box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
     }
 
     .icon {
@@ -81,34 +56,48 @@ $card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
     .info {
       h3 {
         font-size: 0.9rem;
-        color: #64748b;
+        color: var(--text-muted);
         margin-bottom: 0.25rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
       }
+
       p {
         font-size: 1.5rem;
-        font-weight: bold;
-        color: $dark;
+        font-weight: 800;
+        color: var(--text-primary);
         margin: 0;
+        letter-spacing: -0.025em;
       }
     }
 
     // Variantes de color
     &.blue {
       .icon {
-        background: lighten($primary, 35%);
-        color: $primary;
+        background: rgba(14, 165, 233, 0.1);
+        color: #0ea5e9;
       }
     }
+
     &.green {
       .icon {
-        background: lighten($success, 35%);
-        color: $success;
+        background: rgba(34, 197, 94, 0.1);
+        color: #22c55e;
       }
     }
+
     &.orange {
       .icon {
-        background: lighten($warning, 35%);
-        color: $warning;
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+      }
+    }
+
+    &.red {
+      .icon {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
       }
     }
   }
@@ -117,23 +106,24 @@ $card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 // --- 2. Middle Grid (Gráfica y Acciones) ---
 .middle-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr; // La gráfica ocupa 2/3, acciones 1/3
+  grid-template-columns: 2fr 1fr;
   gap: 1.5rem;
   margin-bottom: 2rem;
 
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr; // En móviles, una columna
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
   }
 
   .card-panel {
-    background: white;
+    background: var(--bg-secondary);
     padding: 1.5rem;
-    border-radius: 1rem;
-    box-shadow: $card-shadow;
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
   }
 
   .chart-wrapper {
-    height: 300px; // Altura fija para la gráfica
+    height: 300px;
     position: relative;
   }
 
@@ -142,32 +132,16 @@ $card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
       display: flex;
       flex-direction: column;
       gap: 1rem;
-
-      .btn-action {
-        padding: 0.75rem;
-        border-radius: 0.5rem;
-        border: none;
-        background-color: $primary;
-        color: white;
-        font-weight: 600;
-        cursor: pointer;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        transition: background 0.2s;
-
-      
-      }
     }
   }
 }
 
 // --- 3. Bottom Grid (Tabla) ---
 .bottom-grid {
-  background: white;
+  background: var(--bg-secondary);
   padding: 1.5rem;
-  border-radius: 1rem;
-  box-shadow: $card-shadow;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-color);
 }
 
 // --- Estilos Genéricos de Tabla y Badges ---
@@ -178,51 +152,68 @@ $card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 .data-table {
   width: 100%;
   border-collapse: collapse;
+
   th,
   td {
     padding: 1rem;
     text-align: left;
-    border-bottom: 1px solid $light-gray;
+    border-bottom: 1px solid var(--border-color);
   }
+
   th {
-    color: #64748b;
-    font-weight: 600;
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  td {
+    color: var(--text-secondary);
   }
 }
 
 .badge {
   padding: 0.25rem 0.75rem;
   border-radius: 1rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  &.badge-success {
-  }
-  &.badge-warning {
-  }
-  &.badge-info {
-  }
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 .btn-sm {
   padding: 0.4rem 0.8rem;
-  border: 1px solid $light-gray;
-  background: white;
-  border-radius: 0.4rem;
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-radius: 0.5rem;
   cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+
   &:hover {
-    background: $light-gray;
+    background: var(--bg-secondary);
+    border-color: var(--text-muted);
   }
 }
 
-// Animación de entrada suave
+.loading-skeleton {
+  padding: 3rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
 .fade-in {
   animation: fadeIn 0.5s ease-in;
 }
+
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

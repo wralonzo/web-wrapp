@@ -1,75 +1,62 @@
-<div class="relative w-full py-2">
-  <label class="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1 mb-2 block">
+<div class="relative w-full py-2 transition-colors duration-300">
+  <label class="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] ml-1 mb-2 block">
     {{ label() }}
   </label>
 
-  <button
-    (click)="toggle()"
-    type="button"
-    class="w-full flex items-center justify-between bg-white border border-zinc-200 p-3 rounded-2xl shadow-sm hover:border-blue-400 transition-all min-h-[52px]"
-  >
-    <div class="flex flex-wrap gap-1 items-center overflow-hidden">
+  <button (click)="toggle()" type="button"
+    class="w-full flex items-center justify-between bg-bg-primary border border-border p-4 rounded-[20px] shadow-sm hover:border-primary/40 transition-all min-h-[56px] group active:scale-[0.99]">
+    <div class="flex flex-wrap gap-2 items-center overflow-hidden">
       @if (selectedRoles().length > 0) {
-      <span class="text-sm font-semibold text-zinc-700 truncate max-w-[200px]">
+      <span class="text-sm font-black text-text-primary truncate max-w-[200px] uppercase tracking-tight">
         {{ displayLabel() }}
       </span>
-      <span class="bg-blue-100 text-blue-700 text-[10px] px-2 py-0.5 rounded-full font-bold">
+      <span class="bg-primary text-white text-[10px] px-2.5 py-0.5 rounded-lg font-black shadow-sm shadow-primary/20">
         {{ selectedRoles().length }}
       </span>
       } @else {
-      <span class="text-zinc-400 text-sm italic">Seleccionar roles...</span>
+      <span class="text-text-muted text-sm font-bold italic tracking-tight opacity-60">Seleccionar roles
+        corporativos...</span>
       }
     </div>
 
-    <svg
-      class="w-4 h-4 text-zinc-400 transition-transform"
-      [class.rotate-180]="isOpen()"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="m19.5 8.25-7.5 7.5-7.5-7.5"
-      />
-    </svg>
+    <div class="p-1 rounded-lg bg-bg-secondary border border-border group-hover:border-primary/20 transition-colors">
+      <svg class="w-4 h-4 text-text-muted transition-transform duration-300 group-hover:text-primary"
+        [class.rotate-180]="isOpen()" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+      </svg>
+    </div>
   </button>
 
   @if (isOpen()) {
   <div
-    class="absolute z-50 w-full mt-2 bg-white border border-zinc-200 rounded-[24px] shadow-2xl p-2 animate-in fade-in slide-in-from-top-2 duration-200"
-  >
-    <div class="max-h-60 overflow-y-auto space-y-1">
+    class="absolute z-50 w-full mt-3 bg-bg-secondary border border-border rounded-[28px] shadow-2xl p-3 animate-in fade-in slide-in-from-top-4 duration-300 backdrop-blur-xl bg-bg-secondary/95">
+    <div class="max-h-64 overflow-y-auto space-y-1.5 custom-scrollbar pr-1">
       @for (role of options(); track role.value.toString()) {
-      <button
-        (click)="toggleRole(role.value.toString())"
-        type="button"
-        class="w-full flex items-center justify-between p-3 rounded-xl transition-colors group"
-        [class.bg-blue-50]="isSelected(role.value.toString())"
-        [class.text-blue-700]="isSelected(role.value.toString())"
-        [class.hover:bg-zinc-50]="!isSelected(role.value.toString())"
-      >
-        <span class="text-sm font-medium">{{ role.label }}</span>
+      <button (click)="toggleRole(role.value.toString())" type="button"
+        class="w-full flex items-center justify-between p-4 rounded-[18px] transition-all group relative overflow-hidden"
+        [class.bg-primary/10]="isSelected(role.value.toString())"
+        [class.text-primary]="isSelected(role.value.toString())"
+        [class.hover:bg-bg-primary]="!isSelected(role.value.toString())">
+
+        <div class="flex items-center gap-3 relative z-10">
+          <span class="text-sm font-black uppercase tracking-wider">{{ role.label }}</span>
+        </div>
 
         <div
-          class="w-5 h-5 rounded-md border flex items-center justify-center transition-all"
-          [class.bg-blue-600]="isSelected(role.value.toString())"
-          [class.border-blue-600]="isSelected(role.value.toString())"
-          [class.border-zinc-300]="!isSelected(role.value.toString())"
-        >
+          class="w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-300 relative z-10"
+          [class.bg-primary]="isSelected(role.value.toString())"
+          [class.border-primary]="isSelected(role.value.toString())"
+          [class.border-border]="!isSelected(role.value.toString())"
+          [class.scale-110]="isSelected(role.value.toString())">
           @if (isSelected(role.value.toString())) {
-          <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="3"
-              d="M5 13l4 4L19 7"
-            />
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7" />
           </svg>
           }
         </div>
+
+        <!-- Hover highlight effect -->
+        <div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
       </button>
       }
     </div>

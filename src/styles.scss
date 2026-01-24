@@ -1,71 +1,103 @@
-/* You can add global styles to this file, and also import other style files */
-@use 'tailwindcss';
+@use "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Light Mode Values */
+:root {
+  --font-sans: 'Work Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --border-color: #e2e8f0;
+  --color-primary: #db2777;
+  --color-primary-hover: #be185d;
+  --color-secondary: #475569;
+  --color-primary-field: #3f3cbb;
+  --radius-btn: 0.5rem;
+  --radius-card: 0.75rem;
+}
 
-/* Opcional: para forzar que el navegador use Inter por defecto */
-body {
-  font-family: 'Inter', sans-serif;
+/* Dark Mode Overrides */
+.dark {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #64748b;
+  --border-color: #334155;
+  --color-primary: #ec4899;
+  --color-primary-hover: #db2777;
+  --color-secondary: #94a3b8;
+  --color-primary-field: #6366f1;
 }
 
 @theme {
-  /* --- COLORES DE MARCA (Detail Shop) --- */
-  --color-primary: #db2777; /* Rosa intenso (pink-600) */
-  --color-primary-hover: #be185d; /* Rosa oscuro (pink-700) */
-  --color-secondary: #475569; /* Slate-600 */
-  --color-primary-field: #3f3cbb; /* Slate-600 */
-
-  /* --- RADIOS DE BORDE (Estilo moderno) --- */
-  --radius-btn: 0.75rem; /* Botones redondeados suaves */
-  --radius-card: 1rem; /* Tarjetas más circulares */
-
-  /* --- SOMBRAS PERSONALIZADAS --- */
-  --shadow-beauty: 0 10px 15px -3px rgba(219, 39, 119, 0.1), 0 4px 6px -4px rgba(219, 39, 119, 0.1);
-  /* --- TOKENS DE COLOR --- */
-  --color-brand-50: #fdf2f8; /* Fondo muy claro */
-  --color-brand-100: #fce7f3; /* Decoraciones */
-  --color-brand-500: #ec4899; /* Principal (Pink) */
-  --color-brand-600: #db2777; /* Hover / Énfasis */
-
-  --color-neutral-500: #64748b; /* Slate suave */
-  --color-neutral-800: #1e293b; /* Texto fuerte */
-
-  /* --- TOKENS DE UI --- */
-  --radius-login: 1.5rem;
-  --shadow-brand: 0 10px 15px -3px rgba(219, 39, 119, 0.2);
+  --font-sans: var(--font-sans);
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-border: var(--border-color);
+  --color-primary: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
+  --color-secondary: var(--color-secondary);
+  --color-primary-field: var(--color-primary-field);
+  --radius-btn: var(--radius-btn);
+  --radius-card: var(--radius-card);
 }
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Theme variables deprecated in favor of semantic vars above */
 
 /* --- CLASES GLOBALES DE COMPONENTES --- */
 @layer components {
+
   // Botón Principal (Rosa)
   .btn-primary {
-    @apply bg-(--color-primary) text-white font-bold py-3 px-6 rounded-(--radius-btn) 
-           transition-all duration-200 shadow-lg shadow-pink-600/20 
-           hover:bg-(--color-primary-hover) hover:scale-[1.02] active:scale-[0.98] 
-           disabled:opacity-50 disabled:pointer-events-none;
+    @apply bg-(--color-primary) text-white font-bold py-3 px-6 rounded-(--radius-btn) transition-all duration-200 shadow-lg shadow-pink-600/20 hover:bg-(--color-primary-hover) hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
   }
 
   // Botón Secundario (Gris/Slate)
   .btn-secondary {
-    @apply bg-white text-slate-700 border border-slate-200 font-semibold py-3 px-6 
-    rounded-(--radius-btn) 
-           transition-all duration-200 shadow-lg shadow-pink-600/20 
-           hover:bg-(--color-secondary-hover) hover:scale-[1.02] active:scale-[0.98] 
-           disabled:opacity-50 disabled:pointer-events-none;
+    @apply bg-bg-primary text-text-secondary border border-border font-semibold py-3 px-6 rounded-(--radius-btn) transition-all duration-200 shadow-lg shadow-primary/10 hover:bg-bg-secondary hover:text-text-primary hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
   }
 
   .btn-blue {
     /* Fondo azul sólido y texto blanco para contraste */
     @apply bg-blue-600 text-white font-semibold py-3 px-6;
-    
+
     /* Bordes y Redondeado (usando tu variable o rounded-full para el estilo circular) */
-    @apply border-none rounded-[var(--radius-btn,9999px)]; 
-    
+    @apply border-none rounded-(--radius-btn);
+
     /* Animaciones y Sombras */
     @apply transition-all duration-200 shadow-lg shadow-blue-100;
-    
+
     /* Estados: Hover (encima), Active (clic) y Disabled */
     @apply hover:bg-blue-700 hover:scale-[1.02] shadow-blue-200;
     @apply active:scale-[0.98];
@@ -74,10 +106,9 @@ body {
 
   // Inputs del Sistema
   .input-field {
-    @apply w-full px-5 py-3 rounded-(--radius-btn) bg-slate-50 border border-slate-200 
-           placeholder-slate-500 text-slate-800 outline-none transition-all
-           focus:bg-white focus:border-(--color-primary-field) focus:ring-4 focus:ring-pink-500/10;
+    @apply w-full px-5 py-3 rounded-(--radius-btn) bg-bg-secondary border border-border placeholder-text-muted text-text-primary outline-none transition-all focus:bg-bg-primary focus:border-primary-field focus:ring-4 focus:ring-primary/10;
   }
+
   /* Contenedor de la parte decorativa (izquierda) */
   .login-visual-panel {
     @apply hidden md:flex md:w-1/2 bg-(--color-brand-50) items-center justify-center p-12 relative overflow-hidden;
@@ -101,6 +132,7 @@ body {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;

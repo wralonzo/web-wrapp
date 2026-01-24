@@ -11,22 +11,21 @@ import { ConfirmService } from '@core/services/confirm.service';
     @if (confirmService.modalState(); as state) {
     <div class="fixed inset-0 z-[10000] flex items-center justify-center p-4">
       <div
-        class="absolute inset-0 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-300"
+        class="absolute inset-0 bg-text-primary/60 backdrop-blur-sm animate-in fade-in duration-300"
         (click)="confirmService.close(false)"
       ></div>
 
       <div
-        class="relative bg-white w-full max-w-[440px] rounded-[32px] shadow-2xl border border-zinc-200 overflow-hidden animate-in zoom-in-95 duration-200"
+        class="relative bg-bg-secondary w-full max-w-[480px] rounded-[3rem] shadow-2xl border border-border overflow-hidden animate-in zoom-in-95 duration-200 transition-colors"
       >
         <button
           (click)="confirmService.close(false)"
-          class="absolute top-5 right-5 z-50 p-2 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-full transition-all"
+          class="absolute top-6 right-6 z-50 p-2 text-text-muted hover:text-text-primary hover:bg-bg-primary rounded-xl transition-all border border-transparent hover:border-border"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
-              stroke-width="2"
               d="M6 18L18 6M6 6l12 12"
             />
           </svg>

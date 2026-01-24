@@ -1,19 +1,20 @@
-<div class="max-w-3xl mx-auto bg-white border border-zinc-200 rounded-[32px] shadow-sm">
-  <div class="mb-8 flex items-center bg-zinc-50/50 border-b border-zinc-100 justify-between">
+<div
+  class="max-w-3xl mx-auto bg-bg-secondary border border-border rounded-[32px] overflow-hidden transition-colors duration-300 shadow-sm">
+  <div class="mb-8 flex items-center bg-bg-primary/50 border-b border-border justify-between">
     <div class="p-8">
-      <h2 class="text-2xl font-bold text-zinc-900">Nuevo Usuario</h2>
-      <p class="text-zinc-500 text-sm">Completa los datos para crear el usuario en el sistema.</p>
+      <h2 class="text-2xl font-black text-text-primary">Nuevo Usuario</h2>
+      <p class="text-text-muted text-sm font-medium">Completa los datos para crear el usuario en el sistema.</p>
     </div>
     <a [routerLink]="ROUTES.nav.users.list"
-      class="text-zinc-500 hover:text-zinc-700 transition-colors flex items-center gap-1 font-medium text-sm px-10">
+      class="text-text-muted hover:text-text-primary transition-colors flex items-center gap-1 font-bold text-sm px-10">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
       </svg>
       Volver a la lista
     </a>
   </div>
-  <form class="px-4" #f="ngForm" (ngSubmit)="register(f)">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <form class="px-8 pb-8" #f="ngForm" (ngSubmit)="register(f)">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <app-input name="fullName" placeholder="Nombre Completo" label="Nombre Completo"
         [(ngModel)]="user.profile.fullName" [required]="true" [maxlength]="100" [minLength]="3"
         [showErrors]="formSubmitted()"></app-input>
@@ -42,11 +43,12 @@
       <app-custom-select [label]="'Posición'" [options]="optionsPositionTypes"
         (onSelectionChange)="selectPositionType($event)"></app-custom-select>
 
-      <app-multi-select-roles [options]="roleOptions()" [(selectedRoles)]="userRoles" label="Roles del Sistema">
-      </app-multi-select-roles>
+      <div class="md:col-span-2">
+        <app-multi-select-roles [options]="roleOptions()" [(selectedRoles)]="userRoles" label="Roles del Sistema">
+        </app-multi-select-roles>
+      </div>
     </div>
-    <div class="py-3"></div>
+    <div class="py-4"></div>
     <app-button [type]="'submit'" label="Crear Usuario" icon="add-plus"> </app-button>
-    <div class="py-3"></div>
   </form>
 </div>

@@ -1,31 +1,15 @@
-<div class="space-y-6">
+<div class="space-y-6 transition-colors duration-300">
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div>
-      <h1 class="text-2xl font-bold text-zinc-900">Reservaciones</h1>
-      <p class="text-zinc-500 text-sm">Gestiona la información de tus reservaciones</p>
+      <h1 class="text-2xl font-black text-text-primary uppercase tracking-tight">Reservaciones</h1>
+      <p class="text-text-muted text-sm font-medium">Gestiona la información y programación de servicios.</p>
     </div>
-    <app-button
-      label="Agregar Reservación"
-      type="button"
-      (btnClick)="add()"
-      [icon]="'add-plus'"
-    ></app-button>
+    <app-button label="Agregar Reservación" type="button" (btnClick)="add()" [icon]="'add-plus'"></app-button>
   </div>
 
-  <app-table-list
-    [data]="filtered()"
-    [columns]="tableColumns"
-    [filters]="filters() || []"
-    [totalItems]="totalItems()"
-    [currentPage]="currentPage()"
-    [totalPages]="totlPages()"
-    (onAction)="handleTableAction($event)"
-    (onFilter)="handleFilter($event)"
-    (onSort)="handleSort($event)"
-    (onPageChange)="handlePage($event)"
-    [searchTerm]="searchQuery()"
-    (onSearch)="searchQuery.set($event)"
-    (onPageSizeChange)="pageSize.set($event)"
-  >
+  <app-table-list [data]="filtered()" [columns]="tableColumns" [filters]="filters() || []" [totalItems]="totalItems()"
+    [currentPage]="currentPage()" [totalPages]="totlPages()" (onAction)="handleTableAction($event)"
+    (onFilter)="handleFilter($event)" (onSort)="handleSort($event)" (onPageChange)="handlePage($event)"
+    [searchTerm]="searchQuery()" (onSearch)="searchQuery.set($event)" (onPageSizeChange)="pageSize.set($event)">
   </app-table-list>
 </div>

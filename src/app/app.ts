@@ -5,6 +5,7 @@ import { LoaderComponent } from '@shared/components/loader/loader.component';
 import { ToastComponent } from '@shared/components/toast/toast.component';
 import { PageConfiguration } from './page-configurations';
 import { Location } from '@angular/common';
+import { ThemeService } from '@core/services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -17,6 +18,7 @@ import { Location } from '@angular/common';
 export class App extends PageConfiguration implements OnInit {
   private router = inject(Router);
   private location = inject(Location);
+  private themeService = inject(ThemeService); // Initialize theme
 
   constructor() {
     super();

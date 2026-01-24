@@ -1,33 +1,18 @@
-<app-modal
-  [(isOpen)]="showModal"
-  [isValid]="validatebutton()"
-  (onConfirm)="importResponse() ? onCancel() : onUpload()"
+<app-modal [(isOpen)]="showModal" [isValid]="validatebutton()" (onConfirm)="importResponse() ? onCancel() : onUpload()"
   [title]="importResponse() ? 'Resultado de Importación' : 'Cargar productos desde libro excel'"
   [confirmLabel]="importResponse() ? 'Entendido' : 'Procesar productos'"
-  [cancelLabel]="importResponse() ? '' : 'Cancelar'"
-  (onCancel)="onCancel()"
->
-  <app-button
-    btnType="secondary"
-    label="Descargar plantilla"
-    type="button"
-    (btnClick)="download()"
-    [icon]="'cloud-download'"
-  >
+  [cancelLabel]="importResponse() ? '' : 'Cancelar'" (onCancel)="onCancel()">
+  <app-button btnType="secondary" label="Descargar plantilla" type="button" (btnClick)="download()"
+    [icon]="'cloud-download'">
   </app-button>
   <div class="mb-5"></div>
-  <div class="p-6 bg-white rounded-3xl max-w-lg">
+  <div class="p-6 bg-bg-secondary rounded-card max-w-lg border border-border">
     <div *ngIf="!importResponse(); else reportTemplate">
-      <h2 class="font-display text-2xl font-bold mb-6 text-zinc-900">Importar Productos</h2>
+      <h2 class="font-black text-2xl mb-6 text-text-primary">Importar Productos</h2>
       <div class="space-y-4">
         <label class="block">
-          <input
-            #fileInput
-            type="file"
-            (change)="onFileSelected($event)"
-            accept=".xlsx, .xls"
-            class="block w-full text-sm text-zinc-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-zinc-900 file:text-white hover:file:bg-zinc-800 transition-all cursor-pointer"
-          />
+          <input #fileInput type="file" (change)="onFileSelected($event)" accept=".xlsx, .xls"
+            class="block w-full text-sm text-text-muted file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border file:border-border file:text-xs file:font-black file:bg-bg-primary file:text-text-primary hover:file:bg-bg-secondary transition-all cursor-pointer" />
         </label>
       </div>
     </div>
@@ -35,52 +20,51 @@
     <ng-template #reportTemplate>
       <div class="space-y-6">
         <div class="grid grid-cols-3 gap-3">
-          <div class="p-3 bg-green-50 border border-green-100 rounded-2xl text-center">
-            <span class="block text-2xl font-bold text-green-700">{{
+          <div class="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-center">
+            <span class="block text-2xl font-black text-emerald-600">{{
               importResponse()?.created
-            }}</span>
-            <span class="text-xs font-semibold text-green-600 uppercase tracking-wider"
-              >Creados</span
-            >
+              }}</span>
+            <span class="text-[10px] font-black text-emerald-700 uppercase tracking-widest">Creados</span>
           </div>
-          <div class="p-3 bg-blue-50 border border-blue-100 rounded-2xl text-center">
-            <span class="block text-2xl font-bold text-blue-700">{{
+          <div class="p-3 bg-blue-500/10 border border-blue-500/20 rounded-2xl text-center">
+            <span class="block text-2xl font-black text-blue-600">{{
               importResponse()?.updated
-            }}</span>
-            <span class="text-xs font-semibold text-blue-600 uppercase tracking-wider"
-              >Editados</span
-            >
+              }}</span>
+            <span class="text-[10px] font-black text-blue-700 uppercase tracking-widest">Editados</span>
           </div>
-          <div class="p-3 bg-red-50 border border-red-100 rounded-2xl text-center">
-            <span class="block text-2xl font-bold text-red-700">{{
+          <div class="p-3 bg-red-500/10 border border-red-500/20 rounded-2xl text-center">
+            <span class="block text-2xl font-black text-red-600">{{
               importResponse()?.failed
-            }}</span>
-            <span class="text-xs font-semibold text-red-600 uppercase tracking-wider"
-              >Fallidos</span
-            >
+              }}</span>
+            <span class="text-[10px] font-black text-red-700 uppercase tracking-widest">Fallidos</span>
           </div>
         </div>
 
         <div *ngIf="importResponse()?.errorDetails?.length" class="space-y-2">
-          <h3 class="text-sm font-bold text-zinc-800 flex items-center gap-2">
+          <h3 class="text-[10px] font-black text-text-primary flex items-center gap-2 uppercase tracking-widest">
             <span class="w-2 h-2 bg-red-500 rounded-full"></span>
             Errores encontrados
           </h3>
-          <div class="max-h-32 overflow-y-auto bg-zinc-50 p-3 rounded-xl border border-zinc-100">
-            <ul class="text-xs text-zinc-600 space-y-1">
-              <li *ngFor="let error of importResponse()?.errorDetails">• {{ error }}</li>
+          <div class="max-h-32 overflow-y-auto bg-bg-primary p-3 rounded-xl border border-border transition-colors">
+            <ul class="text-[11px] text-text-secondary space-y-1 font-medium">
+              <li *ngFor="let error of importResponse()?.errorDetails" class="flex gap-2">
+                <span class="text-red-500">•</span> {{ error }}
+              </li>
             </ul>
           </div>
         </div>
 
         <div *ngIf="importResponse()?.warnings?.length" class="space-y-2">
-          <h3 class="text-sm font-bold text-zinc-800 flex items-center gap-2">
+          <h3 class="text-[10px] font-black text-text-primary flex items-center gap-2 uppercase tracking-widest">
             <span class="w-2 h-2 bg-amber-500 rounded-full"></span>
             Advertencias
           </h3>
-          <div class="max-h-32 overflow-y-auto bg-amber-50 p-3 rounded-xl border border-amber-100">
-            <ul class="text-xs text-amber-700 space-y-1">
-              <li *ngFor="let warning of importResponse()?.warnings">• {{ warning }}</li>
+          <div
+            class="max-h-32 overflow-y-auto bg-amber-500/5 p-3 rounded-xl border border-amber-500/20 transition-colors">
+            <ul class="text-[11px] text-amber-700 space-y-1 font-medium">
+              <li *ngFor="let warning of importResponse()?.warnings" class="flex gap-2">
+                <span class="text-amber-500">•</span> {{ warning }}
+              </li>
             </ul>
           </div>
         </div>
@@ -89,45 +73,23 @@
   </div>
 </app-modal>
 
-<div class="space-y-6">
+<div class="space-y-6 transition-colors duration-300">
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div>
-      <h1 class="text-2xl font-bold text-zinc-900">Productos</h1>
-      <p class="text-zinc-500 text-sm">Gestiona la información de tus Productos.</p>
+      <h1 class="text-2xl font-black text-text-primary">Productos</h1>
+      <p class="text-text-muted text-sm font-medium">Gestiona el inventario y catálogo de productos.</p>
     </div>
 
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-      <app-button
-        label="Subir Excel"
-        btnType="blue"
-        type="button"
-        (btnClick)="formFile()"
-        [icon]="'cloud-upload'"
-      >
+    <div class="flex flex-wrap items-center gap-3">
+      <app-button label="Subir Excel" btnType="secondary" type="button" (btnClick)="formFile()" [icon]="'cloud-upload'">
       </app-button>
-      <app-button
-        label="Registrar producto"
-        type="button"
-        (btnClick)="add()"
-        [icon]="'add-plus'"
-      ></app-button>
+      <app-button label="Registrar producto" type="button" (btnClick)="add()" [icon]="'add-plus'"></app-button>
     </div>
   </div>
 
-  <app-table-list
-    [data]="filtered()"
-    [columns]="tableColumns"
-    [filters]="filters() || []"
-    [totalItems]="totalItems()"
-    [currentPage]="currentPage()"
-    [totalPages]="totlPages()"
-    (onAction)="handleTableAction($event)"
-    (onFilter)="handleFilter($event)"
-    (onSort)="handleSort($event)"
-    (onPageChange)="handlePage($event)"
-    [searchTerm]="searchQuery()"
-    (onSearch)="searchQuery.set($event)"
-    (onPageSizeChange)="pageSize.set($event)"
-  >
+  <app-table-list [data]="filtered()" [columns]="tableColumns" [filters]="filters() || []" [totalItems]="totalItems()"
+    [currentPage]="currentPage()" [totalPages]="totlPages()" (onAction)="handleTableAction($event)"
+    (onFilter)="handleFilter($event)" (onSort)="handleSort($event)" (onPageChange)="handlePage($event)"
+    [searchTerm]="searchQuery()" (onSearch)="searchQuery.set($event)" (onPageSizeChange)="pageSize.set($event)">
   </app-table-list>
 </div>

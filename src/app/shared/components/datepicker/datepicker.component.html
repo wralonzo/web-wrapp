@@ -1,34 +1,22 @@
 <div class="flex flex-col w-full">
   @if (label()) {
-  <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-widest ml-1 mb-2 block">
+  <label class="text-[11px] font-bold text-text-muted uppercase tracking-widest ml-1 mb-2 block">
     {{ label() }}
   </label>
   }
 
   <div class="relative w-full group">
-    <div class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none z-10">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="w-5 h-5"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"
-        />
+    <div class="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none z-10">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+        class="w-5 h-5">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
       </svg>
     </div>
 
-    <input
-      type="date"
-      [formControl]="control()"
-      class="w-full bg-white border border-zinc-200 pl-12 pr-4 py-3 rounded-2xl text-sm font-medium text-zinc-700 outline-none shadow-sm transition-all focus:border-zinc-900 focus:ring-4 focus:ring-zinc-100 appearance-none cursor-pointer"
-      [class.border-red-500]="showErrors() && control().invalid"
-    />
+    <input type="date" [formControl]="control()"
+      class="w-full bg-bg-primary border border-border pl-12 pr-4 py-3 rounded-2xl text-sm font-medium text-text-primary outline-none shadow-sm transition-all focus:border-primary-field focus:ring-4 focus:ring-primary/10 appearance-none cursor-pointer"
+      [class.border-red-500]="showErrors() && control().invalid" />
   </div>
 
   @if (showErrors() && control().invalid) {

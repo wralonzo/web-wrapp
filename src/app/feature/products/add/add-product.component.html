@@ -1,19 +1,19 @@
 <div
-  class="max-w-3xl mx-auto bg-white border border-zinc-200 rounded-[32px] shadow-sm bg-gradient-to-br from-pink-50 to-rose-100 border border-pink-200 rounded-2xl">
-  <div class="flex items-center bg-zinc-50/50 border-b border-zinc-100 justify-between">
+  class="max-w-3xl mx-auto bg-bg-secondary border border-border rounded-[32px] overflow-hidden shadow-sm transition-colors duration-300">
+  <div class="flex items-center bg-bg-primary/50 border-b border-border justify-between">
     <div class="p-8">
-      <h2 class="text-2xl font-bold text-zinc-900">Nuevo Producto</h2>
-      <p class="text-zinc-500 text-sm">Completa los datos para crear el nuevo producto en el sistema.</p>
+      <h2 class="text-2xl font-black text-text-primary">Nuevo Producto</h2>
+      <p class="text-text-muted text-sm font-medium">Completa los datos para crear el nuevo producto en el sistema.</p>
     </div>
     <a [routerLink]="ROUTES.nav.products.list"
-      class="text-zinc-500 hover:text-zinc-700 transition-colors flex items-center gap-1 font-medium text-sm px-10">
+      class="text-text-muted hover:text-text-primary transition-colors flex items-center gap-1 font-bold text-sm px-10">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
       </svg>
       Volver a la lista
     </a>
   </div>
-  <div class="p-8">
+  <div class="p-10">
     <app-dynamic-form [fields]="productFormConfig" (onSubmit)="onSaveProduct($event)">
     </app-dynamic-form>
   </div>

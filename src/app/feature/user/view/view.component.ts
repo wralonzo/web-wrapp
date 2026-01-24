@@ -9,11 +9,12 @@ import { InputComponent } from '@shared/components/input/input.component';
 import { PageConfiguration } from 'src/app/page-configurations';
 import { GenericHttpBridge } from '@assets/retail-shop/rust_retail';
 import { IpService } from '@core/services/ip.service';
+import { ButtonComponent } from '@shared/components/button/button.component';
 
 @Component({
   selector: 'app-view-user',
   standalone: true,
-  imports: [CommonModule, RouterLink, ModalComponent, FormsModule, InputComponent],
+  imports: [CommonModule, RouterLink, ModalComponent, FormsModule, InputComponent, ButtonComponent],
   templateUrl: './view.component.html',
 })
 export class ViewUserComponent extends PageConfiguration implements OnInit {

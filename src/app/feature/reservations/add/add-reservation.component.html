@@ -1,36 +1,45 @@
-<div class="max-w-4xl mx-auto py-4 md:py-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-  
+<div
+  class="max-w-4xl mx-auto py-4 md:py-8 animate-in fade-in slide-in-from-bottom-4 duration-500 transition-colors duration-300">
+
   <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
     <div class="space-y-1">
-      <h1 class="text-3xl font-bold text-zinc-900 tracking-tight">Nueva Reservación</h1>
-      <p class="text-zinc-500 text-sm">Agende una nueva experiencia de belleza para su cliente.</p>
+      <h1 class="text-3xl font-black text-text-primary tracking-tight">Nueva Reservación</h1>
+      <p class="text-text-muted text-sm font-medium">Agende una nueva experiencia de belleza para su cliente.</p>
     </div>
-    
-    <button (click)="this.nav.pop()" class="text-zinc-400 hover:text-zinc-900 text-sm font-medium transition-colors flex items-center gap-2">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+
+    <button (click)="this.nav.pop()"
+      class="text-text-muted hover:text-text-primary text-sm font-bold transition-colors flex items-center gap-2 px-4 py-2 bg-bg-secondary rounded-xl border border-border">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path d="M15 19l-7-7 7-7" stroke-width="2.5" />
+      </svg>
       Volver a la agenda
     </button>
   </div>
 
-  <div class="bg-white border border-zinc-200 rounded-[2rem] shadow-sm p-6 md:p-10 relative overflow-hidden">
-    
-    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-zinc-100 via-zinc-400 to-zinc-100 opacity-30"></div>
+  <div
+    class="bg-bg-secondary border border-border rounded-[2rem] shadow-sm p-6 md:p-10 relative overflow-hidden transition-colors duration-300">
 
-    <div class="mb-8">
-      <h2 class="text-xs font-black text-zinc-400 uppercase tracking-[0.2em] mb-6">Configuración de la cita</h2>
-      
-      <app-dynamic-form 
-        [fields]="fields()" 
-        (onSubmit)="handleSave($event)"
-      />
+    <div
+      class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-50">
     </div>
 
-    <div class="mt-6 p-4 bg-zinc-50 rounded-2xl border border-zinc-100 flex items-start gap-3">
-      <div class="w-5 h-5 rounded-full bg-zinc-200 flex items-center justify-center shrink-0">
-        <svg class="w-3 h-3 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    <div class="mb-8">
+      <h2 class="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] mb-8 border-b border-border pb-4">
+        Configuración de la cita</h2>
+
+      <app-dynamic-form [fields]="fields()" (onSubmit)="handleSave($event)" />
+    </div>
+
+    <div class="mt-10 p-6 bg-bg-primary rounded-2xl border border-border flex items-start gap-4">
+      <div
+        class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20">
+        <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-width="3" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
       </div>
-      <p class="text-[11px] text-zinc-500 leading-relaxed italic">
-        * Al guardar la reservación, se notificará automáticamente a la cliente y a la estilista asignada vía correo electrónico.
+      <p class="text-[11px] text-text-muted leading-relaxed font-medium italic">
+        * Al guardar la reservación, se notificará automáticamente a la cliente y a la estilista asignada vía correo
+        electrónico institucional.
       </p>
     </div>
   </div>

@@ -54,7 +54,12 @@
         <div class="ml-9 mt-1 space-y-1 animate-in slide-in-from-top-2 duration-200">
           @for (child of item.children; track child.label) {
           <a [routerLink]="child.route" routerLinkActive="text-primary font-black"
-            class="block p-2 text-sm text-text-muted hover:text-text-primary transition-colors font-bold">
+            class="flex items-center gap-3 p-2 text-sm text-text-muted hover:text-text-primary transition-colors font-bold group">
+            @if (child.iconPath) {
+            <div class="w-4 h-4 bg-current shrink-0"
+              [style.mask-image]="'url(/assets/icons/' + child.iconPath + '.svg)'"
+              [style.-webkit-mask-image]="'url(/assets/icons/' + child.iconPath + '.svg)'"></div>
+            }
             {{ child.label }}
           </a>
           }

@@ -1,0 +1,46 @@
+<div
+    class="max-w-3xl mx-auto bg-bg-secondary border border-border rounded-[32px] overflow-hidden transition-colors duration-300">
+    <div class="flex items-center bg-bg-primary/50 border-b border-border justify-between">
+        <div class="p-8">
+            <h2 class="text-2xl font-black text-text-primary uppercase tracking-tight">Editar Categoría</h2>
+            <p class="text-text-muted text-sm font-medium">
+                Actualiza el nombre, código o notas de la clasificación.
+            </p>
+        </div>
+        <a routerLink="/app/categories"
+            class="text-text-muted hover:text-text-primary transition-colors flex items-center gap-1 font-bold text-sm px-10">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Volver a la lista
+        </a>
+    </div>
+
+    @if (fetching()) {
+    <div class="flex justify-center items-center py-20">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-text-primary"></div>
+    </div>
+    } @else {
+    <form class="p-8" #f="ngForm" (ngSubmit)="update(f)">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <app-input name="name" label="Nombre de la Categoría" [(ngModel)]="category.name" [required]="true"
+                [maxlength]="100" placeholder="Ej: Accesorios" [minLength]="3" [showErrors]="formSubmitted()">
+            </app-input>
+
+            <app-input name="code" label="Código" [(ngModel)]="category.code" [required]="true" [maxlength]="10"
+                placeholder="Ej: ACC" [showErrors]="formSubmitted()">
+            </app-input>
+
+            <div class="md:col-span-2">
+                <app-input name="notes" label="Notas / Descripción" [(ngModel)]="category.notes" [required]="false"
+                    [maxlength]="200" placeholder="Notas adicionales..." [showErrors]="formSubmitted()">
+                </app-input>
+            </div>
+        </div>
+
+        <div class="py-4"></div>
+        <app-button [type]="'submit'" label="Actualizar Categoría" icon="refresh" [isLoading]="loading()">
+        </app-button>
+    </form>
+    }
+</div>

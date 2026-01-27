@@ -45,6 +45,18 @@ export class LayoutComponent extends PageConfiguration {
       iconPath: 'clients',
     },
     {
+      label: 'Ventas',
+      route: this.ROUTES.nav.users.list,
+      roles: [ROLES.ADMIN],
+      iconPath: 'sales',
+    },
+    {
+      label: 'Cotizaciones',
+      route: this.ROUTES.nav.users.list,
+      roles: [ROLES.ADMIN],
+      iconPath: 'quotes',
+    },
+    {
       label: 'Reservaciones',
       route: '/app/reservations',
       roles: [ROLES.ADMIN, ROLES.SALES],
@@ -57,21 +69,54 @@ export class LayoutComponent extends PageConfiguration {
       iconPath: 'handbag',
     },
     {
+      label: 'Gastos',
+      route: '/app/products',
+      roles: [ROLES.ADMIN, ROLES.SALES],
+      iconPath: 'expenses',
+    },
+    {
       label: 'Usuarios',
       route: this.ROUTES.nav.users.list,
       roles: [ROLES.ADMIN],
       iconPath: 'users',
     },
     {
+      label: 'Compras',
+      route: this.ROUTES.nav.users.list,
+      roles: [ROLES.ADMIN],
+      iconPath: 'purchases',
+    },
+    {
+      label: 'Pedidos',
+      route: this.ROUTES.nav.users.list,
+      roles: [ROLES.ADMIN],
+      iconPath: 'orders',
+    },
+    {
+      label: 'Reportes',
+      route: this.ROUTES.nav.users.list,
+      roles: [ROLES.ADMIN],
+      iconPath: 'reports',
+      children: [
+        { label: 'Reporte de Ventas', route: this.ROUTES.nav.users.list, iconPath: 'sales' },
+        { label: 'Reporte de Gastos', route: this.ROUTES.nav.users.list, iconPath: 'expenses' },
+        { label: 'Reporte de Compras', route: this.ROUTES.nav.users.list, iconPath: 'purchases' },
+        { label: 'Reporte de Pedidos', route: this.ROUTES.nav.users.list, iconPath: 'orders' },
+        { label: 'Reporte de Reservaciones', route: this.ROUTES.nav.users.list, iconPath: 'reservations' },
+      ],
+    },
+    {
       label: 'Configuraciones', // Ejemplo con Submenú
       iconPath: 'config',
       roles: [ROLES.ADMIN, ROLES.SALES],
       children: [
-        { label: 'Roles', route: this.ROUTES.nav.roles.list, iconPath: 'list' },
-        { label: 'Permisos', route: this.ROUTES.nav.permissions.list, iconPath: 'category' },
-        { label: 'Sucursales', route: this.ROUTES.nav.branches.list, iconPath: 'category' },
-        { label: 'Almacenes', route: this.ROUTES.nav.warehouses.list, iconPath: 'category' },
-        { label: 'Puestos de trabajo', route: this.ROUTES.nav.positions.list, iconPath: 'positions' },
+        { label: 'Roles', route: this.ROUTES.nav.roles.list, iconPath: 'users' },
+        { label: 'Categorías', route: this.ROUTES.nav.categories.list, iconPath: 'handbag' },
+        { label: 'Proveedores', route: this.ROUTES.nav.suppliers.list, iconPath: 'clients' },
+        { label: 'Permisos', route: this.ROUTES.nav.permissions.list, iconPath: 'config' },
+        { label: 'Sucursales', route: this.ROUTES.nav.branches.list, iconPath: 'config' },
+        { label: 'Almacenes', route: this.ROUTES.nav.warehouses.list, iconPath: 'handbag' },
+        { label: 'Puestos de trabajo', route: this.ROUTES.nav.positions.list, iconPath: 'profile' },
       ],
     },
   ];

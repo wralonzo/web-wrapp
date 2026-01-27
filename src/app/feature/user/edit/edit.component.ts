@@ -9,10 +9,9 @@ import { ButtonComponent } from '@shared/components/button/button.component';
 import { InputComponent } from '@shared/components/input/input.component';
 import { MultiSelectRolesComponent } from '@shared/components/multi-select/multi-select-roles.component';
 import { CustomSelectComponent } from '@shared/components/select/select.component';
-import { PositionType } from '@shared/models/position-type/postion-type.interface';
+import { PositionType } from '@shared/models/position-type/position-type.interface';
 import { Role } from '@shared/models/role/role.interface';
 import { SelectOption } from '@shared/models/select/option.interface';
-import { UserAdd } from '@shared/models/user/add-user.interface';
 import { User } from '@shared/models/user/user.model';
 import { Warehouse } from '@shared/models/warehouse/warehouse.interface';
 import { PageConfiguration } from 'src/app/page-configurations';
@@ -77,13 +76,13 @@ export class EditUserComponponent extends PageConfiguration implements OnInit {
 
   private async loadWarehouses() {
     try {
-      const response: Warehouse[] = await this.rustService.call(
+      const response: PaginatedResponse<Warehouse> = await this.rustService.call(
         async (bridge: GenericHttpBridge) => {
           return bridge.get('/warehouse');
         }
       );
       this.logger.info('Warehouses', response);
-      const mapping: SelectOption[] = response.map((item) => {
+      const mapping: SelectOption[] = response.content.map((item) => {
         return {
           value: item.id.toString(),
           label: item.name,

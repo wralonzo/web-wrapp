@@ -11,10 +11,9 @@ import { MultiSelectRolesComponent } from '@shared/components/multi-select/multi
 import { PageConfiguration } from 'src/app/page-configurations';
 import { GenericHttpBridge } from '@assets/retail-shop/rust_retail';
 import { PaginatedResponse } from '@assets/retail-shop/PaginatedResponse';
-import { PositionType } from '@shared/models/position-type/postion-type.interface';
 import { Role } from '@shared/models/role/role.interface';
-import { UserAdd } from '@shared/models/user/add-user.interface';
 import { User } from '@assets/retail-shop/User';
+import { PositionType } from '@shared/models/position-type/position-type.interface';
 
 @Component({
   selector: 'app-add',
@@ -78,13 +77,13 @@ export class AddUserComponent extends PageConfiguration implements OnInit {
 
   private async loadWarehouses() {
     try {
-      const response: Warehouse[] = await this.rustService.call(
+      const response: PaginatedResponse<Warehouse> = await this.rustService.call(
         async (bridge: GenericHttpBridge) => {
           return await bridge.get('/warehouse');
         }
       );
       this.logger.info(this.loadWarehouses.name, response);
-      const mapping: SelectOption[] = response.map((item) => {
+      const mapping: SelectOption[] = response.content.map((item) => {
         return {
           value: item.id.toString(),
           label: item.name,

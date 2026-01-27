@@ -1,25 +1,176 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { Permission } from '@shared/models/permission/permission.interface';
+import { PageConfiguration } from 'src/app/page-configurations';
+import { GenericHttpBridge } from '@assets/retail-shop/rust_retail';
+import { APP_ROUTES } from '@core/constants/routes.constants';
+import { TableListComponent } from '@shared/components/table-list/table-list.component';
+import { ColumnConfig, FilterConfig, TableActionEvent } from '@shared/models/table';
+import { ConfirmService } from '@core/services/confirm.service';
+import { PaginatedResponse } from '@assets/retail-shop/PaginatedResponse';
+import { toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { skip, debounceTime, distinctUntilChanged } from 'rxjs';
+import { SelectOption } from '@shared/models/select/option.interface';
+import { HttpParams } from '@angular/common/http';
 
 @Component({
   selector: 'app-permissions-list',
   standalone: true,
-  imports: [CommonModule],
-  template: `
-    <div class="p-8 transition-colors duration-300">
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
-        <div>
-           <h1 class="text-3xl font-black text-text-primary tracking-tight uppercase">Permisos</h1>
-           <p class="text-text-muted font-bold text-sm mt-1">Definición de privilegios y políticas de acceso.</p>
-        </div>
-      </div>
-      <div class="bg-bg-secondary rounded-[2.5rem] border border-border p-16 text-center shadow-inner">
-        <div class="w-16 h-16 bg-bg-primary rounded-2xl flex items-center justify-center border border-border mx-auto mb-6 text-text-muted/30">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-        </div>
-        <p class="text-text-muted font-black uppercase tracking-widest text-xs">Políticas de privilegios inalterables por el sistema</p>
-      </div>
-    </div>
-  `,
+  imports: [CommonModule, ButtonComponent, TableListComponent],
+  templateUrl: './permissions-list.component.html',
 })
-export class PermissionsListComponent { }
+export class PermissionsListComponent extends PageConfiguration implements OnInit {
+  private readonly confirmService = inject(ConfirmService);
+
+  public permissions = signal<Permission[]>([]);
+  public loading = signal<boolean>(false);
+  public totalItems = signal(0);
+  public currentPage = signal(0);
+  public totalPages = signal(0);
+  public pageSize = signal(10);
+
+  private readonly activeParams = signal<Record<string, any>>({
+    sort: 'id,asc',
+  });
+
+  public filters = signal<FilterConfig[]>([]);
+
+  public searchQuery = signal('');
+
+  public tableColumns: ColumnConfig[] = [
+    { key: 'name', label: 'Nombre del Permiso', type: 'text', sortable: true },
+    { key: 'description', label: 'Descripción', type: 'text', sortable: true },
+    { key: 'actions', label: '', type: 'action' },
+  ];
+
+  constructor() {
+    super();
+    toObservable(this.searchQuery)
+      .pipe(
+        skip(1), // <--- IMPORTANTE: Ignora el valor inicial al cargar
+        debounceTime(2000), // 400ms es más natural que 2000ms
+        distinctUntilChanged(),
+        takeUntilDestroyed()
+      )
+      .subscribe(() => {
+        this.currentPage.set(0);
+        this.loadPermissions();
+      });
+
+    // 2. Manejo de tamaño de página (sin debounce o muy corto)
+    toObservable(this.pageSize)
+      .pipe(
+        skip(1), // <--- Ignora el valor inicial
+        takeUntilDestroyed()
+      )
+      .subscribe(() => {
+        this.currentPage.set(0);
+        this.loadPermissions();
+      });
+  }
+
+  public filteredPermissions = computed(() => {
+    this.searchQuery().toLowerCase().trim();
+    return this.permissions();
+  });
+
+  ngOnInit(): void {
+    this.loadPermissions();
+  }
+
+  async loadPermissions() {
+    this.loading.set(true);
+    try {
+      const params = {
+        ...this.activeParams(),
+        term: this.searchQuery() ?? '', // Enviamos el término al backend
+        page: this.currentPage(),
+        size: this.pageSize(),
+      };
+      const queryString = new HttpParams({ fromObject: params }).toString();
+      const response: PaginatedResponse<Permission> = await this.rustService.call(async (bridge: GenericHttpBridge) => {
+        return await bridge.get(`/permission?${queryString}`);
+      });
+      this.logger.info(this.loadPermissions.name, response);
+      this.permissions.set(response.content);
+      this.totalItems.set(response.totalElements);
+      this.totalPages.set(response.totalPages);
+      this.pageSize.set(response.size);
+    } catch (error) {
+      this.provideError(error);
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  handleTableAction(event: TableActionEvent) {
+    const { type, item } = event;
+    switch (type) {
+      case 'edit':
+        this.goToEdit(item.id);
+        break;
+      case 'delete':
+        this.deletePermission(item.id);
+        break;
+      default:
+        this.logger.warnign('Acción no reconocida:', type);
+    }
+  }
+
+  goToAdd() {
+    this.nav.push(APP_ROUTES.nav.permissions.add);
+  }
+
+  goToEdit(id: number) {
+    this.nav.push(APP_ROUTES.nav.permissions.edit(id));
+  }
+
+  async deletePermission(id: number) {
+    const confirmed = await this.confirmService.open({
+      title: 'Eliminar Permiso',
+      message: '¿Estás seguro de que deseas eliminar este permiso? Esta acción no se puede deshacer.',
+      btnConfirmText: 'Eliminar',
+      btnCancelText: 'Cancelar',
+      variant: 'danger',
+    });
+
+    if (confirmed) {
+      try {
+        await this.rustService.call(async (bridge: GenericHttpBridge) => {
+          return await bridge.patch(`/permission/${id}/delete`, {});
+        });
+        this.toast.show('Permiso eliminado correctamente', 'success');
+        this.loadPermissions();
+      } catch (error) {
+        this.provideError(error);
+      }
+    }
+  }
+
+  handleFilter(filterUpdate: Record<string, any>) {
+    // 1. Extraemos la llave y el valor (ej: key='status', value='VIP')
+    const [key, value] = Object.entries(filterUpdate)[0] as [string, SelectOption];
+    this.logger.info('Filtro cambiado:', { key, value });
+    if (value.value === 'ALL') {
+      value.value = '';
+    }
+    this.activeParams.update((prev) => ({ ...prev, [key]: value.value }));
+    this.filters()[0].selectedName = String(value.value);
+    this.currentPage.set(0);
+    this.loadPermissions();
+  }
+
+  handleSort(event: { key: string; dir: 'asc' | 'desc' }) {
+    this.activeParams.update((prev) => ({
+      sort: `${event.key},${event.dir}`,
+    }));
+    this.logger.info('Ordenando por:', event);
+    this.loadPermissions();
+  }
+
+  handlePage(page: number) {
+    this.currentPage.set(page);
+    this.loadPermissions();
+  }
+}

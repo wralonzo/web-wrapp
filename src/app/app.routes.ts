@@ -84,10 +84,22 @@ export const routes: Routes = [
           import('./feature/warehouses/warehouses.routes').then((m) => m.WAREHOUSES_ROUTES),
       },
       {
+        path: APP_ROUTES.definitions.positionTypes,
+        title: 'Tipos de Posición',
+        loadChildren: () =>
+          import('./feature/positions/positions.routes').then((m) => m.POSITIONS_ROUTES),
+      },
+      {
         path: APP_ROUTES.definitions.permissions,
         title: 'Permisos',
         loadChildren: () =>
           import('./feature/permissions/permissions.routes').then((m) => m.PERMISSIONS_ROUTES),
+      },
+      {
+        path: APP_ROUTES.definitions.categories,
+        title: 'Permisos',
+        loadChildren: () =>
+          import('./feature/categories/categories.routes').then((m) => m.CATEGORIES_ROUTES),
       },
       {
         path: 'reservations/calendar',
@@ -99,7 +111,8 @@ export const routes: Routes = [
       {
         path: 'suppliers',
         title: 'Proveedores',
-        loadComponent: () => import('./feature/home/home').then((m) => m.HomeComponent),
+        loadChildren: () =>
+          import('./feature/suppliers/suppliers.routes').then((m) => m.SUPPLIERS_ROUTES),
       },
 
       // Default de la APP

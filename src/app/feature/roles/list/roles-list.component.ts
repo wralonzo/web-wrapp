@@ -91,7 +91,7 @@ export class RolesListComponent extends PageConfiguration implements OnInit {
     if (confirmed) {
       try {
         await this.rustService.call(async (bridge: GenericHttpBridge) => {
-          return await bridge.delete(`/role/${role.id}`);
+          return await bridge.patch(`/role/${role.id}/delete`, {});
         });
         this.toast.show('Rol eliminado correctamente', 'success');
         this.loadRoles();

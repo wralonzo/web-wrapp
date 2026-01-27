@@ -19,6 +19,9 @@ export const APP_ROUTES = {
     branches: 'branches',
     warehouses: 'warehouses',
     permissions: 'permissions',
+    positionTypes: 'positions',
+    categories: 'categories',
+    suppliers: 'suppliers',
     // Sub-rutas
     add: 'add',
     edit: 'edit/:id',
@@ -83,8 +86,22 @@ export const APP_ROUTES = {
       edit: (id: string | number) => `/${APP_BASE}/positions/edit/${id}`,
     },
 
+    categories: {
+      list: `/${APP_BASE}/categories`,
+      add: `/${APP_BASE}/categories/add`,
+      edit: (id: string | number) => `/${APP_BASE}/categories/edit/${id}`,
+    },
+
+    suppliers: {
+      list: `/${APP_BASE}/suppliers`,
+      add: `/${APP_BASE}/suppliers/add`,
+      edit: (id: string | number) => `/${APP_BASE}/suppliers/edit/${id}`,
+    },
+
     permissions: {
       list: `/${APP_BASE}/permissions`,
+      add: `/${APP_BASE}/permissions/add`,
+      edit: (id: string | number) => `/${APP_BASE}/permissions/edit/${id}`,
     },
   },
 } as const;

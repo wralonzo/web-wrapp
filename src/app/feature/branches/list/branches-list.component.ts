@@ -1,27 +1,105 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { Branch } from '@shared/models/branch/branch.interface';
+import { PageConfiguration } from 'src/app/page-configurations';
+import { GenericHttpBridge } from '@assets/retail-shop/rust_retail';
+import { APP_ROUTES } from '@core/constants/routes.constants';
+import { TableListComponent } from '@shared/components/table-list/table-list.component';
+import { ColumnConfig, TableActionEvent } from '@shared/models/table';
+import { ConfirmService } from '@core/services/confirm.service';
+import { PaginatedResponse } from '@assets/retail-shop/PaginatedResponse';
 
 @Component({
   selector: 'app-branches-list',
   standalone: true,
-  imports: [CommonModule, ButtonComponent],
-  template: `
-    <div class="p-8 transition-colors duration-300">
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
-        <div>
-           <h1 class="text-3xl font-black text-text-primary tracking-tight uppercase">Sucursales</h1>
-           <p class="text-text-muted font-bold text-sm mt-1">Gestión de puntos de venta y atención al cliente.</p>
-        </div>
-        <app-button label="Abrir Punto de Venta" type="button" icon="add-plus"></app-button>
-      </div>
-      <div class="bg-bg-secondary rounded-[2.5rem] border border-border p-16 text-center shadow-inner">
-        <div class="w-16 h-16 bg-bg-primary rounded-2xl flex items-center justify-center border border-border mx-auto mb-6 text-text-muted/30">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-        </div>
-        <p class="text-text-muted font-black uppercase tracking-widest text-xs">Sincronizando red de establecimientos</p>
-      </div>
-    </div>
-  `,
+  imports: [CommonModule, ButtonComponent, TableListComponent],
+  templateUrl: './branches-list.component.html',
 })
-export class BranchesListComponent { }
+export class BranchesListComponent extends PageConfiguration implements OnInit {
+  private readonly confirmService = inject(ConfirmService);
+
+  public branches = signal<Branch[]>([]);
+  public loading = signal<boolean>(false);
+  public searchQuery = signal('');
+
+  public tableColumns: ColumnConfig[] = [
+    { key: 'code', label: 'Código', type: 'text', sortable: true },
+    { key: 'name', label: 'Nombre', type: 'text', sortable: true },
+    { key: 'phone', label: 'Teléfono', type: 'text', sortable: true },
+    { key: 'active', label: 'Estado', type: 'boolean', sortable: true },
+    { key: 'actions', label: '', type: 'action' },
+  ];
+
+  public filteredBranches = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    if (!query) return this.branches();
+    return this.branches().filter(b =>
+      b.name.toLowerCase().includes(query) ||
+      b.code.toLowerCase().includes(query)
+    );
+  });
+
+  ngOnInit(): void {
+    this.loadBranches();
+  }
+
+  async loadBranches() {
+    this.loading.set(true);
+    try {
+      const response: PaginatedResponse<Branch> = await this.rustService.call(async (bridge: GenericHttpBridge) => {
+        return await bridge.get('/branch');
+      });
+      this.logger.info(this.loadBranches.name, response);
+      this.branches.set(response.content);
+    } catch (error) {
+      this.provideError(error);
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  handleTableAction(event: TableActionEvent) {
+    const { type, item } = event;
+    switch (type) {
+      case 'edit':
+        this.goToEdit(item.id);
+        break;
+      case 'delete':
+        this.deleteBranch(item.id);
+        break;
+      default:
+        this.logger.warnign('Acción no reconocida:', type);
+    }
+  }
+
+  goToAdd() {
+    this.nav.push(APP_ROUTES.nav.branches.add);
+  }
+
+  goToEdit(id: number) {
+    this.nav.push(APP_ROUTES.nav.branches.edit(id));
+  }
+
+  async deleteBranch(id: number) {
+    const confirmed = await this.confirmService.open({
+      title: 'Eliminar Sucursal',
+      message: '¿Estás seguro de que deseas eliminar esta sucursal? Esta acción no se puede deshacer.',
+      btnConfirmText: 'Eliminar',
+      btnCancelText: 'Cancelar',
+      variant: 'danger',
+    });
+
+    if (confirmed) {
+      try {
+        await this.rustService.call(async (bridge: GenericHttpBridge) => {
+          return await bridge.patch(`/branch/${id}/delete`, {});
+        });
+        this.toast.show('Sucursal eliminada correctamente', 'success');
+        this.loadBranches();
+      } catch (error) {
+        this.provideError(error);
+      }
+    }
+  }
+}

@@ -8,6 +8,7 @@ import { APP_ROUTES } from '@core/constants/routes.constants';
 import { TableListComponent } from '@shared/components/table-list/table-list.component';
 import { ColumnConfig, TableActionEvent } from '@shared/models/table';
 import { ConfirmService } from '@core/services/confirm.service';
+import { PaginatedResponse } from '@assets/retail-shop/PaginatedResponse';
 
 @Component({
   selector: 'app-warehouses-list',
@@ -46,10 +47,11 @@ export class WarehousesListComponent extends PageConfiguration implements OnInit
   async loadWarehouses() {
     this.loading.set(true);
     try {
-      const response: Warehouse[] = await this.rustService.call(async (bridge: GenericHttpBridge) => {
+      const response: PaginatedResponse<Warehouse> = await this.rustService.call(async (bridge: GenericHttpBridge) => {
         return await bridge.get('/warehouse');
       });
-      this.warehouses.set(response);
+      this.logger.info(this.loadWarehouses.name, response);
+      this.warehouses.set(response.content);
     } catch (error) {
       this.provideError(error);
     } finally {
@@ -91,7 +93,7 @@ export class WarehousesListComponent extends PageConfiguration implements OnInit
     if (confirmed) {
       try {
         await this.rustService.call(async (bridge: GenericHttpBridge) => {
-          return await bridge.delete(`/warehouse/${id}`);
+          return await bridge.patch(`/warehouse/${id}/delete`, {});
         });
         this.toast.show('Almacén eliminado correctamente', 'success');
         this.loadWarehouses();

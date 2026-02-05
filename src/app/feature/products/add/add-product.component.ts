@@ -31,14 +31,6 @@ export class AddProductComponent extends PageConfiguration {
       colSpan: 1,
     },
     {
-      name: 'priceSale',
-      label: 'Precio de Venta',
-      type: 'number',
-      required: true,
-      colSpan: 1,
-      valueDefault: 0,
-    },
-    {
       name: 'stockMinim',
       label: 'Stock Mínimo',
       type: 'number',
@@ -55,26 +47,20 @@ export class AddProductComponent extends PageConfiguration {
       valueDefault: 0,
     },
     {
-      name: 'pricePurchase',
-      label: 'Precio de compra',
+      name: 'priceSale',
+      label: 'Precio de Venta',
       type: 'number',
       required: true,
       colSpan: 1,
       valueDefault: 0,
     },
     {
-      name: 'categoryId',
-      label: 'Categoría',
-      type: 'select',
+      name: 'pricePurchase',
+      label: 'Precio de compra',
+      type: 'number',
       required: true,
       colSpan: 1,
-      endpoint: '/category', // Tu ruta de Spring Boot
-      // Transformamos lo que viene del back al formato {label, value}
-      mapResponse: (res: any) =>
-        res.content.map((cat: any) => ({
-          label: cat.name,
-          value: cat.id,
-        })),
+      valueDefault: 0,
     },
     {
       name: 'description',

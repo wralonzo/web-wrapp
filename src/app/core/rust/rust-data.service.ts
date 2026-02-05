@@ -17,6 +17,7 @@ export class RustDataService {
 
   public async initialize(): Promise<void> {
     try {
+      if (this.isInitialized()) return;
       // 1. Esperamos al Bridge (WASM/SQLite)
       await this.bridge.initConfig();
       // 1. Rust recupera el token de SQLite e inyecta en HttpClient (Rust)

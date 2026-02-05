@@ -31,6 +31,7 @@ export class AuthService {
       auth
         .login(user, password)
         .then((response) => {
+          this.userSignal.set(response);
           resolve(response);
         })
         .catch((e) => reject(e));

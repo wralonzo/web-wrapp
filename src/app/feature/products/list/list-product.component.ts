@@ -190,9 +190,8 @@ export class ListProductComponent extends PageConfiguration {
     this.loading.set(true);
 
     try {
-      const url = `/products?term=${this.searchQuery()}&active=${true}&page=${this.currentPage()}&size=${this.pageSize()}&sort=${
-        this.activeParams()['sort'] ?? 'name,desc'
-      }`;
+      const url = `/products?term=${this.searchQuery()}&active=${true}&page=${this.currentPage()}&size=${this.pageSize()}&sort=${this.activeParams()['sort'] ?? 'name,desc'
+        }`;
       const response: PaginatedResponse<Product> = await this.rustService.call(async (bridge) => {
         return await bridge.get(url);
       });
@@ -227,7 +226,7 @@ export class ListProductComponent extends PageConfiguration {
   public async download() {
     // 1. Rust hace la magia (descarga, nombra y guarda/codifica)
     const result: any = await this.rustService.call((b) =>
-      b.download_file('/batch/products/template')
+      b.download_file('/batch/template')
     );
 
     if (result.startsWith('data:')) {
@@ -286,7 +285,7 @@ export class ListProductComponent extends PageConfiguration {
       // Nota: Usamos Array.from si tu bridge de wasm-bindgen no acepta TypedArrays directamente
       const report = await this.rustService.call((bridge: GenericHttpBridge) =>
         bridge.upload(
-          '/batch/products/import', // Endpoint de tu backend
+          '/batch/import', // Endpoint de tu backend
           bytes,
           file.name,
           file.type

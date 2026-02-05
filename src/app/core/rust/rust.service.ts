@@ -5,7 +5,7 @@ import init, {
   GenericHttpBridge,
 } from '@assets/retail-shop/rust_retail';
 import { LoaderService } from '@core/services/loader.service';
-import { environment } from '@env/environment.development.js';
+import { environment } from '../../../environments/environment';
 import rustPaht from 'rust-retail/rust_retail_bg.wasm?url';
 import { BehaviorSubject } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
@@ -18,9 +18,23 @@ export class RustService {
   private readonly isReady$ = new BehaviorSubject<boolean>(false);
   async initConfig(): Promise<void> {
     try {
+      if (this.isReady$.value) return;
       await init(rustPaht); // Carga WASM
 
-      initCoreConfig(environment.apiUrl);
+      // Force string primitive and trim
+      const apiUrl = String(environment.apiUrl || '').trim();
+
+      console.log('--------------------------------------------------');
+      console.log('Start Rust Init');
+      console.log('Environment:', environment);
+      console.log('API URL (Passed to WASM):', `"${apiUrl}"`);
+      console.log('--------------------------------------------------');
+
+      if (!apiUrl) {
+        throw new Error('API URL is missing/empty');
+      }
+
+      initCoreConfig(apiUrl);
 
       // Añadimos un pequeño delay de seguridad para que la memoria WASM se asiente
       // (A veces necesario en entornos de desarrollo muy rápidos)

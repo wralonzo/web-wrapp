@@ -162,7 +162,7 @@ export class EditUserComponponent extends PageConfiguration implements OnInit {
         positionTypeId: currentUser.employee?.positionId ?? 0,
         warehouseId: currentUser.employee?.warehouseId ?? 0,
         roles: this.userRoles(),
-        password: currentUser.profile.username,
+        password: "Test?9090G",
       };
 
       this.logger.info('User', payload);

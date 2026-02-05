@@ -50,19 +50,20 @@ export class LoginComponent extends PageConfiguration implements OnInit, AfterVi
   }
 
   public async ngOnInit(): Promise<void> {
-    this.getGoogleClientId();
+    // We will initialize Google Button after view init to ensure container exists,
+    // or we can just wait for the async call to finish.
+    // Ideally, we move the logic to ngAfterViewInit or handle it carefully.
   }
 
   public async ngAfterViewInit(): Promise<void> {
-    setTimeout(() => {
-      if (this.googleBtnContainer) {
-        google.accounts.id.renderButton(this.googleBtnContainer.nativeElement, {
-          theme: 'filled_blue',
-          size: 'large',
-          shape: 'pill',
-        });
-      }
-    }, 100);
+    try {
+      const config = this.rustService.auth.getConfig();
+      console.log('🔍 DEBUG: Current Rust Config BaseURL:', config);
+      this.logger.info('Rust Config', config);
+    } catch (e) {
+      console.error('Failed to get rust config', e);
+    }
+    this.getGoogleClientId();
   }
 
   public async onLogin() {
@@ -98,15 +99,19 @@ export class LoginComponent extends PageConfiguration implements OnInit, AfterVi
     try {
       const { clientId } = await this.rustService.auth.getIdGoogleClient();
       this.logger.log('Google Client ID:', clientId);
+
       google.accounts.id.initialize({
         client_id: clientId,
         callback: (response: any) => this.handleLogin(response),
       });
-      google.accounts.id.renderButton(document.getElementById('google-btn'), {
-        theme: 'filled_blue',
-        size: 'large',
-        shape: 'pill',
-      });
+
+      if (this.googleBtnContainer) {
+        google.accounts.id.renderButton(this.googleBtnContainer.nativeElement, {
+          theme: 'filled_blue',
+          size: 'large',
+          shape: 'pill',
+        });
+      }
     } catch (error: any) {
       this.provideError(error);
     }

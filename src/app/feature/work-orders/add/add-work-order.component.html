@@ -1,0 +1,106 @@
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-2xl font-black text-text-primary tracking-tight">
+                {{ isEditMode() ? 'Editar Orden' : 'Nueva Orden de Trabajo' }}
+            </h2>
+            <p class="text-text-secondary text-sm font-medium">
+                {{ isEditMode() ? 'Modifica los detalles de la orden' : 'Crea una nueva orden de servicio o reparación'
+                }}
+            </p>
+        </div>
+        <div class="flex gap-2">
+            <button (click)="nav.pop()"
+                class="px-4 py-2 text-text-muted hover:bg-bg-secondary rounded-xl font-bold transition-all border border-transparent hover:border-border">
+                Cancelar
+            </button>
+            <button (click)="save()"
+                class="px-4 py-2 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/30 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                Guardar
+            </button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Header Form -->
+        <div class="lg:col-span-1 space-y-6">
+            <div class="bg-bg-secondary p-6 rounded-2xl border border-border shadow-sm">
+                <h3 class="text-lg font-bold text-text-primary mb-4">Información General</h3>
+                <app-dynamic-form [fields]="headerFields" [data]="initialData()" [showSubmitButton]="false"
+                    (formChange)="onHeaderChange($event)">
+                </app-dynamic-form>
+            </div>
+        </div>
+
+        <!-- Items & Description -->
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-bg-secondary p-6 rounded-2xl border border-border shadow-sm">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-text-primary">Materiales / Repuestos</h3>
+                    <button type="button" (click)="addItem()" class="text-xs font-bold text-primary hover:underline">+
+                        Agregar Material</button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-text-muted uppercase bg-bg-primary/50 border-b border-border">
+                            <tr>
+                                <th class="px-3 py-2">Producto / Material</th>
+                                <th class="px-3 py-2 w-24">Cant.</th>
+                                <th class="px-3 py-2 w-32">Costo U.</th>
+                                <th class="px-3 py-2 w-32 text-right">Total</th>
+                                <th class="px-3 py-2 w-10"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-border">
+                            @for (item of items(); track $index) {
+                            <tr>
+                                <td class="px-3 py-2">
+                                    <!-- TODO: Replace with searchable select -->
+                                    <input type="text" [(ngModel)]="item.productName" placeholder="Buscar material..."
+                                        class="w-full bg-transparent border-none focus:ring-0 p-0 text-sm font-medium" />
+                                </td>
+                                <td class="px-3 py-2">
+                                    <input type="number" [(ngModel)]="item.quantity" (change)="calculateTotals()"
+                                        min="1"
+                                        class="w-full bg-bg-primary/50 rounded-lg border-transparent text-sm p-1.5 focus:border-primary focus:ring-primary" />
+                                </td>
+                                <td class="px-3 py-2">
+                                    <input type="number" [(ngModel)]="item.price" (change)="calculateTotals()"
+                                        class="w-full bg-bg-primary/50 rounded-lg border-transparent text-sm p-1.5 focus:border-primary focus:ring-primary" />
+                                </td>
+                                <td class="px-3 py-2 text-right font-bold text-text-primary">
+                                    {{ calculateItemTotal(item) | currency }}
+                                </td>
+                                <td class="px-3 py-2 text-center">
+                                    <button (click)="removeItem($index)" class="text-red-500 hover:text-red-700">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4 flex justify-end">
+                    <div class="text-lg font-bold">
+                        Total Materiales: <span class="text-primary">{{ totals() | currency }}</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="bg-bg-secondary p-6 rounded-2xl border border-border shadow-sm">
+                <h3 class="text-lg font-bold text-text-primary mb-4">Notas / Observaciones</h3>
+                <textarea [(ngModel)]="headerFormValue.notes" rows="4"
+                    class="w-full bg-bg-primary/50 rounded-xl border-transparent focus:border-primary focus:ring-primary text-sm p-3"
+                    placeholder="Describe el trabajo a realizar o notas importantes..."></textarea>
+            </div>
+        </div>
+    </div>
+</div>

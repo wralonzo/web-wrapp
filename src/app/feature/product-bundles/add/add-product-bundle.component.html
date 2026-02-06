@@ -1,0 +1,21 @@
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-2xl font-black text-text-primary tracking-tight">
+                {{ isEditMode() ? 'Editar Combo' : 'Nuevo Combo' }}
+            </h2>
+            <p class="text-text-secondary text-sm font-medium">
+                {{ isEditMode() ? 'Modifica la estructura del combo' : 'Define la composición de un combo' }}
+            </p>
+        </div>
+        <button (click)="nav.pop()"
+            class="px-4 py-2 text-text-muted hover:bg-bg-secondary rounded-xl font-bold transition-all border border-transparent hover:border-border">
+            Cancelar
+        </button>
+    </div>
+
+    <div class="bg-bg-secondary p-6 rounded-2xl border border-border shadow-sm">
+        <app-dynamic-form [fields]="formConfig" [data]="initialData()" (formSubmit)="onSave($event)">
+        </app-dynamic-form>
+    </div>
+</div>

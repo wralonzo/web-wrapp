@@ -59,6 +59,42 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./feature/products/products.routes').then((m) => m.PRODUCTS_ROUTES),
       },
+      {
+        path: 'product-units',
+        title: 'Unidades de Producto',
+        loadChildren: () =>
+          import('./feature/product-units/product-units.routes').then((m) => m.PRODUCT_UNITS_ROUTES),
+      },
+      {
+        path: 'product-bundles',
+        title: 'Combos / Kits',
+        loadChildren: () =>
+          import('./feature/product-bundles/product-bundles.routes').then((m) => m.PRODUCT_BUNDLES_ROUTES),
+      },
+      {
+        path: 'inventory',
+        title: 'Inventario',
+        loadChildren: () =>
+          import('./feature/inventory/inventory.routes').then((m) => m.INVENTORY_ROUTES),
+      },
+      {
+        path: 'quotes',
+        title: 'Cotizaciones',
+        loadChildren: () =>
+          import('./feature/quotes/quotes.routes').then((m) => m.QUOTES_ROUTES),
+      },
+      {
+        path: 'work-orders',
+        title: 'Órdenes de Trabajo',
+        loadChildren: () =>
+          import('./feature/work-orders/work-orders.routes').then((m) => m.WORK_ORDERS_ROUTES),
+      },
+      {
+        path: 'sales',
+        title: 'Ventas',
+        loadChildren: () =>
+          import('./feature/sales/sales.routes').then((m) => m.SALES_ROUTES),
+      },
 
       {
         path: 'reservations',

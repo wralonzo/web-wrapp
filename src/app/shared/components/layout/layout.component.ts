@@ -46,15 +46,9 @@ export class LayoutComponent extends PageConfiguration {
     },
     {
       label: 'Ventas',
-      route: this.ROUTES.nav.users.list,
-      roles: [ROLES.ADMIN],
+      route: '/app/sales',
+      roles: [ROLES.ADMIN, ROLES.SALES],
       iconPath: 'sales',
-    },
-    {
-      label: 'Cotizaciones',
-      route: this.ROUTES.nav.users.list,
-      roles: [ROLES.ADMIN],
-      iconPath: 'quotes',
     },
     {
       label: 'Reservaciones',
@@ -67,6 +61,30 @@ export class LayoutComponent extends PageConfiguration {
       route: '/app/products',
       roles: [ROLES.ADMIN, ROLES.SALES],
       iconPath: 'handbag',
+    },
+    {
+      label: 'Combos / Kits',
+      route: '/app/product-bundles',
+      roles: [ROLES.ADMIN, ROLES.SALES],
+      iconPath: 'orders',
+    },
+    {
+      label: 'Inventario',
+      route: '/app/inventory',
+      roles: [ROLES.ADMIN, ROLES.SALES],
+      iconPath: 'reports',
+    },
+    {
+      label: 'Cotizaciones',
+      route: '/app/quotes',
+      roles: [ROLES.ADMIN, ROLES.SALES],
+      iconPath: 'quotes', // Assuming 'receipt' icon exists, otherwise need to check or use a generic one
+    },
+    {
+      label: 'Órdenes Trabajo',
+      route: '/app/work-orders',
+      roles: [ROLES.ADMIN, ROLES.SALES],
+      iconPath: 'settings', // Generic icon
     },
     {
       label: 'Gastos',
@@ -110,6 +128,7 @@ export class LayoutComponent extends PageConfiguration {
       iconPath: 'config',
       roles: [ROLES.ADMIN, ROLES.SALES],
       children: [
+        { label: 'Unidades de Producto', route: '/app/product-units', iconPath: 'handbag' },
         { label: 'Roles', route: this.ROUTES.nav.roles.list, iconPath: 'users' },
         { label: 'Categorías', route: this.ROUTES.nav.categories.list, iconPath: 'handbag' },
         { label: 'Proveedores', route: this.ROUTES.nav.suppliers.list, iconPath: 'clients' },

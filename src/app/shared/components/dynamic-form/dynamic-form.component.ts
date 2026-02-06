@@ -40,6 +40,7 @@ export class DynamicFormComponent extends PageConfiguration implements OnInit {
   public fields = input.required<FieldConfig[]>();
   public onSubmit = output<any>();
   public onCancel = output<void>();
+  public showSubmitButton = input(true);
   public isSubmitting = signal(false);
   public formSubmitted = signal(false);
   public form = new FormGroup<Record<string, FormControl>>({});

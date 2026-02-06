@@ -6,25 +6,16 @@
     @switch (field.type) {
 
     @case ('select') {
-      <div class="relative w-full"> 
-        <app-custom-select 
-          class="w-full"
-          [label]="field.label" 
-          [options]="getOptions(field)" 
-          [selected]="form.get(field.name)?.value"
-          (onSelectionChange)="onSelectChange(field.name, $event)" 
-        />
-      </div>
+    <div class="relative w-full">
+      <app-custom-select class="w-full" [label]="field.label" [options]="getOptions(field)"
+        [selected]="form.get(field.name)?.value" (onSelectionChange)="onSelectChange(field.name, $event)" />
+    </div>
     }
 
     @case ('date') {
-      <div class="w-full relative">
-        <app-datepicker 
-          [label]="field.label" 
-          [control]="$any(form.get(field.name))"
-          [showErrors]="formSubmitted()"
-        />
-      </div>
+    <div class="w-full relative">
+      <app-datepicker [label]="field.label" [control]="$any(form.get(field.name))" [showErrors]="formSubmitted()" />
+    </div>
     }
 
     @default {
@@ -35,9 +26,11 @@
   </div>
   }
 
+  @if (showSubmitButton()) {
   <div class="col-span-1 md:col-span-2 mt-4">
     <app-button type="submit" [label]="isSubmitting() ? 'Guardando...' : 'Guardar Información'"
       [isLoading]="isSubmitting()" [isDisabled]="form.invalid" icon="add-plus" class="w-full" />
   </div>
+  }
 
 </form>

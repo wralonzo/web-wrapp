@@ -1,0 +1,15 @@
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-2xl font-black text-text-primary tracking-tight">Inventario Global</h2>
+            <p class="text-text-secondary text-sm font-medium">Consulta el stock actual de tus productos en todos los
+                almacenes</p>
+        </div>
+    </div>
+
+    <app-table-list [data]="filteredInventory()" [columns]="availableColumns" [totalItems]="totalItems()"
+        [currentPage]="currentPage()" [totalPages]="totalPages()" (onAction)="handleTableAction($event)"
+        (onPageChange)="currentPage.set($event)" [searchTerm]="searchQuery()" (onSearch)="handleSearch($event)"
+        (onPageSizeChange)="pageSize.set($event)">
+    </app-table-list>
+</div>

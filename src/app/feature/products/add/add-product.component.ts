@@ -68,6 +68,24 @@ export class AddProductComponent extends PageConfiguration {
       type: 'textarea',
       colSpan: 1,
     },
+    {
+      name: 'categoryId',
+      label: 'Categoría',
+      type: 'select',
+      required: true,
+      colSpan: 1,
+      endpoint: '/categories',
+      mapResponse: (r: any) => (r.data || r.content || r).map((c: any) => ({ label: c.name, value: c.id }))
+    },
+    {
+      name: 'unitId', // Virtual field for selection
+      label: 'Unidad de Medida (Base)',
+      type: 'select',
+      required: true,
+      colSpan: 1,
+      endpoint: '/inventory/product-units',
+      mapResponse: (r: any) => (r.data || r).map((u: any) => ({ label: u.name, value: u.id }))
+    }
   ];
 
   // En tu componente .ts
@@ -83,6 +101,7 @@ export class AddProductComponent extends PageConfiguration {
         stockMinim: formData.stockMinim,
         active: true,
         categoryId: formData.categoryId,
+        units: formData.unitId ? [{ id: formData.unitId }] : [],
       };
       const response = await this.rustService.call(async (bridge) => {
         return await bridge.post('/products', payload);

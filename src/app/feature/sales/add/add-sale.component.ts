@@ -48,7 +48,7 @@ export class AddSaleComponent extends PageConfiguration implements OnInit {
 
         let finalTotal = 0;
         this.items().forEach(item => {
-            finalTotal += item.total;
+            finalTotal += item.total || 0;
         });
 
         // Re-calcing subtotal/discount from items if needed for display
@@ -70,7 +70,7 @@ export class AddSaleComponent extends PageConfiguration implements OnInit {
             type: 'select',
             required: true,
             colSpan: 2,
-            endpoint: '/clients',
+            endpoint: '/client',
             mapResponse: (r: any) => (r.data || r).map((c: any) => ({ label: c.name + ' ' + (c.lastName || ''), value: c.id }))
         },
         {
@@ -79,7 +79,7 @@ export class AddSaleComponent extends PageConfiguration implements OnInit {
             type: 'select',
             required: true,
             colSpan: 2,
-            endpoint: '/inventory/warehouses',
+            endpoint: '/warehouse',
             mapResponse: (r: any) => (r.data || r).map((w: any) => ({ label: w.name, value: w.id }))
 
         },
@@ -91,22 +91,22 @@ export class AddSaleComponent extends PageConfiguration implements OnInit {
             colSpan: 2
         },
         {
-            name: 'paymentMethod',
+            name: 'type',
             label: 'Método de Pago',
             type: 'select',
             required: true,
             colSpan: 2,
             options: Object.values(PaymentMethod).map(m => ({ label: m, value: m })),
-            valueDefault: PaymentMethod.CASH
+            valueDefault: PaymentMethod.CONTADO
         },
         {
-            name: 'status',
+            name: 'state', // Only useful for display or admin edits, but keeping for consistency if editing
             label: 'Estado',
             type: 'select',
             required: true,
             colSpan: 2,
             options: Object.values(SaleStatus).map(s => ({ label: s, value: s })),
-            valueDefault: SaleStatus.PENDING
+            valueDefault: SaleStatus.COMPLETADA
         },
         {
             name: 'notes',
@@ -143,7 +143,11 @@ export class AddSaleComponent extends PageConfiguration implements OnInit {
             const sale = await this.saleService.getById(id);
             this.initialData.set(sale);
             this.headerFormValue = sale;
-            this.items.set(sale.details || []);
+            this.items.set(sale.details?.map(d => ({
+                ...d,
+                price: d.priceUnit || d.price || 0,
+                total: d.subtotal || 0
+            })) || []);
         } catch (error) {
             this.provideError(error);
             this.nav.pop();
@@ -161,6 +165,7 @@ export class AddSaleComponent extends PageConfiguration implements OnInit {
                 productId: 0, // Placeholder
                 quantity: 1,
                 price: 0,
+                unitId: 0, // Default
                 discount: 0,
                 total: 0
             }
@@ -184,17 +189,26 @@ export class AddSaleComponent extends PageConfiguration implements OnInit {
     async save() {
         try {
             const totals = this.totals();
-            const payload: Sale = {
-                ...this.headerFormValue,
-                subtotal: totals.subtotal,
-                tax: totals.tax,
-                total: totals.total,
-                details: this.items()
+            // Map items to backend expected structure
+            const itemsPayload = this.items().map(item => ({
+                productId: item.productId,
+                unitId: item.unitId || 1, // Assumption: needs valid unit. TODO: Add Unit Selector to Item Row
+                quantity: item.quantity,
+                discount: item.discount
+            }));
+
+            const payload: any = {
+                clientId: this.headerFormValue.clientId,
+                warehouseId: this.headerFormValue.warehouseId,
+                type: this.headerFormValue.type,
+                notes: this.headerFormValue.notes,
+                items: itemsPayload
+                // Backend calculates totals
             };
 
             if (this.isEditMode() && this.saleId) {
-                await this.saleService.update(this.saleId, payload);
-                this.toast.show('Venta actualizada', 'success');
+                // await this.saleService.update(this.saleId, payload); // Backend UPDATE not fully implemented standardly usually for Sales, but assumes yes
+                this.toast.show('Edición de ventas no soportada completamente por backend aún', 'warning');
             } else {
                 await this.saleService.create(payload);
                 this.toast.show('Venta creada', 'success');

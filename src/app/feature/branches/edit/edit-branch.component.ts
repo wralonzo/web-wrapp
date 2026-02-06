@@ -35,7 +35,6 @@ export class EditBranchComponent extends PageConfiguration implements OnInit {
         name: '',
         code: '',
         address: '',
-        phone: '',
         active: true,
     };
 

@@ -22,7 +22,7 @@
     </div>
     } @else {
     <form class="p-8" #f="ngForm" (ngSubmit)="update(f)">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-2 md:grid-cols-2 gap-6">
             <app-input name="name" label="Nombre de la Sucursal" [(ngModel)]="branch.name" [required]="true"
                 [maxlength]="100" placeholder="Ej: Sucursal Centro" [minLength]="3" [showErrors]="formSubmitted()">
             </app-input>
@@ -31,19 +31,13 @@
                 placeholder="Ej: SUC-01" [showErrors]="formSubmitted()">
             </app-input>
 
-            <app-input name="phone" label="Teléfono" [(ngModel)]="branch.phone" [required]="true" [maxlength]="15"
-                placeholder="Ej: 2222-2222" [showErrors]="formSubmitted()">
-            </app-input>
-
             <app-input name="address" label="Dirección" [(ngModel)]="branch.address" [required]="true" [maxlength]="200"
                 placeholder="Ej: Calle Principal #123" [showErrors]="formSubmitted()">
             </app-input>
 
-            <div class="md:col-span-2 pt-2">
-                <app-checkbox [(ngModel)]="branch.active" name="active" label="¿Sucursal activa para operaciones?"
-                    [required]="false">
-                </app-checkbox>
-            </div>
+            <app-checkbox class="py-10" [(ngModel)]="branch.active" name="active"
+                label="¿Sucursal activa para operaciones?" [required]="false">
+            </app-checkbox>
         </div>
 
         <div class="py-4"></div>

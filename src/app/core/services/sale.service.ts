@@ -9,31 +9,31 @@ export class SaleService extends PageConfiguration {
 
     async getAll(): Promise<Sale[]> {
         return await this.rustService.call(async (bridge) => {
-            return await bridge.get('/inventory/sales');
+            return await bridge.get('/api/sales');
         });
     }
 
     async getById(id: number): Promise<Sale> {
         return await this.rustService.call(async (bridge) => {
-            return await bridge.get(`/inventory/sales/${id}`);
+            return await bridge.get(`/api/sales/${id}`);
         });
     }
 
     async create(sale: Sale): Promise<Sale> {
         return await this.rustService.call(async (bridge) => {
-            return await bridge.post('/inventory/sales', sale);
+            return await bridge.post('/api/sales', sale);
         });
     }
 
     async update(id: number, sale: Sale): Promise<Sale> {
         return await this.rustService.call(async (bridge) => {
-            return await bridge.put(`/inventory/sales/${id}`, sale);
+            return await bridge.put(`/api/sales/${id}`, sale);
         });
     }
 
     async delete(id: number): Promise<void> {
         return await this.rustService.call(async (bridge) => {
-            return await bridge.delete(`/inventory/sales/${id}`);
+            return await bridge.delete(`/api/sales/${id}`);
         });
     }
 }

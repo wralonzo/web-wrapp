@@ -31,8 +31,8 @@ export class ListSaleComponent extends PageConfiguration implements OnInit {
         { key: 'clientName', label: 'Cliente', type: 'text', sortable: true },
         { key: 'date', label: 'Fecha', type: 'date', sortable: true },
         { key: 'total', label: 'Total', type: 'currency', sortable: true },
-        { key: 'paymentMethod', label: 'Método Pago', type: 'text', sortable: true },
-        { key: 'status', label: 'Estado', type: 'badge', sortable: true, color: 'blue' },
+        { key: 'type', label: 'Método Pago', type: 'text', sortable: true },
+        { key: 'state', label: 'Estado', type: 'badge', sortable: true, color: 'blue' },
         { key: 'actions', label: 'Acciones', type: 'action' }
     ];
 
@@ -48,7 +48,7 @@ export class ListSaleComponent extends PageConfiguration implements OnInit {
         const query = this.searchQuery().toLowerCase();
         let filtered = this.sales().filter(s =>
             (s.clientName || '').toLowerCase().includes(query) ||
-            s.status.toLowerCase().includes(query)
+            s.state?.toLowerCase().includes(query)
         );
 
         const start = this.currentPage() * this.pageSize();

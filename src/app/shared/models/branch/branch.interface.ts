@@ -5,7 +5,6 @@ export interface Branch {
     name: string;
     code: string;
     address: string;
-    phone: string;
     active: boolean;
 }
 

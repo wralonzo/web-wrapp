@@ -18,8 +18,9 @@ export interface Product {
   warehouseName?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  units?: { id: number }[];
 }
 
 
-export interface ProductsResponse extends HttpResponseApi<Product> {}
-export interface ProductResponse extends HttpResponseApiFindOne<Product[]> {}
+export interface ProductsResponse extends HttpResponseApi<Product> { }
+export interface ProductResponse extends HttpResponseApiFindOne<Product[]> { }

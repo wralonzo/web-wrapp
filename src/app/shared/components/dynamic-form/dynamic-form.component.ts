@@ -91,8 +91,10 @@ export class DynamicFormComponent extends PageConfiguration implements OnInit {
             this.logger.info(`Respuesta para ${field.name}:`, response);
 
             if (field.mapResponse) {
+              this.logger.info(`Mapeando respuesta para ${field.name}`);
               return field.mapResponse(response);
             }
+            this.logger.info(`Respuesta para ${field.name}:`, response);
             return Array.isArray(response) ? response : [];
           })
         ).pipe(

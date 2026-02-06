@@ -27,11 +27,7 @@ export class AddProductBundleComponent extends PageConfiguration implements OnIn
             required: true,
             colSpan: 2,
             endpoint: '/products',
-            mapResponse: (response: any) => {
-                // Assuming response.data is where the list is, based on standard HttpResponseApi
-                const list = response.data || response;
-                return list.map((p: any) => ({ label: p.name, value: p.id }));
-            }
+            mapResponse: (response: any) => response?.content.map((p: any) => ({ label: p.name, value: p.sku })),
         },
         {
             name: 'componentProductId',
@@ -40,10 +36,7 @@ export class AddProductBundleComponent extends PageConfiguration implements OnIn
             required: true,
             colSpan: 2,
             endpoint: '/products',
-            mapResponse: (response: any) => {
-                const list = response.data || response;
-                return list.map((p: any) => ({ label: p.name, value: p.id }));
-            }
+            mapResponse: (response: any) => response?.content.map((p: any) => ({ label: p.name, value: p.sku })),
         },
         {
             name: 'quantity',

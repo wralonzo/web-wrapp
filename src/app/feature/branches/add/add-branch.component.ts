@@ -30,7 +30,6 @@ export class AddBranchComponent extends PageConfiguration {
         name: '',
         code: '',
         address: '',
-        phone: '',
         active: true,
     };
 

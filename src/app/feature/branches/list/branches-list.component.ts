@@ -26,8 +26,7 @@ export class BranchesListComponent extends PageConfiguration implements OnInit {
   public tableColumns: ColumnConfig[] = [
     { key: 'code', label: 'Código', type: 'text', sortable: true },
     { key: 'name', label: 'Nombre', type: 'text', sortable: true },
-    { key: 'phone', label: 'Teléfono', type: 'text', sortable: true },
-    { key: 'active', label: 'Estado', type: 'boolean', sortable: true },
+    { key: 'address', label: 'Dirección', type: 'text', sortable: true },
     { key: 'actions', label: '', type: 'action' },
   ];
 

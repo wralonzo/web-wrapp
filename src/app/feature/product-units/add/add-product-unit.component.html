@@ -1,6 +1,7 @@
-<div class="space-y-6">
-    <div class="flex items-center justify-between">
-        <div>
+<div
+    class="max-w-3xl mx-auto bg-bg-secondary border border-border rounded-[32px] shadow-sm transition-colors duration-300">
+    <div class="flex items-center bg-bg-primary/50 border-b border-border justify-between">
+        <div class="p-8">
             <h2 class="text-2xl font-black text-text-primary tracking-tight">
                 {{ isEditMode() ? 'Editar Unidad' : 'Nueva Unidad' }}
             </h2>
@@ -8,14 +9,17 @@
                 {{ isEditMode() ? 'Modifica los datos de la unidad' : 'Registra una nueva unidad de medida' }}
             </p>
         </div>
-        <button (click)="nav.pop()"
-            class="px-4 py-2 text-text-muted hover:bg-bg-secondary rounded-xl font-bold transition-all border border-transparent hover:border-border">
-            Cancelar
-        </button>
+        <a [routerLink]="ROUTES.nav.productUnits.list"
+            class="text-text-muted hover:text-text-primary transition-colors flex items-center gap-1 font-bold text-sm px-10">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Volver a la lista
+        </a>
     </div>
 
-    <div class="bg-bg-secondary p-6 rounded-2xl border border-border shadow-sm">
-        <app-dynamic-form [fields]="formConfig" [data]="initialData()" (formSubmit)="onSave($event)">
+    <div class="p-10">
+        <app-dynamic-form [fields]="formConfig" [data]="initialData()" (onSubmit)="onSave($event)">
         </app-dynamic-form>
     </div>
 </div>

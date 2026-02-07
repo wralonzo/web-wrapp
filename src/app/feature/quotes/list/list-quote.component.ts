@@ -59,7 +59,7 @@ export class ListQuoteComponent extends PageConfiguration implements OnInit {
     async loadQuotes() {
         try {
             const data = await this.quoteService.getAll();
-            this.quotes.set(data);
+            this.quotes.set(data.content);
         } catch (error) {
             this.provideError(error);
         }

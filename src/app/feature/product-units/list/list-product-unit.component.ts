@@ -29,7 +29,7 @@ export class ListProductUnitComponent extends PageConfiguration implements OnIni
     public availableColumns: ColumnConfig[] = [
         { key: 'name', label: 'Nombre', type: 'text', sortable: true },
         { key: 'conversionFactor', label: 'Conversor', type: 'text', sortable: true },
-        { key: 'barcode', label: 'Barcode', type: 'boolean', color: 'green' }, // Assuming boolean logic or custom render, but based on prev html it was just text/presence
+        { key: 'barcode', label: 'Barcode', type: 'text', color: 'green' }, // Assuming boolean logic or custom render, but based on prev html it was just text/presence
         { key: 'actions', label: 'Acciones', type: 'action' }
     ];
 
@@ -57,7 +57,7 @@ export class ListProductUnitComponent extends PageConfiguration implements OnIni
     async loadUnits() {
         try {
             const data = await this.productUnitService.getAll();
-            this.units.set(data);
+            this.units.set(data.content);
         } catch (error) {
             this.provideError(error);
         }

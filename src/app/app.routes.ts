@@ -95,6 +95,12 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./feature/sales/sales.routes').then((m) => m.SALES_ROUTES),
       },
+      {
+        path: 'pos',
+        title: 'Punto de Venta',
+        loadChildren: () =>
+          import('./feature/pos/pos.routes').then((m) => m.POS_ROUTES),
+      },
 
       {
         path: 'reservations',

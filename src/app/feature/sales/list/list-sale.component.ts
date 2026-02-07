@@ -59,7 +59,7 @@ export class ListSaleComponent extends PageConfiguration implements OnInit {
     async loadSales() {
         try {
             const data = await this.saleService.getAll();
-            this.sales.set(data);
+            this.sales.set(data.content);
         } catch (error) {
             this.provideError(error);
         }

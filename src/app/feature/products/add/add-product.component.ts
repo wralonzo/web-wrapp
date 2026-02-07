@@ -74,8 +74,8 @@ export class AddProductComponent extends PageConfiguration {
       type: 'select',
       required: true,
       colSpan: 1,
-      endpoint: '/categories',
-      mapResponse: (r: any) => (r.data || r.content || r).map((c: any) => ({ label: c.name, value: c.id }))
+      endpoint: '/category',
+      mapResponse: (r: any) => (r.content || r).map((c: any) => ({ label: c.name, value: c.id }))
     },
     {
       name: 'unitId', // Virtual field for selection
@@ -84,7 +84,7 @@ export class AddProductComponent extends PageConfiguration {
       required: true,
       colSpan: 1,
       endpoint: '/inventory/product-units',
-      mapResponse: (r: any) => (r.data || r).map((u: any) => ({ label: u.name, value: u.id }))
+      mapResponse: (r: any) => (r.content || r).map((u: any) => ({ label: u.name, value: u.id }))
     }
   ];
 

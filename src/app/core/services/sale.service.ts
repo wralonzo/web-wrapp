@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { PageConfiguration } from 'src/app/page-configurations';
 import { Sale } from '@shared/models/inventory/sale.interface';
+import { PaginatedResponse } from '@assets/retail-shop/PaginatedResponse';
 
 @Injectable({
     providedIn: 'root'
 })
 export class SaleService extends PageConfiguration {
 
-    async getAll(): Promise<Sale[]> {
+    async getAll(): Promise<PaginatedResponse<Sale>> {
         return await this.rustService.call(async (bridge) => {
             return await bridge.get('/api/sales');
         });

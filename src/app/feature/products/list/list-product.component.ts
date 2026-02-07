@@ -61,7 +61,7 @@ export class ListProductComponent extends PageConfiguration {
     { key: 'sku', label: 'SKU', type: 'text', sortable: true },
     { key: 'name', label: 'Nombre', type: 'text', sortable: true },
     { key: 'priceSale', label: 'Precio', type: 'currency', sortable: true },
-    { key: 'stockMinim', label: 'Stock alerta', type: 'badge', sortable: true },
+    { key: 'type', label: 'Tipo', type: 'badge', sortable: true },
     { key: 'active', label: 'Estado', type: 'boolean', sortable: true },
     { key: 'actions', label: '', type: 'action' },
   ];

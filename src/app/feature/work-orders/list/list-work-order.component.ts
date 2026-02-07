@@ -58,7 +58,7 @@ export class ListWorkOrderComponent extends PageConfiguration implements OnInit 
     async loadWorkOrders() {
         try {
             const data = await this.workOrderService.getAll();
-            this.workOrders.set(data);
+            this.workOrders.set(data.content);
         } catch (error) {
             this.provideError(error);
         }

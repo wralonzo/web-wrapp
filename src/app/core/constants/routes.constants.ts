@@ -103,5 +103,16 @@ export const APP_ROUTES = {
       add: `/${APP_BASE}/permissions/add`,
       edit: (id: string | number) => `/${APP_BASE}/permissions/edit/${id}`,
     },
+
+    productUnits: {
+      list: `/${APP_BASE}/product-units`,
+      add: `/${APP_BASE}/product-units/add`,
+      edit: (id: string | number) => `/${APP_BASE}/product-units/edit/${id}`,
+    },
+    productBundles: {
+      list: `/${APP_BASE}/product-bundles`,
+      add: `/${APP_BASE}/product-bundles/add`,
+      edit: (id: string | number) => `/${APP_BASE}/product-bundles/edit/${id}`,
+    },
   },
 } as const;

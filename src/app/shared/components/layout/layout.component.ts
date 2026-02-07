@@ -51,6 +51,12 @@ export class LayoutComponent extends PageConfiguration {
       iconPath: 'sales',
     },
     {
+      label: 'Punto de Venta',
+      route: '/app/pos',
+      roles: [ROLES.ADMIN, ROLES.SALES],
+      iconPath: 'handbag',
+    },
+    {
       label: 'Reservaciones',
       route: '/app/reservations',
       roles: [ROLES.ADMIN, ROLES.SALES],

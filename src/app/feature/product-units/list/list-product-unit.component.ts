@@ -57,7 +57,7 @@ export class ListProductUnitComponent extends PageConfiguration implements OnIni
     async loadUnits() {
         try {
             const data = await this.productUnitService.getAll();
-            this.units.set(data.content);
+            this.units.set(data);
         } catch (error) {
             this.provideError(error);
         }
@@ -88,7 +88,7 @@ export class ListProductUnitComponent extends PageConfiguration implements OnIni
 
         try {
             if (unit.id) {
-                await this.productUnitService.delete(unit.id);
+                await this.productUnitService.delete(unit.id.toString());
                 await this.loadUnits();
                 this.toast.show('Unidad eliminada correctamente', 'success');
             }

@@ -148,6 +148,14 @@ export const routes: Routes = [
         component: ReservationCalendarComponent,
       },
 
+      // Módulo de Compras
+      {
+        path: 'purchases',
+        title: 'Compras',
+        loadChildren: () =>
+          import('./feature/purchases/purchases.routes').then((m) => m.PURCHASE_ROUTES),
+      },
+
       // Otras Rutas
 
       {

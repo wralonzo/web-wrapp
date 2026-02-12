@@ -81,7 +81,7 @@ export class ReferenceInventoryComponent extends PageConfiguration implements On
 
     async loadInventory() {
         try {
-            const data = await this.inventoryService.getStock();
+            const data = await this.inventoryService.getLowStockAlerts();
             this.inventory.set(data);
         } catch (error) {
             this.provideError(error);

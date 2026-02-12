@@ -1,5 +1,5 @@
 export interface ProductUnit {
-    id?: string;
+    id?: number;
     name: string;
     conversionFactor: number;
     barcode: string;

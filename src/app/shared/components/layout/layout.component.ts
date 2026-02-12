@@ -49,6 +49,19 @@ export class LayoutComponent extends PageConfiguration {
       route: '/app/sales',
       roles: [ROLES.ADMIN, ROLES.SALES],
       iconPath: 'sales',
+      children: [
+        { label: 'Ventas', route: '/app/sales', iconPath: 'sales' },
+        {
+          label: 'Cotizaciones',
+          route: '/app/quotes',
+          iconPath: 'quotes', // Assuming 'receipt' icon exists, otherwise need to check or use a generic one
+        },
+        {
+          label: 'Órdenes Trabajo',
+          route: '/app/work-orders',
+          iconPath: 'settings', // Generic icon
+        },
+      ],
     },
     {
       label: 'Punto de Venta',
@@ -63,59 +76,39 @@ export class LayoutComponent extends PageConfiguration {
       iconPath: 'reservations',
     },
     {
-      label: 'Productos',
-      route: '/app/products',
-      roles: [ROLES.ADMIN, ROLES.SALES],
-      iconPath: 'handbag',
-    },
-    {
-      label: 'Combos / Kits',
-      route: '/app/product-bundles',
-      roles: [ROLES.ADMIN, ROLES.SALES],
-      iconPath: 'orders',
-    },
-    {
       label: 'Inventario',
-      route: '/app/inventory',
       roles: [ROLES.ADMIN, ROLES.SALES],
       iconPath: 'reports',
-    },
-    {
-      label: 'Cotizaciones',
-      route: '/app/quotes',
-      roles: [ROLES.ADMIN, ROLES.SALES],
-      iconPath: 'quotes', // Assuming 'receipt' icon exists, otherwise need to check or use a generic one
-    },
-    {
-      label: 'Órdenes Trabajo',
-      route: '/app/work-orders',
-      roles: [ROLES.ADMIN, ROLES.SALES],
-      iconPath: 'settings', // Generic icon
-    },
-    {
-      label: 'Gastos',
-      route: '/app/products',
-      roles: [ROLES.ADMIN, ROLES.SALES],
-      iconPath: 'expenses',
-    },
-    {
-      label: 'Usuarios',
-      route: this.ROUTES.nav.users.list,
-      roles: [ROLES.ADMIN],
-      iconPath: 'users',
+      children: [
+        {
+          label: 'Productos',
+          route: '/app/products',
+          iconPath: 'handbag',
+        },
+        {
+          label: 'Combos / Kits',
+          route: '/app/product-bundles',
+          iconPath: 'orders',
+        },
+        { label: 'Categorías', route: this.ROUTES.nav.categories.list, iconPath: 'handbag' },
+        { label: 'Unidades de Producto', route: '/app/product-units', iconPath: 'handbag' },
+      ],
     },
     {
       label: 'Compras',
-      route: this.ROUTES.nav.users.list,
       roles: [ROLES.ADMIN],
       iconPath: 'purchases',
+      children: [
+        { label: 'Compras', route: this.ROUTES.nav.users.list, iconPath: 'purchases' },
+        { label: 'Proveedores', route: this.ROUTES.nav.users.list, iconPath: 'clients' },
+        {
+          label: 'Pedidos',
+          route: this.ROUTES.nav.users.list,
+          iconPath: 'orders',
+        },
+      ],
     },
-    {
-      label: 'Pedidos',
-      route: this.ROUTES.nav.users.list,
-      roles: [ROLES.ADMIN],
-      iconPath: 'orders',
-    },
+
     {
       label: 'Reportes',
       route: this.ROUTES.nav.users.list,
@@ -130,14 +123,23 @@ export class LayoutComponent extends PageConfiguration {
       ],
     },
     {
+      label: 'Gastos',
+      route: '/app/products',
+      roles: [ROLES.ADMIN, ROLES.SALES],
+      iconPath: 'expenses',
+    },
+    {
+      label: 'Usuarios',
+      route: this.ROUTES.nav.users.list,
+      roles: [ROLES.ADMIN],
+      iconPath: 'users',
+    },
+    {
       label: 'Configuraciones', // Ejemplo con Submenú
       iconPath: 'config',
       roles: [ROLES.ADMIN, ROLES.SALES],
       children: [
-        { label: 'Unidades de Producto', route: '/app/product-units', iconPath: 'handbag' },
         { label: 'Roles', route: this.ROUTES.nav.roles.list, iconPath: 'users' },
-        { label: 'Categorías', route: this.ROUTES.nav.categories.list, iconPath: 'handbag' },
-        { label: 'Proveedores', route: this.ROUTES.nav.suppliers.list, iconPath: 'clients' },
         { label: 'Permisos', route: this.ROUTES.nav.permissions.list, iconPath: 'config' },
         { label: 'Sucursales', route: this.ROUTES.nav.branches.list, iconPath: 'config' },
         { label: 'Almacenes', route: this.ROUTES.nav.warehouses.list, iconPath: 'handbag' },

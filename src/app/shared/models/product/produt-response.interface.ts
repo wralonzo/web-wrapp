@@ -18,7 +18,13 @@ export interface Product {
   warehouseName?: string;
   createdAt?: Date;
   updatedAt?: Date;
-  units?: { id: number }[];
+  type?: string;
+  units?: {
+    id: number;
+    name?: string;
+    conversionFactor?: number;
+    barcode?: string;
+  }[];
 }
 
 

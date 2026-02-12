@@ -1,1 +1,211 @@
-<p>view works!</p>
+<div class="space-y-6 animate-in fade-in duration-500">
+    <!-- Header con navegación y acciones -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <button (click)="goBack()" class="p-2 hover:bg-bg-secondary rounded-full transition-colors text-text-muted">
+                <span class="icon-arrow-left text-xl"></span>
+            </button>
+            <div>
+                <h1 class="text-2xl font-black text-text-primary">Detalle del Producto</h1>
+                <p class="text-text-muted text-sm font-medium">Información completa y unidades de medida.</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <app-button label="Editar" btnType="secondary" (btnClick)="editProduct()" [icon]="'edit'"></app-button>
+            <app-button label="Agregar Unidad" (btnClick)="openUnitModal()" [icon]="'add-plus'"></app-button>
+        </div>
+    </div>
+
+    @if (isLoading()) {
+    <div class="flex flex-col items-center justify-center py-20 bg-bg-secondary rounded-card border border-border">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <p class="mt-4 text-text-muted font-bold">Cargando detalles...</p>
+    </div>
+    }
+
+    @if (!isLoading() && product()) {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Card Principal de Información -->
+        <div class="lg:col-span-2 space-y-6">
+            <div class="p-6 bg-bg-secondary rounded-card border border-border shadow-sm">
+                <div class="flex items-start gap-6 mb-8">
+                    <div
+                        class="w-24 h-24 rounded-3xl bg-primary/10 flex items-center justify-center text-primary text-3xl font-black shrink-0 border border-primary/20">
+                        {{ getInitials(product()?.name || '') }}
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h2 class="text-2xl font-black text-text-primary">{{ product()?.name }}</h2>
+                            <span
+                                [class]="product()?.active ? 'bg-emerald-500/10 text-emerald-600' : 'bg-red-500/10 text-red-600'"
+                                class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border border-current/20">
+                                {{ product()?.active ? 'Activo' : 'Inactivo' }}
+                            </span>
+                        </div>
+                        <p class="text-text-muted font-medium mb-4">{{ product()?.description || 'Sin descripción
+                            disponible.' }}</p>
+
+                        <div class="flex flex-wrap gap-4">
+                            <div
+                                class="px-4 py-2 bg-bg-primary rounded-2xl border border-border flex items-center gap-3">
+                                <span
+                                    class="text-[10px] font-black text-text-muted uppercase tracking-widest">SKU</span>
+                                <span class="text-sm font-bold text-text-primary">{{ product()?.sku }}</span>
+                                <button (click)="copyToClipboard(product()?.sku || '')"
+                                    class="text-text-muted hover:text-primary transition-colors">
+                                    <span class="icon-copy text-xs"></span>
+                                </button>
+                            </div>
+                            <div
+                                class="px-4 py-2 bg-bg-primary rounded-2xl border border-border flex items-center gap-3">
+                                <span
+                                    class="text-[10px] font-black text-text-muted uppercase tracking-widest">Código</span>
+                                <span class="text-sm font-bold text-text-primary">{{ product()?.barcode }}</span>
+                                <button (click)="copyToClipboard(product()?.barcode || '')"
+                                    class="text-text-muted hover:text-primary transition-colors">
+                                    <span class="icon-copy text-xs"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-border">
+                    <div>
+                        <h3 class="text-xs font-black text-text-muted uppercase tracking-widest mb-4">Información de
+                            Precios</h3>
+                        <div class="space-y-3">
+                            <div
+                                class="flex justify-between items-center p-3 bg-bg-primary rounded-2xl border border-border">
+                                <span class="text-sm font-medium text-text-secondary">Precio de Compra</span>
+                                <span class="text-lg font-black text-text-primary">{{ product()?.pricePurchase |
+                                    currency }}</span>
+                            </div>
+                            <div
+                                class="flex justify-between items-center p-3 bg-primary/5 rounded-2xl border border-primary/20">
+                                <span class="text-sm font-medium text-primary">Precio de Venta</span>
+                                <span class="text-xl font-black text-primary">{{ product()?.priceSale | currency
+                                    }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-black text-text-muted uppercase tracking-widest mb-4">Tipo de producto
+                        </h3>
+                        <div class="space-y-3">
+                            <div
+                                class="flex justify-between items-center p-3 bg-bg-primary rounded-2xl border border-border">
+                                <span class="text-sm font-medium text-text-secondary">Tipo de producto</span>
+                                <span class="text-lg font-black text-text-primary">{{ product()?.type }}</span>
+                            </div>
+                            <div
+                                class="flex justify-between items-center p-3 bg-bg-primary rounded-2xl border border-border">
+                                <span class="text-sm font-medium text-text-secondary">Categoría</span>
+                                <span class="text-sm font-bold text-text-primary">{{ product()?.categoryName ||
+                                    'General' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unidades de Medida -->
+            <div class="p-6 bg-bg-secondary rounded-card border border-border shadow-sm">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-black text-text-primary">Unidades de Medida</h3>
+                    <span class="text-xs font-bold text-text-muted">{{ (product()?.units || []).length }}
+                        registradas</span>
+                </div>
+
+                <div class="overflow-hidden bg-bg-primary rounded-2xl border border-border">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-bg-secondary/50">
+                                <th class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest">
+                                    Nombre</th>
+                                <th class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest">
+                                    Factor</th>
+                                <th class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest">
+                                    Código Barras</th>
+                                <th class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest">
+                                    Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-border">
+                            <tr *ngFor="let unit of product()?.units"
+                                class="hover:bg-bg-secondary/30 transition-colors">
+                                <td class="px-4 py-4 text-sm font-bold text-text-primary">{{ unit.name }}</td>
+                                <td class="px-4 py-4 text-sm font-medium text-text-secondary">x {{ unit.conversionFactor
+                                    }}</td>
+                                <td class="px-4 py-4 text-sm font-mono text-text-muted">{{ unit.barcode }}</td>
+                                <td class="px-4 py-4 text-sm font-bold text-text-secondary">
+                                    <button (click)="deleteUnit(unit.id)"
+                                        class="p-2 hover:bg-bg-secondary rounded-full transition-colors text-text-muted cursor-pointer">
+                                        Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+
+                            @if (product()?.units?.length === 0) {
+                            <tr>
+                                <td colspan="3" class="px-4 py-8 text-center text-text-muted italic">
+                                    No hay unidades adicionales registradas para este producto.
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Info -->
+        <div class="space-y-6">
+            <div class="p-6 bg-bg-secondary rounded-card border border-border shadow-sm">
+                <h3 class="text-xs font-black text-text-muted uppercase tracking-widest mb-4 text-center">Trazabilidad
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[10px] font-black text-text-muted uppercase tracking-widest">Proveedor</span>
+                        <span class="text-sm font-bold text-text-primary">{{ product()?.supplierName || 'No asignado'
+                            }}</span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[10px] font-black text-text-muted uppercase tracking-widest">Almacén
+                            Principal</span>
+                        <span class="text-sm font-bold text-text-primary">{{ product()?.warehouseName || 'Almacén
+                            Central' }}</span>
+                    </div>
+                    <div class="pt-4 border-t border-border flex flex-col gap-1">
+                        <span class="text-[10px] font-black text-text-muted uppercase tracking-widest">Creado el</span>
+                        <span class="text-sm font-medium text-text-secondary">{{ product()?.createdAt | date:'medium'
+                            }}</span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[10px] font-black text-text-muted uppercase tracking-widest">Última
+                            actualización</span>
+                        <span class="text-sm font-medium text-text-secondary">{{ product()?.updatedAt | date:'medium'
+                            }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+</div>
+
+<app-modal [(isOpen)]="showModal" [title]="'Agregar Unidad de Medida'" [confirmLabel]="'Guardar Unidad'"
+    [isSubmitting]="isSubmittingUnit()" (onConfirm)="saveUnit()" (onCancel)="showModal.set(false)">
+
+    <div class="space-y-5 p-2">
+        <p class="text-sm text-text-muted mb-4">
+            Assinar unidad de medidad
+        </p>
+
+        <div class="relative w-full">
+            <app-custom-select class="w-full" [label]="'Unidades de Medida'" [options]="productUnits()"
+                (onSelectionChange)="onSelectChange($event)" />
+        </div>
+    </div>
+</app-modal>

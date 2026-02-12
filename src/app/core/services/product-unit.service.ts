@@ -8,7 +8,7 @@ import { PaginatedResponse } from '@assets/retail-shop/PaginatedResponse';
 })
 export class ProductUnitService extends PageConfiguration {
 
-    async getAll(): Promise<PaginatedResponse<ProductUnit>> {
+    async getAll(): Promise<any> {
         return await this.rustService.call(async (bridge) => {
             // Assuming existing backend pattern or mocking for now if endpoint doesn't exist
             return await bridge.get('/inventory/product-units');

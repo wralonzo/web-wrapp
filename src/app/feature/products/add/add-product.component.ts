@@ -36,7 +36,7 @@ export class AddProductComponent extends PageConfiguration {
       type: 'number',
       required: false,
       colSpan: 1,
-      valueDefault: 0,
+      valueDefault: 1,
     },
     {
       name: 'barcode',
@@ -81,10 +81,23 @@ export class AddProductComponent extends PageConfiguration {
       name: 'unitId', // Virtual field for selection
       label: 'Unidad de Medida (Base)',
       type: 'select',
-      required: true,
+      required: false,
       colSpan: 1,
       endpoint: '/inventory/product-units',
       mapResponse: (r: any) => (r.content || r).map((u: any) => ({ label: u.name, value: u.id }))
+    },
+    {
+      name: 'type',
+      label: 'Tipo de Producto',
+      type: 'select',
+      required: true,
+      valueDefault: 'STANDAR',
+      colSpan: 1,
+      options: [
+        { label: 'Producto', value: 'STANDAR' },
+        { label: 'Servicio', value: 'SERVICE' },
+        { label: 'Combo', value: 'BUNDLE' }
+      ]
     }
   ];
 
@@ -102,6 +115,7 @@ export class AddProductComponent extends PageConfiguration {
         active: true,
         categoryId: formData.categoryId,
         units: formData.unitId ? [{ id: formData.unitId }] : [],
+        type: formData.type,
       };
       const response = await this.rustService.call(async (bridge) => {
         return await bridge.post('/products', payload);

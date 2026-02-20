@@ -1,4 +1,4 @@
-import { inject } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpService } from './http.service';
 import {
   Product,
@@ -7,6 +7,9 @@ import {
 } from '@shared/models/product/produt-response.interface';
 import { ImportProductResponse } from '@shared/models/product/response-import.interface';
 
+@Injectable({
+  providedIn: 'root',
+})
 export class ProductService {
   private readonly api = inject(HttpService);
   private readonly pathApi = 'products';

@@ -22,6 +22,10 @@ export class ReservationService {
     return this.api.doPost<ReservationResponse>(`${this.controller}`, product);
   }
 
+  public createReservation(payload: any) {
+    return this.api.doPost<ReservationResponse>(`${this.controller}`, payload);
+  }
+
   public update(id: number, product: Reservation) {
     return this.api.doPatch<ReservationResponse>(`${this.controller}/${id}`, product);
   }

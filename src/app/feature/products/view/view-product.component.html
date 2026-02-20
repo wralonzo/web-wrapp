@@ -13,7 +13,6 @@
 
         <div class="flex items-center gap-3">
             <app-button label="Editar" btnType="secondary" (btnClick)="editProduct()" [icon]="'edit'"></app-button>
-            <app-button label="Agregar Unidad" (btnClick)="openUnitModal()" [icon]="'add-plus'"></app-button>
         </div>
     </div>
 
@@ -43,8 +42,8 @@
                                 {{ product()?.active ? 'Activo' : 'Inactivo' }}
                             </span>
                         </div>
-                        <p class="text-text-muted font-medium mb-4">{{ product()?.description || 'Sin descripción
-                            disponible.' }}</p>
+                        <p class="text-text-muted font-medium mb-4">{{ product()?.description || 'Sin
+                            descripciónvdisponible.' }}</p>
 
                         <div class="flex flex-wrap gap-4">
                             <div
@@ -110,12 +109,13 @@
                 </div>
             </div>
 
-            <!-- Unidades de Medida -->
+            <!-- Configuraciones por Sucursal -->
+            @if (product()?.branchConfigs?.length) {
             <div class="p-6 bg-bg-secondary rounded-card border border-border shadow-sm">
                 <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-lg font-black text-text-primary">Unidades de Medida</h3>
-                    <span class="text-xs font-bold text-text-muted">{{ (product()?.units || []).length }}
-                        registradas</span>
+                    <h3 class="text-lg font-black text-text-primary">Configuraciones por Sucursal</h3>
+                    <span class="text-xs font-bold text-text-muted">{{ product()?.branchConfigs?.length }}
+                        sucursales</span>
                 </div>
 
                 <div class="overflow-hidden bg-bg-primary rounded-2xl border border-border">
@@ -123,34 +123,90 @@
                         <thead>
                             <tr class="bg-bg-secondary/50">
                                 <th class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest">
-                                    Nombre</th>
+                                    ID Sucursal</th>
                                 <th class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest">
-                                    Factor</th>
-                                <th class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest">
-                                    Código Barras</th>
-                                <th class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest">
-                                    Acciones</th>
+                                    Categoría</th>
+                                <th
+                                    class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest text-center">
+                                    Stock Mín.</th>
+                                <th
+                                    class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest text-center">
+                                    Estado</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-border">
-                            <tr *ngFor="let unit of product()?.units"
-                                class="hover:bg-bg-secondary/30 transition-colors">
-                                <td class="px-4 py-4 text-sm font-bold text-text-primary">{{ unit.name }}</td>
-                                <td class="px-4 py-4 text-sm font-medium text-text-secondary">x {{ unit.conversionFactor
-                                    }}</td>
-                                <td class="px-4 py-4 text-sm font-mono text-text-muted">{{ unit.barcode }}</td>
-                                <td class="px-4 py-4 text-sm font-bold text-text-secondary">
-                                    <button (click)="deleteUnit(unit.id)"
-                                        class="p-2 hover:bg-bg-secondary rounded-full transition-colors text-text-muted cursor-pointer">
-                                        Eliminar
-                                    </button>
+                            @for (config of product()?.branchConfigs; track config.id) {
+                            <tr class="hover:bg-bg-secondary/30 transition-colors">
+                                <td class="px-4 py-4 text-sm font-bold text-text-primary">#{{ config.branchId }}</td>
+                                <td class="px-4 py-4 text-sm font-medium text-text-secondary">{{ config.categoryName }}
+                                </td>
+                                <td class="px-4 py-4 text-sm font-black text-text-primary text-center">{{
+                                    config.stockMinim }}</td>
+                                <td class="px-4 py-4 text-center">
+                                    <span
+                                        [class]="config.active ? 'bg-emerald-500/10 text-emerald-600' : 'bg-red-500/10 text-red-600'"
+                                        class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border border-current/20">
+                                        {{ config.active ? 'Activo' : 'Inactivo' }}
+                                    </span>
                                 </td>
                             </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            }
 
-                            @if (product()?.units?.length === 0) {
+            <!-- Existencias por Almacén -->
+            <div class="p-6 bg-bg-secondary rounded-card border border-border shadow-sm">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-black text-text-primary">Existencias por Almacén</h3>
+                    <span class="text-xs font-bold text-text-muted">{{ productStock().length }} almacenes</span>
+                </div>
+
+                <div class="overflow-hidden bg-bg-primary rounded-2xl border border-border">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-bg-secondary/50">
+                                <th class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest">
+                                    Almacén</th>
+                                <th
+                                    class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest text-center">
+                                    Actual</th>
+                                <th
+                                    class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest text-center">
+                                    Disponible</th>
+                                <th
+                                    class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest text-center">
+                                    Reservado</th>
+                                <th
+                                    class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest text-center">
+                                    Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-border">
+                            @for (item of productStock(); track item.almacenName) {
+                            <tr class="hover:bg-bg-secondary/30 transition-colors">
+                                <td class="px-4 py-4 text-sm font-bold text-text-primary">{{ item.almacenName }}</td>
+                                <td class="px-4 py-4 text-sm font-black text-text-primary text-center">{{
+                                    item.inventario.currentStock }}</td>
+                                <td class="px-4 py-4 text-sm font-bold text-primary text-center">{{
+                                    item.inventario.quantityAvailable }}</td>
+                                <td class="px-4 py-4 text-sm font-medium text-text-muted text-center">{{
+                                    item.inventario.quantityReserved }}</td>
+                                <td class="px-4 py-4 text-center">
+                                    <span
+                                        [class]="item.inventario.status === 'DISPONIBLE' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-red-500/10 text-red-600'"
+                                        class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border border-current/20">
+                                        {{ item.inventario.status | titlecase }}
+                                    </span>
+                                </td>
+                            </tr>
+                            }
+                            @if (productStock().length === 0) {
                             <tr>
-                                <td colspan="3" class="px-4 py-8 text-center text-text-muted italic">
-                                    No hay unidades adicionales registradas para este producto.
+                                <td colspan="5" class="px-4 py-8 text-center text-text-muted italic">
+                                    No se encontraron registros de existencias para este producto.
                                 </td>
                             </tr>
                             }
@@ -162,32 +218,141 @@
 
         <!-- Sidebar Info -->
         <div class="space-y-6">
-            <div class="p-6 bg-bg-secondary rounded-card border border-border shadow-sm">
-                <h3 class="text-xs font-black text-text-muted uppercase tracking-widest mb-4 text-center">Trazabilidad
-                </h3>
-                <div class="space-y-4">
-                    <div class="flex flex-col gap-1">
-                        <span class="text-[10px] font-black text-text-muted uppercase tracking-widest">Proveedor</span>
-                        <span class="text-sm font-bold text-text-primary">{{ product()?.supplierName || 'No asignado'
-                            }}</span>
+            <div class="bg-bg-secondary rounded-card border border-border shadow-sm overflow-hidden">
+                <!-- Sección: Temporalidad -->
+                <div class="p-6">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="icon-calendar text-primary"></span>
+                        <h3 class="text-xs font-black text-text-muted uppercase tracking-widest">Trazabilidad Temporal
+                        </h3>
                     </div>
-                    <div class="flex flex-col gap-1">
-                        <span class="text-[10px] font-black text-text-muted uppercase tracking-widest">Almacén
-                            Principal</span>
-                        <span class="text-sm font-bold text-text-primary">{{ product()?.warehouseName || 'Almacén
-                            Central' }}</span>
+
+                    <div class="space-y-4">
+                        <div
+                            class="flex items-center justify-between p-2.5 bg-bg-primary/50 rounded-xl border border-border/30">
+                            <div class="flex flex-col">
+                                <span
+                                    class="text-[9px] font-black text-text-muted uppercase tracking-widest">Creación</span>
+                                <span class="text-xs font-bold text-text-secondary">{{ product()?.createdAt |
+                                    date:'short' }}</span>
+                            </div>
+                        </div>
+                        <div
+                            class="flex items-center justify-between p-2.5 bg-bg-primary/50 rounded-xl border border-border/30">
+                            <div class="flex flex-col">
+                                <span
+                                    class="text-[9px] font-black text-text-muted uppercase tracking-widest">Actualización</span>
+                                <span class="text-xs font-bold text-text-secondary">{{ product()?.updatedAt |
+                                    date:'short' }}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="pt-4 border-t border-border flex flex-col gap-1">
-                        <span class="text-[10px] font-black text-text-muted uppercase tracking-widest">Creado el</span>
-                        <span class="text-sm font-medium text-text-secondary">{{ product()?.createdAt | date:'medium'
-                            }}</span>
+                </div>
+
+                <!-- Productos en el Combo (Bundle Items) -->
+                @if (product()?.type === 'BUNDLE' || (bundleItems() && bundleItems().length > 0)) {
+                <div class="p-6 border-t border-border bg-bg-secondary/10">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="icon-package text-primary"></span>
+                            <h3 class="text-xs font-black text-text-muted uppercase tracking-widest">Items del Combo
+                            </h3>
+                        </div>
+                        <span
+                            class="text-[10px] font-bold text-text-muted bg-bg-primary px-2 py-0.5 rounded-full border border-border">
+                            {{ bundleItems().length > 0 ? bundleItems().length : 0 }} items
+                        </span>
                     </div>
-                    <div class="flex flex-col gap-1">
-                        <span class="text-[10px] font-black text-text-muted uppercase tracking-widest">Última
-                            actualización</span>
-                        <span class="text-sm font-medium text-text-secondary">{{ product()?.updatedAt | date:'medium'
-                            }}</span>
+
+                    <div class="space-y-2">
+                        @for (item of bundleItems(); track item.childProductId) {
+                        <div
+                            class="flex flex-col gap-2 p-3 bg-bg-primary/40 rounded-2xl border border-border/20 group/bundle">
+                            <div class="flex items-start justify-between">
+                                <div class="flex flex-col flex-1 min-w-0 pr-2">
+                                    <span class="text-sm font-bold text-text-primary truncate">{{
+                                        item.childProductName }}</span>
+                                </div>
+                                <span
+                                    class="text-xs font-black text-primary px-2 py-1 bg-primary/5 rounded-lg border border-primary/10">
+                                    x{{ item.quantity }}
+                                </span>
+                            </div>
+                            <button (click)="deleteBundleItem(item.childProductId)"
+                                class="text-[10px] font-black text-red-500/70 hover:text-red-600 uppercase tracking-widest text-right transition-colors">
+                                Quitar Item
+                            </button>
+                        </div>
+                        }
+
+                        <!-- Action Card: Agregar Item al Combo -->
+                        <button (click)="openBundleModal()"
+                            class="w-full p-4 border-2 border-dashed border-border/40 rounded-xl flex flex-col items-center justify-center gap-2 group/add-combo transition-all hover:border-primary/40 hover:bg-primary/5 mt-2">
+                            <div
+                                class="w-8 h-8 rounded-full bg-bg-primary border border-border flex items-center justify-center text-text-muted group-hover/add-combo:text-primary group-hover/add-combo:border-primary/30 transition-all">
+                                <span class="icon-add-plus text-base"></span>
+                            </div>
+                            <span
+                                class="text-[9px] font-black text-text-muted uppercase tracking-widest group-hover/add-combo:text-primary transition-colors">Agregar
+                                Producto al Combo</span>
+                        </button>
                     </div>
+                </div>
+                }
+
+                <!-- Unidades de Medida -->
+                <div class="p-6 border-t border-border">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="icon-ruler text-primary"></span>
+                        <h3 class="text-xs font-black text-text-muted uppercase tracking-widest">Unidades de Medida</h3>
+                    </div>
+
+                    <div class="space-y-3">
+                        @for (unit of product()?.units; track unit.id) {
+                        <div
+                            class="flex flex-col gap-2 p-3 bg-bg-primary/40 rounded-2xl border border-border/20 group/unit">
+                            <div class="flex items-start justify-between">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold text-text-primary">{{ unit.name }}</span>
+                                    <span class="text-[10px] font-mono text-text-muted uppercase tracking-tighter">{{
+                                        unit.barcode }}</span>
+                                </div>
+                                <span
+                                    class="text-xs font-black text-primary px-2 py-1 bg-primary/5 rounded-lg border border-primary/10">
+                                    x{{ unit.conversionFactor }}
+                                </span>
+                            </div>
+                            <button (click)="deleteUnit(unit.id)"
+                                class="text-[10px] font-black text-red-500/70 hover:text-red-600 uppercase tracking-widest text-right transition-colors">
+                                Quitar Unidad
+                            </button>
+                        </div>
+                        }
+
+                        <!-- Action Card: Agregar Unidad -->
+                        <button (click)="openUnitModal()"
+                            class="w-full p-4 border-2 border-dashed border-border/40 rounded-2xl flex flex-col items-center justify-center gap-2 group/add transition-all hover:border-primary/40 hover:bg-primary/5">
+                            <div
+                                class="w-10 h-10 rounded-full bg-bg-primary border border-border flex items-center justify-center text-text-muted group-hover/add:text-primary group-hover/add:border-primary/30 transition-all">
+                                <span class="icon-add-plus text-lg"></span>
+                            </div>
+                            <span
+                                class="text-[10px] font-black text-text-muted uppercase tracking-widest group-hover/add:text-primary transition-colors">Agregar
+                                Nueva Unidad</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sugerencia o Quick Actions (Opcional, pero mejora UX) -->
+            <div class="p-4 bg-primary/5 rounded-2xl border border-primary/10 flex items-start gap-4">
+                <span class="icon-info text-primary mt-0.5 text-lg"></span>
+                <div>
+                    <h4 class="text-xs font-black text-primary uppercase tracking-widest mb-1">Nota de Calidad</h4>
+                    <p class="text-[11px] text-text-muted font-medium leading-relaxed">
+                        Los datos de trazabilidad son auditados automáticamente. Asegúrese de que el SKU coincida
+                        con las etiquetas físicas.
+                    </p>
                 </div>
             </div>
         </div>
@@ -200,12 +365,36 @@
 
     <div class="space-y-5 p-2">
         <p class="text-sm text-text-muted mb-4">
-            Assinar unidad de medidad
+            Asignar unidad de medida
         </p>
 
         <div class="relative w-full">
             <app-custom-select class="w-full" [label]="'Unidades de Medida'" [options]="productUnits()"
                 (onSelectionChange)="onSelectChange($event)" />
+        </div>
+    </div>
+</app-modal>
+
+<!-- Modal Agregar Producto al Combo -->
+<app-modal [(isOpen)]="showBundleModal" [title]="'Agregar Producto al Combo'" [confirmLabel]="'Agregar Item'"
+    [isSubmitting]="isSubmittingBundle()" (onConfirm)="saveBundleItem()" (onCancel)="showBundleModal.set(false)">
+
+    <div class="space-y-5 p-2">
+        <p class="text-sm text-text-muted mb-4">
+            Selecciona un producto para añadirlo al componente de este combo.
+        </p>
+
+        <div class="space-y-4">
+            <div class="relative w-full">
+                <app-custom-select class="w-full" [label]="'Producto componente'" [options]="availableProducts()"
+                    (onSelectionChange)="onBundleProductChange($event)" />
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label class="text-[10px] font-black text-text-muted uppercase tracking-widest ml-1">Cantidad</label>
+                <input type="number" [(ngModel)]="bundleQuantity" min="1"
+                    class="w-full px-4 py-3 bg-bg-secondary border border-border rounded-xl text-sm font-bold text-text-primary focus:border-primary outline-none transition-all" />
+            </div>
         </div>
     </div>
 </app-modal>

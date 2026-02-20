@@ -25,8 +25,22 @@ export interface Product {
     conversionFactor?: number;
     barcode?: string;
   }[];
+  branchConfigs?: {
+    id: number;
+    branchId: number;
+    categoryId: number;
+    categoryName: string;
+    active: boolean;
+    stockMinim: number;
+  }[];
 }
 
+export interface ProductBundleResponse {
+  id: number;
+  childProductId: number;
+  childProductName: string;
+  quantity: number;
+}
 
 export interface ProductsResponse extends HttpResponseApi<Product> { }
 export interface ProductResponse extends HttpResponseApiFindOne<Product[]> { }

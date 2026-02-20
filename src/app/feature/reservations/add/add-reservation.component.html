@@ -27,7 +27,85 @@
       <h2 class="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] mb-8 border-b border-border pb-4">
         Configuración de la cita</h2>
 
-      <app-dynamic-form [fields]="fields()" (onSubmit)="handleSave($event)" />
+      <app-dynamic-form [fields]="fields()" (onChanges)="setHeaderData($event)" />
+    </div>
+
+    <div class="mt-8 border-t border-border pt-8">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-[10px] font-black text-text-muted uppercase tracking-[0.2em]">Servicios / Productos Reservados
+        </h2>
+        <button type="button" (click)="addItem()"
+          class="flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary/20 rounded-lg text-xs font-bold transition-colors">
+          <span class="icon-add text-sm"></span> Agregar Item
+        </button>
+      </div>
+
+      <div class="space-y-4">
+        @for (item of items(); track $index) {
+        <div
+          class="p-4 bg-bg-primary rounded-2xl border border-border flex flex-col md:flex-row gap-4 items-end relative overflow-hidden group">
+          <div class="w-full md:w-5/12">
+            <label class="text-[10px] font-black text-text-muted uppercase tracking-widest pl-2 mb-1 block">Producto /
+              Servicio</label>
+            <select [(ngModel)]="item.productId"
+              class="w-full h-12 px-4 bg-bg-secondary border-none rounded-xl text-sm font-bold text-text-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none appearance-none">
+              <option [value]="0" disabled selected>Seleccione un producto</option>
+              @for (p of availableProducts(); track p.id) {
+              <option [value]="p.id">{{ p.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="w-full md:w-3/12">
+            <label class="text-[10px] font-black text-text-muted uppercase tracking-widest pl-2 mb-1 block">Unidad de
+              Medida</label>
+            <select [(ngModel)]="item.unitId" [disabled]="!item.productId"
+              class="w-full h-12 px-4 bg-bg-secondary border-none rounded-xl text-sm font-bold text-text-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none appearance-none disabled:opacity-50 disabled:cursor-not-allowed">
+              <option [value]="0" disabled selected>Seleccione unidad</option>
+              @for (u of getProductUnits(item.productId); track u.id) {
+              <option [value]="u.id">{{ u.name }} (x{{ u.conversionFactor }})</option>
+              }
+            </select>
+          </div>
+
+          <div class="w-full md:w-2/12">
+            <label
+              class="text-[10px] font-black text-text-muted uppercase tracking-widest pl-2 mb-1 block">Cantidad</label>
+            <input type="number" [(ngModel)]="item.quantity" min="1"
+              class="w-full h-12 px-4 bg-bg-secondary border-none rounded-xl text-sm font-bold text-text-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+              placeholder="1" />
+          </div>
+
+          <div class="w-full md:w-2/12 flex justify-end pb-1">
+            <button type="button" (click)="removeItem($index)"
+              class="p-2 text-text-muted hover:text-red-500 rounded-lg transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        }
+        @if (items().length === 0) {
+        <div class="p-8 text-center bg-bg-primary rounded-2xl border border-dashed border-border/50">
+          <p class="text-sm text-text-muted font-medium">No hay servicios agregados. Haga clic en <span
+              class="text-primary font-bold">Agregar Item</span> para comenzar.</p>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-8 pt-6 border-t border-border flex items-center justify-end gap-3 w-full">
+      <button type="button" (click)="this.nav.pop()"
+        class="px-6 py-3 rounded-xl font-black text-sm text-text-secondary bg-bg-primary border border-border hover:bg-bg-secondary transition-colors">
+        Cancelar
+      </button>
+      <button type="button" (click)="handleSave(headerFormValue)"
+        class="px-8 py-3 rounded-xl font-black text-sm text-white bg-primary hover:bg-primary-hover border-b-4 border-black/20 focus:border-b-0 focus:translate-y-1 transition-all active:translate-y-1">
+        Guardar Reservación
+      </button>
     </div>
 
     <div class="mt-10 p-6 bg-bg-primary rounded-2xl border border-border flex items-start gap-4">
@@ -38,8 +116,7 @@
         </svg>
       </div>
       <p class="text-[11px] text-text-muted leading-relaxed font-medium italic">
-        * Al guardar la reservación, se notificará automáticamente a la cliente y a la estilista asignada vía correo
-        electrónico institucional.
+        * Al guardar la reservación, se creará el registro completo de los items asociados listos para operar.
       </p>
     </div>
   </div>

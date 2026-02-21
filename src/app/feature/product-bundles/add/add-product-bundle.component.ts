@@ -76,18 +76,16 @@ export class AddProductBundleComponent extends PageConfiguration implements OnIn
 
     async onSave(formData: any) {
         try {
-            const payload: ProductBundle = {
-                parentProductId: +formData.parentProductId,
-                componentProductId: +formData.componentProductId,
-                quantity: +formData.quantity,
-                ...formData
+            const payload = {
+                childProductId: +formData.componentProductId,
+                quantity: +formData.quantity
             };
 
             if (this.isEditMode() && this.bundleId) {
                 await this.productBundleService.update(this.bundleId, payload);
                 this.toast.show('Combo actualizado correctamente', 'success');
             } else {
-                await this.productBundleService.create(payload);
+                await this.productBundleService.create(1, payload);
                 this.toast.show('Combo creado correctamente', 'success');
             }
             this.nav.pop();

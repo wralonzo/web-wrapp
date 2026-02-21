@@ -1,0 +1,117 @@
+<div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-black text-text-primary tracking-tight">Mi Perfil</h1>
+        <p class="text-text-secondary mt-1">Administra tu información personal y preferencias.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Sidebar / User Summary -->
+        <div class="lg:col-span-1 space-y-6">
+            <div class="bg-bg-primary rounded-3xl p-8 border border-border shadow-sm text-center">
+                <div
+                    class="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center text-primary text-4xl font-black mx-auto mb-4 border-4 border-bg-secondary">
+                    {{ user()?.profile?.fullName?.charAt(0) || 'U' }}
+                </div>
+                <h2 class="text-xl font-bold text-text-primary">{{ user()?.profile?.fullName }}</h2>
+                <p class="text-text-muted text-sm">{{ user()?.profile?.email }}</p>
+
+                <div class="mt-6 pt-6 border-t border-border">
+                    <button (click)="logout()"
+                        class="w-full py-3 px-6 rounded-xl bg-bg-secondary text-text-primary font-bold text-sm hover:bg-red-500/10 hover:text-red-500 transition-all border border-border">
+                        Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-bg-primary rounded-3xl p-6 border border-border shadow-sm">
+                <h3 class="text-sm font-black text-text-primary uppercase tracking-widest mb-4">Membresía</h3>
+                <div class="flex items-center gap-4 p-4 bg-primary/5 rounded-2xl border border-primary/10">
+                    <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shrink-0">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="font-bold text-text-primary">Cliente VIP</p>
+                        <p class="text-[10px] text-primary uppercase font-black tracking-widest">Nivel Platino</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content / Edit Form -->
+        <div class="lg:col-span-2 space-y-8">
+            <div class="bg-bg-primary rounded-3xl p-8 border border-border shadow-sm">
+                <div class="flex items-center justify-between mb-8">
+                    <h3 class="text-xl font-black text-text-primary">Información Personal</h3>
+                    <button class="text-primary font-bold text-sm hover:underline">Editar</button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-black text-text-muted uppercase tracking-widest">Nombre Completo</p>
+                        <p class="text-text-primary font-medium">{{ user()?.profile?.fullName || 'No especificado' }}
+                        </p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-black text-text-muted uppercase tracking-widest">Email</p>
+                        <p class="text-text-primary font-medium">{{ user()?.profile?.email || 'No especificado' }}</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-black text-text-muted uppercase tracking-widest">Teléfono</p>
+                        <p class="text-text-primary font-medium">{{ user()?.profile?.phone || 'No especificado' }}</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-black text-text-muted uppercase tracking-widest">Dirección</p>
+                        <p class="text-text-primary font-medium">{{ user()?.profile?.address || 'Sin dirección
+                            registrada' }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <a routerLink="/client/my-appointments"
+                    class="group bg-bg-primary p-6 rounded-3xl border border-border shadow-sm hover:border-primary/30 transition-all">
+                    <div class="flex items-center justify-between mb-2">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-bg-secondary flex items-center justify-center text-text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <svg class="w-5 h-5 text-text-muted group-hover:text-primary transition-all translate-x-0 group-hover:translate-x-1"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                    </div>
+                    <p class="font-bold text-text-primary">Mis Citas</p>
+                    <p class="text-xs text-text-muted">Ver historial y próximas visitas</p>
+                </a>
+
+                <div
+                    class="group bg-bg-primary p-6 rounded-3xl border border-border shadow-sm hover:border-primary/30 transition-all cursor-pointer">
+                    <div class="flex items-center justify-between mb-2">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-bg-secondary flex items-center justify-center text-text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                        </div>
+                        <svg class="w-5 h-5 text-text-muted group-hover:text-primary transition-all translate-x-0 group-hover:translate-x-1"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                    </div>
+                    <p class="font-bold text-text-primary">Seguridad</p>
+                    <p class="text-xs text-text-muted">Cambiar contraseña y accesos</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

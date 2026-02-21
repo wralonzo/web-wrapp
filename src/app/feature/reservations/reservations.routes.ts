@@ -24,4 +24,9 @@ export const RESERVATIONS_ROUTES: Routes = [
     data: { rols: [UserRole.ADMIN, UserRole.SALES, UserRole.CLIENT] },
     loadComponent: () => import('./view/view-reservation.component').then((m) => m.ViewReservationComponent),
   },
+  {
+    path: 'book',
+    title: 'Reservar Cita',
+    loadComponent: () => import('./appointment-booking/appointment-booking.component').then((m) => m.AppointmentBookingComponent),
+  },
 ];

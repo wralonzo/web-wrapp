@@ -1,0 +1,78 @@
+<div class="min-h-screen bg-bg-secondary flex items-center justify-center p-4">
+    <div
+        class="bg-bg-primary rounded-[2rem] shadow-xl max-w-lg w-full p-8 text-center border border-border relative overflow-hidden">
+        <!-- Decorative background circle -->
+        <div class="absolute -top-16 -right-16 w-32 h-32 bg-primary/5 rounded-full blur-2xl"></div>
+
+        <div class="relative z-10 text-center flex flex-col items-center">
+            <!-- Success Icon -->
+            <div
+                class="w-20 h-20 rounded-full bg-green-500/10 text-green-500 flex items-center justify-center mx-auto mb-6">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+
+            <h1 class="text-3xl font-black text-text-primary mb-2 tracking-tight">¡Reserva Confirmada!</h1>
+            <p class="text-text-secondary mb-8">Tu cita ha sido agendada exitosamente. Te esperamos.</p>
+
+            <!-- Summary Card -->
+            <div
+                class="bg-bg-secondary rounded-2xl p-6 text-left w-full mb-8 border border-border shadow-sm transition-all hover:bg-primary/5">
+                <h3 class="text-sm font-bold tracking-widest uppercase text-primary mb-4 border-b border-border pb-2">
+                    Detalles de tu cita</h3>
+
+                <div class="space-y-4">
+                    <div class="flex items-start gap-4">
+                        <div class="p-2 bg-bg-primary rounded-lg shadow-sm text-text-muted">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-bold text-text-primary">{{ appointmentDetails.date }}</p>
+                            <p class="text-sm text-text-secondary">{{ appointmentDetails.time }}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4">
+                        <div class="p-2 bg-white rounded-lg shadow-sm text-slate-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M14.121 15.536c-1.171 1.952-3.07 1.952-4.242 0-1.172-1.953-1.172-5.119 0-7.072 1.171-1.952 3.07-1.952 4.242 0 1.172 1.953 1.172 5.119 0 7.072z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-bold text-text-primary">{{ appointmentDetails.service }}</p>
+                            <p class="text-sm text-text-secondary">con {{ appointmentDetails.stylist }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3 w-full">
+                <button (click)="addToGoogleCalendar()"
+                    class="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-text-primary text-bg-primary font-bold hover:bg-primary transition-colors shadow-md">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M19 4h-1V3a1 1 0 0 0-2 0v1H8V3a1 1 0 0 0-2 0v1H5a3 3 0 0 0-3 3v14a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3Zm1 17a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V10h16v11ZM4 8V7a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v1H4Zm6 4h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1Zm1 4h2v-2h-2v2Z" />
+                    </svg>
+                    Agregar a Google Calendar
+                </button>
+                <a routerLink="/client/my-appointments"
+                    class="w-full py-3 px-6 rounded-xl bg-bg-primary text-text-primary border border-border font-bold hover:bg-bg-secondary transition-colors">
+                    Ver mis citas
+                </a>
+                <a routerLink="/client/landing-page"
+                    class="w-full py-3 px-6 text-sm text-text-muted hover:text-text-primary transition-colors font-medium">
+                    Volver al inicio
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

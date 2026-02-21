@@ -6,50 +6,74 @@ import {
   ProductsResponse,
 } from '@shared/models/product/produt-response.interface';
 import { ImportProductResponse } from '@shared/models/product/response-import.interface';
+import { PageConfiguration } from 'src/app/page-configurations';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ProductService {
-  private readonly api = inject(HttpService);
+export class ProductService extends PageConfiguration {
   private readonly pathApi = 'products';
   private readonly pathApiFile = 'batch/products';
 
   public find(params?: Record<string, string | number>) {
-    return this.api.doGet<ProductsResponse>(`${this.pathApi}`, params);
+    return this.rustService.call(async (bridge) => {
+      return await bridge.get(`${this.pathApi}`, params);
+    });
   }
 
   public findById(id: number) {
-    return this.api.doGet<ProductResponse>(`${this.pathApi}/${id}`);
+    return this.rustService.call(async (bridge) => {
+      return await bridge.get(`${this.pathApi}/${id}`);
+    });
   }
 
   public create(product: Product) {
-    return this.api.doPost<ProductResponse>(`${this.pathApi}`, product);
+    return this.rustService.call(async (bridge) => {
+      return await bridge.post(`${this.pathApi}`, product);
+    });
   }
 
   public update(id: number, product: Product) {
-    return this.api.doPatch<ProductResponse>(`${this.pathApi}/${id}`, product);
+    return this.rustService.call(async (bridge) => {
+      return await bridge.patch(`${this.pathApi}/${id}`, product);
+    });
   }
 
   public delete(id: number) {
-    return this.api.doDelete<void>(`${this.pathApi}/${id}`);
+    return this.rustService.call(async (bridge) => {
+      return await bridge.delete(`${this.pathApi}/${id}`);
+    });
   }
 
   public deactive(id: number) {
-    return this.api.doGet<ProductResponse>(`${this.pathApi}/deactive/${id}`);
+    return this.rustService.call(async (bridge) => {
+      return await bridge.get(`${this.pathApi}/deactive/${id}`);
+    });
   }
 
   public activate(id: number) {
-    return this.api.doGet<ProductResponse>(`${this.pathApi}/activate/${id}`);
+    return this.rustService.call(async (bridge) => {
+      return await bridge.get(`${this.pathApi}/activate/${id}`);
+    });
   }
 
   public downloadTemplateExcel() {
-    return this.api.doGetFile(`${this.pathApiFile}/template`);
+    return this.rustService.call(async (bridge) => {
+      return await bridge.get(`${this.pathApiFile}/template`);
+    });
   }
 
   public importProducts(file: File) {
     const formData = new FormData();
     formData.append('file', file, file.name);
-    return this.api.doPost<ImportProductResponse>(`${this.pathApiFile}/import`, formData);
+    return this.rustService.call(async (bridge) => {
+      return await bridge.post(`${this.pathApiFile}/import`, formData);
+    });
+  }
+
+  public findAvailableProducts(term: string): Promise<ProductsResponse> {
+    return this.rustService.call(async (bridge) => {
+      return await bridge.get(`${this.pathApi}/search?term=${term}`);
+    });
   }
 }

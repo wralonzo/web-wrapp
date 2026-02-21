@@ -45,9 +45,18 @@ export class AuthService {
       auth
         .loginGoogle(idToken)
         .then((response) => {
+          this.userSignal.set(response);
           resolve(response);
         })
         .catch((e) => reject(e));
+    });
+  }
+
+  async registerClient(clientData: any): Promise<any> {
+    return this.rustBridge.call(async (bridge) => {
+      const response = await bridge.post('/client', clientData);
+      // Optional: automatically login or set user signal if registration returns user data
+      return response;
     });
   }
 

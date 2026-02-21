@@ -1,0 +1,123 @@
+<div class="min-h-screen bg-bg-secondary text-text-primary font-sans transition-colors duration-300">
+
+    <!-- Hero Section -->
+    <section class="relative h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden">
+        <!-- Background Image with Overlay -->
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1521590832167-7bfc17484d20?q=80&w=2070&auto=format&fit=crop"
+                alt="Beauty Salon Background" class="w-full h-full object-cover object-center" />
+            <div class="absolute inset-0 bg-gradient-to-r from-rose-900/80 to-slate-900/60 mix-blend-multiply"></div>
+        </div>
+
+        <!-- Hero Content -->
+        <div class="relative z-10 text-center px-4 max-w-4xl mx-auto flex flex-col items-center">
+            <span
+                class="text-rose-200 font-serif italic text-xl md:text-2xl mb-4 tracking-wider animate-in fade-in slide-in-from-bottom-4 duration-700">Beleya
+                Glamour Salon</span>
+            <h1
+                class="text-5xl md:text-7xl font-black text-white mb-6 tracking-tight animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150">
+                Tu belleza, <br class="md:hidden" />nuestra pasión
+            </h1>
+            <p
+                class="text-rose-100 text-lg md:text-xl mb-10 max-w-2xl font-light leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
+                Descubre la experiencia definitiva en cuidado personal y estilismo. Déjate consentir por nuestros
+                expertos.
+            </p>
+            <button (click)="goToBooking()"
+                class="group relative inline-flex items-center justify-center px-8 py-4 text-base font-bold text-rose-900 bg-white rounded-full overflow-hidden transition-all hover:scale-105 hover:shadow-2xl hover:shadow-rose-500/30 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-500">
+                <span
+                    class="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-black"></span>
+                <span class="relative flex items-center gap-2">
+                    Reserva tu Cita
+                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
+                </span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Promotions Section -->
+    <section class="py-24 px-4 bg-bg-primary">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black text-text-primary mb-4 tracking-tight">Ofertas Exclusivas
+                </h2>
+                <p class="text-text-secondary text-lg max-w-2xl mx-auto">Aprovecha nuestras promociones de temporada
+                    para
+                    lucir siempre increíble.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 px-4 md:px-0">
+                @for (promo of promotions; track promo.title) {
+                <div class="group relative bg-bg-secondary rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-border hover:-translate-y-2 cursor-pointer flex flex-col"
+                    (click)="goToBooking(promo.serviceId)">
+
+                    <div class="relative h-64 overflow-hidden">
+                        <img [src]="promo.image" [alt]="promo.title"
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+
+                        <div
+                            class="absolute top-4 right-4 bg-bg-primary/95 backdrop-blur-sm text-primary font-bold px-4 py-2 rounded-full shadow-lg text-sm border border-border">
+                            {{ promo.discount }}
+                        </div>
+
+                        <div class="absolute bottom-4 left-4 right-4 text-white">
+                            <h3 class="text-2xl font-black tracking-tight">{{ promo.title }}</h3>
+                        </div>
+                    </div>
+
+                    <div class="p-6 flex-1 flex flex-col">
+                        <p class="text-text-secondary mb-6 flex-1">{{ promo.description }}</p>
+                        <button
+                            class="w-full py-3 px-6 rounded-xl bg-text-primary text-bg-primary font-bold text-sm tracking-wide transition-colors group-hover:bg-primary shadow-md">
+                            Lo quiero
+                        </button>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Testimonials Section -->
+    <section class="py-24 px-4 bg-bg-primary overflow-hidden relative">
+        <div class="absolute -top-40 -right-40 w-96 h-96 bg-bg-secondary rounded-full blur-3xl opacity-60"></div>
+        <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-bg-secondary rounded-full blur-3xl opacity-60"></div>
+
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black text-text-primary mb-4 tracking-tight">Nuestras Clientas</h2>
+                <p class="text-text-secondary text-lg max-w-2xl mx-auto">Miles de sonrisas y looks deslumbrantes nos
+                    respaldan.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                @for (testimonial of testimonials; track testimonial.name) {
+                <div
+                    class="p-8 bg-bg-secondary rounded-3xl border border-border hover:border-primary/30 transition-colors shadow-sm">
+                    <div class="flex items-center gap-1 mb-6 text-primary">
+                        @for (star of [1,2,3,4,5]; track star) {
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                            <path
+                                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                        }
+                    </div>
+                    <p class="text-text-primary italic text-lg leading-relaxed mb-6">{{ testimonial.text }}</p>
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-black text-lg">
+                            {{ testimonial.name.charAt(0) }}
+                        </div>
+                        <span class="font-bold text-text-primary">{{ testimonial.name }}</span>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+    </section>
+</div>

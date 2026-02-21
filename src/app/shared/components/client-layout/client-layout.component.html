@@ -1,0 +1,77 @@
+<div class="min-h-screen bg-bg-primary font-sans text-text-primary flex flex-col transition-colors duration-300">
+    <!-- Enhanced Client Header -->
+    <header
+        class="bg-white border-b border-gray-100 py-4 px-6 md:px-12 flex items-center justify-between sticky top-0 z-[100] shadow-sm">
+        <!-- Logo -->
+        <div class="flex items-center gap-3">
+            <div
+                class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm shadow-primary/30">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2L2 22h20L12 2zm0 3.8L18.6 19H5.4L12 5.8z" />
+                </svg>
+            </div>
+            <a routerLink="/client/landing-page"
+                class="text-xl font-black text-text-primary tracking-tight uppercase cursor-pointer">
+                BELEYA GLAMOUR
+            </a>
+        </div>
+
+        <!-- Nav Menu -->
+        <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-text-secondary">
+            <a routerLink="/client/landing-page" class="hover:text-primary transition-colors">Inicio</a>
+            <a href="#" class="hover:text-primary transition-colors">Servicios</a>
+            <a href="#" class="hover:text-primary transition-colors">Estilistas</a>
+            <a routerLink="/client/my-appointments" class="hover:text-primary transition-colors">Mis Citas</a>
+        </nav>
+
+        <!-- Right Side -->
+        <div class="flex items-center gap-4">
+            <app-theme-toggle></app-theme-toggle>
+
+            <div class="h-6 w-px bg-gray-100 mx-1"></div>
+
+            @if (authService.currentUser()) {
+            <button (click)="profile()"
+                class="flex items-center gap-2 py-2 px-3 rounded-xl hover:bg-bg-secondary transition-all text-sm font-bold text-text-primary hover:text-primary">
+                <div
+                    class="w-8 h-8 rounded-lg bg-text-primary text-bg-primary flex items-center justify-center font-black shrink-0 text-xs">
+                    {{ authService.currentUser()?.profile?.fullName?.charAt(0) }}
+                </div>
+                <span class="hidden md:inline">{{ authService.currentUser()?.profile?.username }}</span>
+            </button>
+            } @else {
+            <a routerLink="/auth/login"
+                class="px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all shadow-md shadow-primary/20">
+                Iniciar Sesión
+            </a>
+            }
+        </div>
+    </header>
+
+    <!-- Content Area -->
+    <main class="flex-1 overflow-y-auto bg-bg-primary transition-colors duration-300">
+        <router-outlet></router-outlet>
+    </main>
+
+    <!-- Client Footer -->
+    <footer
+        class="bg-bg-primary border-t border-border py-6 px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+            <div class="w-6 h-6 bg-primary/40 rounded-md flex items-center justify-center text-white shrink-0">
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2L2 22h20L12 2zm0 3.8L18.6 19H5.4L12 5.8z" />
+                </svg>
+            </div>
+            <span class="text-xs font-black text-text-primary tracking-tight">BELEYA GLAMOUR</span>
+        </div>
+        <p class="text-xs text-text-muted font-medium text-center">&copy; 2023 Beleya Glamour Salon. Todos los derechos
+            reservados.</p>
+        <div class="flex items-center gap-4 text-gray-400">
+            <svg class="w-5 h-5 hover:text-gray-600 transition-colors cursor-pointer" fill="currentColor"
+                viewBox="0 0 24 24">
+                <path
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+            </svg>
+        </div>
+    </footer>
+</div>

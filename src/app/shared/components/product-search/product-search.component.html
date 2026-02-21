@@ -1,0 +1,50 @@
+<div class="product-search-container">
+    <div class="input-wrapper">
+        <i class="search-icon">🔍</i>
+
+        <input type="text" class="form-control lookup-input" [formControl]="searchControl"
+            placeholder="Buscar por Nombre o SKU..." (keydown)="onKeyDown($event)" (blur)="hideDropdown()"
+            (focus)="onInputFocus()" aria-label="Buscar producto" />
+
+        <!-- Loader visual (feedback de UX) -->
+        @if (isLoading()) {
+        <div class="loader spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden">...</span>
+        </div>
+        }
+    </div>
+
+    <!-- Contenedor del Dropdown Virtual (Autocomplete) -->
+    @if (showDropdown() && products.length > 0) {
+    <ul class="autocomplete-dropdown">
+
+        <!-- Coincidencias encontradas -->
+        @if (products.length > 0) {
+        @for (product of products; track product.id; let i = $index) {
+        <li [class.active]="i === activeIndex()" (click)="selectProduct(product)" class="dropdown-item product-item">
+            <div class="product-details">
+                <span class="product-name" [innerHTML]="product.name | titlecase"></span>
+                @if (product.sku) {
+                <span class="product-sku">SKU: {{ product.sku }}</span>
+                }
+            </div>
+            <div class="product-meta">
+                <span class="product-price">{{ (product.priceSale || 0) | currency }}</span>
+                <!-- Opcional contexto de ventas -->
+                @if (product.stockMinim !== undefined) {
+                <span class="product-stock">Stock Mínimo: {{ product.stockMinim }}</span>
+                }
+            </div>
+        </li>
+        }
+        } @else {
+        <!-- Estado: Vacío (Manejo de Errores) -->
+        @if (hasSearched() && !isLoading()) {
+        <li class="dropdown-item no-match">
+            No se encontraron productos
+        </li>
+        }
+        }
+    </ul>
+    }
+</div>

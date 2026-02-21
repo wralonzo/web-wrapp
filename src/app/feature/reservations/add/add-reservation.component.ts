@@ -79,7 +79,7 @@ export class AddReservationComponent extends PageConfiguration {
 
   async loadProducts() {
     try {
-      const res = await this.productService.find({ pageSize: 1000 }).toPromise();
+      const res = await this.productService.find({ pageSize: 1000 });
       this.availableProducts.set(res?.data?.content || []);
     } catch (error) {
       this.provideError(error);

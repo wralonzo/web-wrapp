@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Product, ProductBundleResponse } from '@shared/models/product/produt-response.interface';
 import { ModalComponent } from '@shared/components/modal-form/modal.component';
 import { ButtonComponent } from '@shared/components/button/button.component';
+import { ProductSearchComponent } from '@shared/components/product-search/product-search.component';
 import { PageConfiguration } from 'src/app/page-configurations';
 import { GenericHttpBridge } from '@assets/retail-shop/rust_retail';
 import { CustomSelectComponent } from '@shared/components/select/select.component';
@@ -23,7 +24,8 @@ import { ProductBundle } from '@shared/models/inventory/product-bundle.interface
     CustomSelectComponent,
     ModalComponent,
     FormsModule,
-    ButtonComponent
+    ButtonComponent,
+    ProductSearchComponent
   ],
   templateUrl: './view-product.component.html',
   styleUrl: './view-product.component.scss',
@@ -52,7 +54,6 @@ export class ViewProductComponent extends PageConfiguration implements OnInit {
   isSubmittingBundle = signal(false);
   bundleComponentId = signal<number>(0);
   bundleQuantity = signal<number>(1);
-  public availableProducts = signal<SelectOption[]>([]);
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -210,23 +211,9 @@ export class ViewProductComponent extends PageConfiguration implements OnInit {
   }
 
   // Bundle Items Logic
-  async loadAvailableProducts() {
-    try {
-      const response = await this.productService.find().toPromise();
-      const mapping: SelectOption[] = response?.data.content.map((p: any) => ({
-        label: p.name,
-        value: p.id.toString()
-      })) || [];
-      this.availableProducts.set(mapping);
-    } catch (error) {
-      this.provideError(error);
-    }
-  }
-
   openBundleModal() {
     this.bundleComponentId.set(0);
     this.bundleQuantity.set(1);
-    this.loadAvailableProducts();
     this.showBundleModal.set(true);
   }
 
@@ -238,15 +225,14 @@ export class ViewProductComponent extends PageConfiguration implements OnInit {
 
     this.isSubmittingBundle.set(true);
     try {
-      // const payload: ProductBundle = {
-      //   // parentProductId: this.id(),
-      //   componentProductId: this.bundleComponentId(),
-      //   quantity: this.bundleQuantity()
-      // };
-      // await this.productBundleService.create(payload);
-      // this.toast.show('Producto agregado al combo correctamente.', 'success');
-      // this.showBundleModal.set(false);
-      // await this.loadProduct();
+      const payload = {
+        childProductId: this.bundleComponentId(),
+        quantity: this.bundleQuantity()
+      };
+      await this.productBundleService.create(this.id(), payload);
+      this.toast.show('Producto agregado al combo correctamente.', 'success');
+      this.showBundleModal.set(false);
+      await this.loadProduct(); // loadProduct llama indirectamente a loadBundleItems
     } catch (error) {
       this.provideError(error);
     } finally {
@@ -264,7 +250,9 @@ export class ViewProductComponent extends PageConfiguration implements OnInit {
     }
   }
 
-  onBundleProductChange(value: SelectOption) {
-    this.bundleComponentId.set(Number(value.value));
+  onBundleProductChange(product: Product) {
+    if (product.id) {
+      this.bundleComponentId.set(product.id);
+    }
   }
 }

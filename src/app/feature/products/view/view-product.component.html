@@ -385,9 +385,9 @@
         </p>
 
         <div class="space-y-4">
-            <div class="relative w-full">
-                <app-custom-select class="w-full" [label]="'Producto componente'" [options]="availableProducts()"
-                    (onSelectionChange)="onBundleProductChange($event)" />
+            <div class="relative w-full z-20">
+                <label class="block text-sm font-medium text-text-primary mb-1">Producto componente</label>
+                <app-product-search (onProductSelect)="onBundleProductChange($event)"></app-product-search>
             </div>
 
             <div class="flex flex-col gap-1.5">

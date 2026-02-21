@@ -33,6 +33,7 @@ export interface Product {
     active: boolean;
     stockMinim: number;
   }[];
+  bundleItems?: ProductBundleResponse[];
 }
 
 export interface ProductBundleResponse {

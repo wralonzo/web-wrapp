@@ -7,6 +7,12 @@ import { ReservationCalendarComponent } from '@shared/components/calendar/calend
 export const routes: Routes = [
   // 1. Redirección inicial
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
+  // 1.1 Rutas de Cliente (Standalone Layout)
+  {
+    path: 'client',
+    loadComponent: () => import('./shared/components/client-layout/client-layout.component').then(m => m.ClientLayoutComponent),
+    loadChildren: () => import('./feature/client/client.routes').then(m => m.CLIENT_ROUTES)
+  },
   // 2. Rutas de Autenticación (Lazy Loaded)
   {
     path: APP_ROUTES.definitions.auth,

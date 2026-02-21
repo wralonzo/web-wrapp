@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AnimationOptions } from 'ngx-lottie';
@@ -84,11 +84,6 @@ export class LayoutComponent extends PageConfiguration {
           label: 'Productos',
           route: '/app/products',
           iconPath: 'handbag',
-        },
-        {
-          label: 'Combos / Kits',
-          route: '/app/product-bundles',
-          iconPath: 'orders',
         },
         { label: 'Categorías', route: this.ROUTES.nav.categories.list, iconPath: 'handbag' },
         { label: 'Unidades de Producto', route: '/app/product-units', iconPath: 'handbag' },

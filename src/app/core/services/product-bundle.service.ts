@@ -27,13 +27,13 @@ export class ProductBundleService extends PageConfiguration {
         });
     }
 
-    async create(data: ProductBundle): Promise<ProductBundle> {
+    async create(idProduct: number, data: { childProductId: number, quantity: number }): Promise<ProductBundle> {
         return await this.rustService.call(async (bridge) => {
-            return await bridge.post(this.pathApi, data);
+            return await bridge.post(`${this.pathApi}/${idProduct}`, data);
         });
     }
 
-    async update(id: number, data: ProductBundle): Promise<ProductBundle> {
+    async update(id: number, data: {}): Promise<ProductBundle> {
         return await this.rustService.call(async (bridge) => {
             return await bridge.put(`${this.pathApi}/${id}`, data);
         });

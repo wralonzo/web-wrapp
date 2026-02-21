@@ -1,0 +1,27 @@
+// SCSS para afinar detalles si faltan utilidades en tailwind
+
+:host {
+    display: block;
+    // La fuente ya está definida globalmente en styles.scss, 
+    // pero mantenemos la flexibilidad aquí si fuera necesario.
+
+    // Custom scrollbar usando variables de tema
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--text-muted);
+        border-radius: 10px;
+        opacity: 0.5;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--text-secondary);
+    }
+}

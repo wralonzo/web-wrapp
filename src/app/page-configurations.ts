@@ -48,6 +48,8 @@ export abstract class PageConfiguration {
     // Validar que sea un objeto AppError generado por Rust
     if (!error || typeof error !== 'object' || !('type' in error)) {
       this.toast.show('Error inesperado en la aplicación.', 'error');
+
+      this.logger.error(`[${error.type}] Error detectado:`, error);
       return;
     }
 

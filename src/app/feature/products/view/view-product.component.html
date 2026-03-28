@@ -110,52 +110,80 @@
             </div>
 
             <!-- Configuraciones por Sucursal -->
-            @if (product()?.branchConfigs?.length) {
             <div class="p-6 bg-bg-secondary rounded-card border border-border shadow-sm">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-black text-text-primary">Configuraciones por Sucursal</h3>
-                    <span class="text-xs font-bold text-text-muted">{{ product()?.branchConfigs?.length }}
+                    <span class="text-xs font-bold text-text-muted">{{ product()?.branchConfigs?.length || 0 }}
                         sucursales</span>
                 </div>
 
-                <div class="overflow-hidden bg-bg-primary rounded-2xl border border-border">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-bg-secondary/50">
-                                <th class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest">
-                                    ID Sucursal</th>
-                                <th class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest">
-                                    Categoría</th>
-                                <th
-                                    class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest text-center">
-                                    Stock Mín.</th>
-                                <th
-                                    class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest text-center">
-                                    Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-border">
-                            @for (config of product()?.branchConfigs; track config.id) {
-                            <tr class="hover:bg-bg-secondary/30 transition-colors">
-                                <td class="px-4 py-4 text-sm font-bold text-text-primary">#{{ config.branchId }}</td>
-                                <td class="px-4 py-4 text-sm font-medium text-text-secondary">{{ config.categoryName }}
-                                </td>
-                                <td class="px-4 py-4 text-sm font-black text-text-primary text-center">{{
-                                    config.stockMinim }}</td>
-                                <td class="px-4 py-4 text-center">
-                                    <span
-                                        [class]="config.active ? 'bg-emerald-500/10 text-emerald-600' : 'bg-red-500/10 text-red-600'"
-                                        class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border border-current/20">
-                                        {{ config.active ? 'Activo' : 'Inactivo' }}
-                                    </span>
-                                </td>
-                            </tr>
-                            }
-                        </tbody>
-                    </table>
+                <div class="space-y-4">
+                    @if (product()?.branchConfigs?.length ?? 0 > 0) {
+                    <div class="overflow-hidden bg-bg-primary rounded-2xl border border-border">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-bg-secondary/50">
+                                    <th
+                                        class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest">
+                                        ID Sucursal</th>
+                                    <th
+                                        class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest">
+                                        Categoría</th>
+                                    <th
+                                        class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest text-center">
+                                        Stock Mín.</th>
+                                    <th
+                                        class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest text-center">
+                                        Estado</th>
+                                    <th
+                                        class="px-4 py-3 text-[10px] font-black text-text-muted uppercase tracking-widest text-center">
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-border">
+                                @for (config of product()?.branchConfigs; track config.id) {
+                                <tr class="hover:bg-bg-secondary/30 transition-colors">
+                                    <td class="px-4 py-4 text-sm font-bold text-text-primary">#{{ config.branchId }}
+                                    </td>
+                                    <td class="px-4 py-4 text-sm font-medium text-text-secondary">{{ config.categoryName
+                                        }}
+                                    </td>
+                                    <td class="px-4 py-4 text-sm font-black text-text-primary text-center">{{
+                                        config.stockMinim }}</td>
+                                    <td class="px-4 py-4 text-center">
+                                        <span
+                                            [class]="config.active ? 'bg-emerald-500/10 text-emerald-600' : 'bg-red-500/10 text-red-600'"
+                                            class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border border-current/20">
+                                            {{ config.active ? 'Activo' : 'Inactivo' }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-4 text-right">
+                                        <button (click)="deleteBranchConfig(config.id)"
+                                            class="text-[10px] font-black text-red-500/70 hover:text-red-600 uppercase tracking-widest transition-colors">
+                                            Quitar
+                                        </button>
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    }
+
+                    <!-- Action Card: Agregar Branch Config -->
+                    <button (click)="openBranchConfigModal()"
+                        class="w-full p-4 border-2 border-dashed border-border/40 rounded-xl flex flex-col items-center justify-center gap-2 group/add transition-all hover:border-primary/40 hover:bg-primary/5">
+                        <div
+                            class="w-8 h-8 rounded-full bg-bg-primary border border-border flex items-center justify-center text-text-muted group-hover/add:text-primary group-hover/add:border-primary/30 transition-all">
+                            <span class="icon-add-plus text-base"></span>
+                        </div>
+                        <span
+                            class="text-[9px] font-black text-text-muted uppercase tracking-widest group-hover/add:text-primary transition-colors">
+                            Agregar Configuración
+                        </span>
+                    </button>
                 </div>
             </div>
-            }
 
             <!-- Existencias por Almacén -->
             <div class="p-6 bg-bg-secondary rounded-card border border-border shadow-sm">
@@ -394,6 +422,48 @@
                 <label class="text-[10px] font-black text-text-muted uppercase tracking-widest ml-1">Cantidad</label>
                 <input type="number" [(ngModel)]="bundleQuantity" min="1"
                     class="w-full px-4 py-3 bg-bg-secondary border border-border rounded-xl text-sm font-bold text-text-primary focus:border-primary outline-none transition-all" />
+            </div>
+        </div>
+    </div>
+</app-modal>
+
+<!-- Modal Agregar Configuración de Sucursal -->
+<app-modal [(isOpen)]="showBranchConfigModal" [title]="'Agregar Configuración de Sucursal'" [confirmLabel]="'Guardar'"
+    [isSubmitting]="isSubmittingBranchConfig()" (onConfirm)="saveBranchConfig()"
+    (onCancel)="showBranchConfigModal.set(false)">
+
+    <div class="space-y-5 p-2">
+        <p class="text-sm text-text-muted mb-4">
+            Selecciona la sucursal y categoría para configurar el stock de este producto.
+        </p>
+
+        <div class="space-y-4">
+            <div class="relative w-full z-20">
+                <app-custom-select class="w-full" [label]="'Sucursal'" [options]="branches()"
+                    [selected]="branchConfigData().branchId"
+                    (onSelectionChange)="onBranchConfigSelectChange('branchId', $event)"></app-custom-select>
+            </div>
+
+            <div class="relative w-full z-10">
+                <app-custom-select class="w-full" [label]="'Categoría'" [options]="categories()"
+                    [selected]="branchConfigData().categoryId"
+                    (onSelectionChange)="onBranchConfigSelectChange('categoryId', $event)"></app-custom-select>
+            </div>
+
+            <div class="flex flex-col gap-1.5 pt-2">
+                <label class="text-[10px] font-black text-text-muted uppercase tracking-widest ml-1">Stock
+                    Mínimo</label>
+                <input type="number" [(ngModel)]="branchConfigData().stockMinim"
+                    class="w-full px-4 py-3 bg-bg-secondary border border-border rounded-xl text-sm font-bold text-text-primary focus:border-primary outline-none transition-all" />
+            </div>
+
+            <div class="flex items-center gap-2 pt-2 cursor-pointer"
+                (click)="branchConfigData().active = !branchConfigData().active">
+                <div [class]="branchConfigData().active ? 'bg-primary border-primary' : 'bg-bg-secondary border-border'"
+                    class="w-5 h-5 rounded border flex items-center justify-center transition-colors">
+                    <span *ngIf="branchConfigData().active" class="icon-check text-white text-xs"></span>
+                </div>
+                <span class="text-sm font-bold text-text-primary">Activo en esta sucursal</span>
             </div>
         </div>
     </div>

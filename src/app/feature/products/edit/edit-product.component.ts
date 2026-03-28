@@ -70,13 +70,18 @@ export class EditProductComponent extends PageConfiguration implements OnInit {
       valueDefault: 0,
     },
     {
+      name: 'description',
+      label: 'Descripción del producto',
+      type: 'textarea',
+      colSpan: 1,
+    },
+    {
       name: 'categoryId',
       label: 'Categoría',
       type: 'select',
       required: true,
       colSpan: 1,
-      endpoint: '/category', // Tu ruta de Spring Boot
-      // Transformamos lo que viene del back al formato {label, value}
+      endpoint: '/category',
       mapResponse: (res: any) =>
         res.content.map((cat: any) => ({
           label: cat.name,
@@ -84,11 +89,18 @@ export class EditProductComponent extends PageConfiguration implements OnInit {
         })),
     },
     {
-      name: 'description',
-      label: 'Descripción del producto',
-      type: 'textarea',
+      name: 'type',
+      label: 'Tipo de Producto',
+      type: 'select',
+      required: true,
+      valueDefault: 'STANDAR',
       colSpan: 1,
-    },
+      options: [
+        { label: 'Producto', value: 'STANDAR' },
+        { label: 'Servicio', value: 'SERVICE' },
+        { label: 'Combo', value: 'BUNDLE' }
+      ]
+    }
   ];
 
   ngOnInit(): void {

@@ -2,7 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Product, ProductBundleResponse } from '@shared/models/product/produt-response.interface';
+import { BranchConfig, Product, ProductBundleResponse } from '@shared/models/product/produt-response.interface';
 import { ModalComponent } from '@shared/components/modal-form/modal.component';
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { ProductSearchComponent } from '@shared/components/product-search/product-search.component';
@@ -15,6 +15,9 @@ import { ProductStock } from '@shared/models/inventory/product-stock.interface';
 import { ProductBundleService } from '@core/services/product-bundle.service';
 import { ProductService } from '@core/services/product.service';
 import { ProductBundle } from '@shared/models/inventory/product-bundle.interface';
+import { PaginatedResponse } from '@assets/retail-shop/PaginatedResponse';
+import { Category } from '@shared/models/category/category.interface';
+import { Branch } from '@shared/models/branch/branch.interface';
 
 @Component({
   selector: 'app-view-product',
@@ -55,13 +58,29 @@ export class ViewProductComponent extends PageConfiguration implements OnInit {
   bundleComponentId = signal<number>(0);
   bundleQuantity = signal<number>(1);
 
-  ngOnInit() {
+  // Modal Branch Config
+  showBranchConfigModal = signal(false);
+  isSubmittingBranchConfig = signal(false);
+  branches = signal<SelectOption[]>([]);
+  categories = signal<SelectOption[]>([]);
+  branchConfigData = signal({
+    branchId: 0,
+    categoryId: 0,
+    active: true,
+    stockMinim: 0
+  });
+
+  async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.id.set(Number(id));
-      this.loadProduct();
+      await this.loadProduct();
       this.loadProductUnits();
       this.loadInventory();
+      this.loadBranchConfig();
+      // Load dependencies for modal
+      this.loadBranches();
+      this.loadCategories();
     }
   }
 
@@ -141,6 +160,90 @@ export class ViewProductComponent extends PageConfiguration implements OnInit {
       this.provideError(error);
     } finally {
       this.isLoading.set(false);
+    }
+  }
+
+  async loadBranchConfig() {
+    try {
+      const response: BranchConfig[] = await this.rustService.call(async (bridge: GenericHttpBridge) => {
+        return bridge.get(`/branches-config/products/${this.id()}`);
+      });
+      this.logger.info(this.loadBranchConfig.name, 'Branch config loaded:', response);
+      this.product.update(p => p ? { ...p, branchConfigs: response } : null);
+    } catch (error) {
+      this.provideError(error);
+    }
+  }
+
+  async loadBranches() {
+    try {
+      const response: PaginatedResponse<Branch> = await this.rustService.call(async (bridge: GenericHttpBridge) => {
+        return bridge.get(`/branch`);
+      });
+      const mapping: SelectOption[] = response.content.map((item: any) => ({
+        value: item.id.toString(),
+        label: item.name,
+      }));
+      this.branches.set(mapping);
+    } catch (error) {
+      this.provideError(error);
+    }
+  }
+
+  async loadCategories() {
+    try {
+      const response: PaginatedResponse<Category> = await this.rustService.call(async (bridge: GenericHttpBridge) => {
+        return bridge.get(`/category`);
+      });
+      const mapping: SelectOption[] = response.content.map((item: any) => ({
+        value: item.id.toString(),
+        label: item.name,
+      }));
+      this.categories.set(mapping);
+    } catch (error) {
+      this.provideError(error);
+    }
+  }
+
+  openBranchConfigModal() {
+    this.showBranchConfigModal.set(true);
+  }
+
+  onBranchConfigSelectChange(field: 'branchId' | 'categoryId', value: SelectOption) {
+    this.branchConfigData.update(data => ({ ...data, [field]: Number(value.value) }));
+  }
+
+  async saveBranchConfig() {
+    const data = this.branchConfigData();
+    if (!data.branchId || !data.categoryId) {
+      this.toast.show('Por favor seleccione una sucursal y una categoría.', 'error');
+      return;
+    }
+
+    this.isSubmittingBranchConfig.set(true);
+    try {
+      await this.rustService.call(async (bridge: GenericHttpBridge) => {
+        return bridge.post(`/branches-config/${this.id()}`, data);
+      });
+      this.toast.show('Configuración de sucursal agregada correctamente.', 'success');
+      this.showBranchConfigModal.set(false);
+      await this.loadBranchConfig();
+    } catch (error) {
+      this.provideError(error);
+    } finally {
+      this.isSubmittingBranchConfig.set(true);
+    }
+  }
+
+  async deleteBranchConfig(id: number) {
+    try {
+      await this.rustService.call(async (bridge: GenericHttpBridge) => {
+        return bridge.delete(`/branches-config/${id}`);
+      });
+      this.toast.show('Configuración de sucursal eliminada.', 'success');
+      await this.loadBranchConfig();
+    } catch (error) {
+      this.provideError(error);
     }
   }
 
